@@ -1,0 +1,60 @@
+.form-box {
+  width: 100%;           /* fill modal width */
+  max-width: 520px;      /* slightly smaller than 600px modal */
+  padding: 25px 30px;
+  margin: 0 auto;        /* center inside modal */
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: none;      /* modal already has shadow */
+  font-family: Arial, sans-serif;
+}
+
+
+.form-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.two-inputs {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.form-box input {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid #dcdcdc;
+  border-radius: 12px;
+  font-size: 15px;
+}
+.checkbox-row {
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  margin: 0;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+}
+
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  background: #1570ef;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  background: #9cc7ff;
+  cursor: not-allowed;
+}

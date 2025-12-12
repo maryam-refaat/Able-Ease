@@ -1,0 +1,142 @@
+.programs-container {
+  width: 100%;
+  margin-top: 50px;
+  font-family: Arial, sans-serif;
+}
+
+.section-box {
+  background: white;
+  border-radius: 10px;
+  padding: 20px 25px;
+  margin-bottom: 30px;
+  border: 1px solid #e6e6e6;
+}
+
+.section-box h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.cards-row {
+  display: flex;
+  gap: 80px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.program-card {
+  background: #d8ecfb;
+  width: 250px;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.08);
+}
+
+.program-card h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.program-card p {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 15px;
+}
+
+.program-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.program-price {
+  font-weight: 600;
+  color: #0b61c6;
+}
+
+.program-dates {
+  font-size: 13px;
+  color: #445566;
+}
+
+.view-btn {
+  padding: 0px 14px;
+  background: #357edd;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-left: 60px;
+}
+
+.view-btn:hover {
+  background: #245cb8;
+}
+
+/* Slider styles */
+.slider-wrapper {
+  position: relative;
+  margin-top: 10px;
+}
+
+.cards-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 10px 6px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cards-track { justify-content: flex-start; align-items: center; }
+
+/* hide scrollbar (webkit) */
+.cards-track::-webkit-scrollbar {
+  height: 8px;
+}
+.cards-track::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.12);
+  border-radius: 8px;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.slider-btn.left { left: 6px; }
+.slider-btn.right { right: 6px; }
+
+.slider-btn:hover { background: rgba(0,0,0,0.12); }
+
+/* Make program cards not shrink so they keep consistent width in track */
+.cards-track .program-card { flex: 0 0 auto; }
+.cards-track {
+  justify-content: center;
+}
+/* Center when there isn't enough content to overflow */
+.cards-track.centered { justify-content: center; }
+
+/* stronger rule to ensure centering overrides other rules */
+.cards-track.centered { justify-content: center !important; }
+
+/* Also center via the wrapper and remove horizontal scrolling when centered */
+.slider-wrapper.centered .cards-track {
+  justify-content: center !important;
+  overflow-x: visible; /* remove tiny scrollbar when centered */
+}
+
+/* hide nav buttons when centered (no overflow) */
+.slider-wrapper.centered .slider-btn { display: none; }

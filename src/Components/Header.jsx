@@ -10,11 +10,15 @@ export default function Header({ onJoin }) {
         
         {/* Left side: Logo + Nav */}
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-          
-          <h1>Able-Ease</h1>
+           <nav>
+            <div className="logo">
+           <Link  to="/Able-Ease">Able-Ease</Link>
+            </div>
+            </nav>  
 
           <nav style={{ display: "flex", gap: "15px",paddingLeft:"90px",paddingTop:"10px" }}>
-            <Link to="/">Home</Link>
+           
+              <Link to="/Home">Home</Link>
               <Link to="/about">About us</Link>
               <Link to="/organizations">Organizations</Link>
               <Link to="/therapy-centers">Physiotherapy</Link>

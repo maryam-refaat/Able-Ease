@@ -1,0 +1,198 @@
+.page-container {
+  padding: 30px;
+  background: #f5f6fa;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.welcome-box h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0;
+}
+.welcome-box p {
+  margin-top: 5px;
+  color: #7b7b7b;
+}
+
+/* ---- Relative Card ---- */
+.relative-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-top: 25px;
+}
+
+.relative-header-gradient {
+  height: 80px;
+  background: linear-gradient(to right, #cfe3ff, #f3edff, #fff5d1);
+}
+
+.relative-content {
+  padding: 25px;
+}
+
+.relative-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.relative-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.relative-avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.relative-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.relative-email {
+  font-size: 14px;
+  color: #6d6d6d;
+}
+
+.relative-input-grid {
+  margin-top: 30px;
+  display: flex;
+  
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+}
+.input-group{
+  display: flex;
+  flex-direction: column;
+}
+.input-group label {
+  color: #7a7a7a;
+  font-size: 14px;
+
+}
+
+.input-group input {
+  width: 500px;
+  padding: 12px;
+  background: #f4f4f4;
+  border-radius: 8px;
+  border: 1px solid #e1e1e1;
+  margin-top: 5px;
+}
+
+.dropdown-arrow {
+  text-align: center;
+  color: #b1b1b1;
+  margin-top: 25px;
+  font-size: 22px;
+}
+
+/* ---- Medical Box ---- */
+.medical-box {
+  background: #d9ebff;
+  border-radius: 22px;
+  padding: 30px;
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.medical-btn {
+  padding: 14px 26px;
+  background:#d9ebff; 
+  border: 2px solid #333;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.save-btn {
+  background: #4caf50;
+  color: white;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: #2e65f3;
+  color: white;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.popup-card {
+  background: #fff;
+  padding: 25px;
+  width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.popup-input-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-row {
+  display: flex;
+  gap: 15px;
+}
+
+.popup-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.add-btn {
+  background: #2e65f3;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background: #999;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+}

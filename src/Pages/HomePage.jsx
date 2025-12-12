@@ -19,7 +19,7 @@ export default function HomePage() {
  return (
     <div className="site-wrapper">
       <div className="site-content">
-        <Header />
+        
         <div className="search-bar-wrapper" style={{ marginTop: 8 }}>
           <SearchBar value={search} onChange={(v) => handleSearch(v)} onSearch={() => handleSearch(search)} />
         </div>
@@ -44,7 +44,7 @@ export default function HomePage() {
         </section>
 
        
-        <Footer />
+        
       </div>
     </div>
   );

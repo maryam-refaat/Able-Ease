@@ -69,10 +69,9 @@ export default function OrganizationsPage() {
 
   return (
     <div className="page-root" >
-      {/* render header only if component exists to avoid crash */}
-      {typeof Header === 'function' && <Header />}
+     
 
-      <h1 style={{ color: '#168a48',paddingLeft:22 }}>Organizations</h1>
+      <h1 style={{ color: '#27865d',paddingLeft:22 }}>Organizations</h1>
 
       <section style={{ marginTop: 18 }}>
         <OrgCarousel
@@ -85,7 +84,7 @@ export default function OrganizationsPage() {
       </section>
     <div className="container-oragnizations">
       <section style={{ marginTop: 30 }}>
-        <h2 style={{ color: '#168a48' }}>Programs for {selectedOrgName}</h2>
+        <h2 style={{ color: '#27865d' }}>Programs for {selectedOrgName}</h2>
         <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
           {filteredPrograms.length ? filteredPrograms.map(p => (
             <ProgramCard key={p.id ?? p.Id ?? JSON.stringify(p)} program={p} orgName={selectedOrgName} onBook={handleBook} />
@@ -94,7 +93,7 @@ export default function OrganizationsPage() {
       </section>
 
       <section style={{ marginTop: 28 }}>
-        <h2 style={{ color: '#168a48' }}>Open Positions</h2>
+        <h2 style={{ color: '#27865d' }}>Open Positions</h2>
         <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
           {filteredPositions.length ? filteredPositions.map(pos => (
             <PositionCard key={pos.positionId ?? pos.id ?? JSON.stringify(pos)} pos={pos} onApply={handleApply} />
@@ -103,16 +102,16 @@ export default function OrganizationsPage() {
       </section>
 
       <section style={{ marginTop: 28 }}>
-        <h2 style={{ color: '#168a48' }}>Care-Takers</h2>
+        <h2 style={{ color: '#27865d' }}>Care-Takers</h2>
         <div style={{ marginTop: 12 }}>
           {filteredCaregivers.length ? (
             <CaregiverCarousel caregivers={filteredCaregivers} showCount={1} />
           ) : <div style={{ color: '#666' }}>No caregivers for this organization.</div>}
         </div>
       </section>
-</div>
-      {/* render footer only if component exists */}
-      {typeof Footer === 'function' && <Footer />}
+      </div>
+      
+      
     </div>
   );
 }

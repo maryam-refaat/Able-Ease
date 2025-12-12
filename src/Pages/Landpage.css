@@ -1,0 +1,239 @@
+.landpage{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    height: 50px;
+    align-items: center;
+    border-bottom: 1px solid lightgray;
+    padding-top: 180px;
+}
+
+.bars{
+    display: flex;
+    gap: 10px;
+}
+.bars > a {
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+    transition: .5s all;
+}
+.bars > a:hover {
+    color: #198751;
+    cursor: pointer;
+}
+.land-btn{
+    width: 100px;
+    border-radius: 20px;
+    text-align: center;
+}
+.logo-img{
+    width: 20px;
+    height: 15px;
+}
+.paragraph{
+    text-align: center;
+    padding-top: 100px;
+    font-size: 20px;
+    font-weight:900;
+    line-height: 30px;
+   font-family:  Arial, sans-serif;
+}
+
+.search-logo{
+   color: white;
+  
+}
+.block{
+    width: 50%;
+    height: 400px;
+    margin-left: 25%;
+    display: flex;
+    flex-direction:column;
+    gap: 20px;
+}
+.block>p{
+    padding: 0%;
+    margin: 0%;
+   font-family:  Arial, sans-serif;
+    font-weight: 600;
+}
+.top-con{
+    display: flex;
+    gap: 10px;
+}
+.top-con>div{
+
+    width: 35%;
+    height: 150px;
+}
+.pictures{
+    font-size: 40px;
+width: 60%;
+height: 40%;
+margin-top: 20px;
+margin-left: 70px;
+}
+.top-con>div>p{
+    margin: 0%;
+    text-align: center;
+    font-family:  Arial, sans-serif;
+}
+
+.arrow{
+    padding-left: 10px;
+    color: white;
+}
+
+.carousel-control-next-icon {
+    background-color: black;  
+    border-radius: 50%;        
+}
+.carousel-control-prev-icon{
+     background-color: black;
+      border-radius: 50%;  
+}
+.paragraph2{
+    text-align: center;
+    font-size: 20px;
+    font-weight:900;
+    line-height: 30px;
+     font-family:  Arial, sans-serif;
+}
+.program-link {
+  display: inline-block;       /* Allows padding and centering */
+  text-decoration: none;       /* Remove underline */
+  color: green;                /* Green text */
+  font-size: 20px; 
+  text-align: center;           /* Bigger font size */
+  font-weight: bold;           /* Bold text */
+  border-radius: 6px;          /* Rounded corners */
+  transition: background 0.3s, color 0.3s;
+}
+.program-link:hover {
+  background-color: green;     /* Green background on hover */
+  color: white;                /* White text on hover */
+  cursor: pointer;             /* Pointer cursor on hover */
+}
+
+
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  gap: 50px 80px;  /* row gap, column gap */
+  justify-items: center; /* center items horizontally */
+  align-items: center;   /* center items vertically */
+  margin-top: 20px;
+}
+
+.search-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.pictures {
+  font-size: 20px; /* adjust icon size */
+  margin-left: -10px;
+  width:35%;
+  height :25%;
+
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: green;
+}
+.simple-carousel {
+  width: 100%;
+  max-width: 900px;
+  margin: 18px auto;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* slides row */
+.simple-carousel .slides {
+  display: flex;
+  transition: transform 400ms ease;
+  will-change: transform;
+}
+
+/* each slide */
+.simple-carousel .slide {
+  flex: 0 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  box-sizing: border-box;
+}
+
+/* image rules */
+.simple-carousel .slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 350px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* arrows */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.95);
+  border: none;
+  padding: 6px 12px;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  user-select: none;
+  z-index: 10;
+}
+.carousel-arrow.prev { left: 10px; }
+.carousel-arrow.next { right: 10px; }
+
+/* dots */
+.carousel-dots {
+    padding-top: 5%;
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.carousel-dots .dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255,255,255,0.6);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 5;
+}
+.carousel-dots .dot.active {
+  background: rgba(0,0,0,0.85);
+}
+
+/* small responsive tweak */
+@media (max-width: 768px) {
+  .search-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 30px;
+  }
+  .pictures { font-size: 36px; }
+}
+.landpage-container{
+    padding: 0%;
+}

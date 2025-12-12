@@ -83,7 +83,7 @@ body {
 body, html, #root {
   margin: 0;
   padding: 0;
-  font-family: Inter, Arial;
+  font-family: Inter, Arial, sans-serif;
   background: #f7f9fb;
   color: #1a1a1a;
   min-height: 100%;
@@ -130,6 +130,12 @@ header {
 header h1 {
   font-size: 32px;
   font-weight: 700;
+  color: #0f6b43;
+  margin: 0 0 0px;
+}
+header .logo a {
+  font-size: 32px;
+  font-weight:bold;
   color: #0f6b43;
   margin: 0 0 0px;
 }
@@ -346,3 +352,86 @@ footer p, footer a {
 footer a:hover {
   text-decoration: underline;
 }
+.Program_finds{
+    max-width:1100px;
+    margin:0 auto; 
+        padding:20px; 
+}
+.centers-strip 
+{ background: linear-gradient(180deg, #0b8b5e20, #0b6b4520);
+     padding:40px 20px;
+      margin-top:40px; 
+      border-top:4px solid rgba(0,0,0,0.03); 
+      overflow-x: hidden;
+}
+.slider-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.slider-arrow {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.slider-arrow:hover {
+    background: #f0f0f0;
+    transform: scale(1.1);
+}
+
+.slider-arrow i {
+    color: #198751;
+    font-size: 18px;
+}
+
+.centers-row { 
+    display:flex;
+     gap:18px; 
+     overflow-x: auto; 
+     overflow-y: hidden;
+     padding:12px 0;
+     scroll-behavior: smooth;
+     scrollbar-width: none; /* Firefox */
+     -ms-overflow-style: none; /* IE/Edge */
+     flex: 1;
+    }
+
+.centers-row::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+.center-card { 
+    min-width:230px;
+     background:white; 
+     border-radius:12px; 
+     padding:12px; 
+     box-shadow:0 12px 30px rgba(3,15,10,0.06);
+     }
+
+.section-title { display:flex; 
+    align-items:center; 
+    justify-content:space-between;
+     margin-top:18px; 
+     padding:0 4px; }
+
+.arrow{
+    color: black;
+}
+.center-location{
+    margin-left: 160px;
+    position: relative;
+    top: 20px;
+}
+

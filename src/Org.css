@@ -11,7 +11,7 @@
   min-height: 100vh;
   color: #222;
    min-width: 100%;
-   padding-top: 180px; 
+   padding-top: 140px; 
 }
 .container-oragnizations
  {padding: 18px;}
@@ -87,7 +87,7 @@
   display: block;
 }
 :root {
-  --green-700: #168a48;
+  --green-700: #27865d;
 }
 
 /* Page wrapper for test */
@@ -173,7 +173,7 @@
 /*///////////////////////////////////
 /* ---------- PROGRAM CARD ---------- */
 
-.program-card {
+.programs-card {
   display: flex;
   gap: 16px;
   background: #ffffff;
@@ -185,7 +185,7 @@
   margin:10px 0px;
 }
 
-.program-card:hover {
+.programs-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
@@ -207,7 +207,8 @@
 /* Content */
 .program-content {
   flex: 1;
-  padding:12px
+  padding:20px;
+   padding-left: 60px;
 }
 
 .program-header {

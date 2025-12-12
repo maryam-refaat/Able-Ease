@@ -1,0 +1,365 @@
+/* ---------------------- PAGE LAYOUT ---------------------- */
+
+.page-container {
+  padding: 30px 40px;
+  min-height: 100vh;
+  background: #f5f6fa;
+  font-family:  Arial, sans-serif;
+  margin-top: 120px;
+}
+
+/* Top welcome text centered */
+.welcome-box.centered {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.welcome-box.centered h1 {
+  color: #0b6b47; /* green in screenshot */
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.welcome-box.centered p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 15px;
+}
+
+/* ---------------------- PATIENT CARD ---------------------- */
+
+.patient-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+/* Header gradient bar */
+.patient-card__header {
+  height: 90px;
+  background: linear-gradient(90deg, #d6ecff 0%, #f4ecff 50%, #fff6d6 100%);
+}
+
+/* Content inside card */
+.patient-card__content {
+  padding: 26px 34px;
+}
+
+.patient-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Avatar inside card */
+.patient-card__avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Title + email under avatar */
+.patient-card__title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.patient-card__email {
+  font-size: 14px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* Edit button inside card */
+.patient-card__edit {
+  background: #2e65f3;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(46, 101, 243, 0.2);
+}
+
+/* ---------------------- INPUT GRID ---------------------- */
+
+.patient-card__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.patient-card__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-card__field label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.patient-card__field input {
+  width: 100%;
+  padding: 14px;
+  background: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #333;
+}
+
+/* Select wrapper for Gender/Address dropdowns */
+.patient-card__select-wrap {
+  position: relative;
+}
+
+.patient-card__select-wrap select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #f4f4f4;
+  appearance: none;
+  font-size: 15px;
+  color: #333;
+}
+
+/* dropdown arrow */
+.patient-card__arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #888;
+  pointer-events: none;
+}
+
+/* ---------------------- BLUE BAND ---------------------- */
+
+.relative-band {
+  background: #dff0ff;
+  padding: 28px 32px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.band-title {
+  font-size: 34px;
+  font-weight: 600;
+  color: #0b6b47;
+}
+
+.outline-btn {
+  border: 2px solid #000;
+  background: transparent;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ---------------------- GENERIC CARD SECTIONS ---------------------- */
+
+.card-section {
+  background: white;
+  padding: 26px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(12, 12, 12, 0.05);
+  margin-bottom: 30px;
+}
+
+.card-section h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Content area inside sections */
+.card-content {
+  margin-top: 20px;
+}
+
+.card-content.horizontal {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ---------------------- PROGRAM CARD ---------------------- */
+
+.program-card.big {
+  background: #dff0ff;
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.program-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.program-state {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* ---------------------- SESSION CARD ---------------------- */
+
+.session-card {
+  background: #dff0ff;
+  padding: 24px;
+  border-radius: 18px;
+  width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.session-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.session-loc {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.session-state {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #444;
+}
+
+/* ---------------------- EMPLOYMENT ---------------------- */
+
+.employment-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 10px;
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.employment-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.employment-sub {
+  color: #777;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ---------------------- POPUP MODAL ---------------------- */
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.popup-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  width: 420px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.popup-input-group {
+  margin-bottom: 14px;
+}
+
+.popup-input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 6px;
+}
+
+.popup-row {
+  display: flex;
+  gap: 14px;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.add-btn {
+  background: #2e65f3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background: #999;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ---------------------- UTILITIES ---------------------- */
+
+.empty-card {
+  padding: 18px;
+  background: #f3f3f3;
+  border-radius: 10px;
+  color: #666;
+  text-align: center;
+}
+
+/* ---------------------- RESPONSIVE ---------------------- */
+@media (max-width: 900px) {
+  .patient-card__grid {
+    grid-template-columns: 1fr;
+  }
+  .patient-card__content {
+    padding: 18px;
+  }
+}

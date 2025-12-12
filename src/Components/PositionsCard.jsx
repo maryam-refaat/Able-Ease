@@ -21,8 +21,8 @@ export default function PositionCard({ pos, onApply = () => {} }) {
         <div className="position-icon" aria-hidden>
           {/* simple icon as SVG */}
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="4" width="20" height="16" rx="3" stroke="#168a48" strokeWidth="1.5" fill="#e6f7ee"/>
-            <path d="M7 9h10M7 13h6" stroke="#168a48" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="2" y="4" width="20" height="16" rx="3" stroke="#27865d" strokeWidth="1.5" fill="#e6f7ee"/>
+            <path d="M7 9h10M7 13h6" stroke="#27865d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
       </div>

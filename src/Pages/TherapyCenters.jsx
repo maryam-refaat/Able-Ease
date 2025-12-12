@@ -80,10 +80,10 @@ export default function TherapyCenters() {
 
   return (
     <div className="page-root">
-      {typeof Header === 'function' && <Header />}
+     
 
      
-        <h1 style={{ color: '#168a48',paddingLeft:22 }}>Therapy Centers</h1>
+        <h1 style={{ color: '#27865d',paddingLeft:22 }}>Therapy Centers</h1>
 
         <section style={{ marginTop: 18 }}>
           <TherapyCenterCarousel
@@ -96,7 +96,7 @@ export default function TherapyCenters() {
         </section>
  <div className="container" style={{ padding: 22 }}>
         <section style={{ marginTop: 30 }}>
-          <h2 style={{ color: '#168a48' }}>Programs at {selectedCenterName || 'selected center'}</h2>
+          <h2 style={{ color: '#27865d' }}>Programs at {selectedCenterName || 'selected center'}</h2>
 
           <div style={{ marginTop: 12 }}>
             {filteredPrograms.length ? (

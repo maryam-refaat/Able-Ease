@@ -20,7 +20,7 @@ export default function ProgramCard({ program, orgName, onBook = () => {} }) {
   if (!program) return null;
 
   return (
-    <div className="program-card">
+    <div className="programs-card">
       <div className="program-img-wrapper">
         <ImgOrPlaceholder src={program.img} alt={program.name} />
       </div>
