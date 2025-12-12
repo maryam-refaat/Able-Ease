@@ -1,0 +1,445 @@
+/* === Carousel-only styling for testing === */
+:root {
+  --green-700: #168a48;
+  min-width: 100%;
+}
+
+/* Page wrapper for test */
+.page-root {
+  font-family: Inter, Arial, sans-serif;
+  background: #f7f7f7;
+  min-height: 100vh;
+  color: #222;
+   min-width: 100%;
+   padding-top: 180px; 
+}
+.container-oragnizations
+ {padding: 18px;}
+
+/* Carousel container */
+.org-carousel-root {
+  background: #e8f7ee;
+  padding: 22px 0;
+  border-radius: 12px;
+  border: 1px solid #dcefe3;
+}
+
+/* Horizontal scroll list */
+.org-list {
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  padding: 8px 18px;
+  scroll-behavior: smooth;
+}
+
+/* Hide default scrollbar (Chrome, Edge, Safari) */
+.org-list::-webkit-scrollbar {
+  height: 6px;
+}
+.org-list::-webkit-scrollbar-thumb {
+  background: #c1e3d1;
+  border-radius: 4px;
+}
+
+/* Each item */
+.org-item {
+  flex: 0 0 auto;
+  width: 140px;
+  text-align: center;
+}
+.org-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Avatar styling */
+.org-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 4px solid transparent;
+  transition: border-color 0.3s, transform 0.15s;
+}
+.org-avatar:hover {
+  transform: translateY(-4px);
+}
+.org-avatar.selected {
+  border-color: var(--green-700);
+}
+
+.org-name {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #234;
+  font-size: 14px;
+}
+
+/* Placeholder image shared */
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+:root {
+  --green-700: #168a48;
+}
+
+/* Page wrapper for test */
+.page-root {
+  font-family: Inter, Arial, sans-serif;
+  background: #f7f7f7;
+  min-height: 100vh;
+  color: #222;
+  min-width: 100%;
+}
+
+/* Carousel container */
+.org-carousel-root {
+  background: #e8f7ee;
+  padding: 22px 0;
+  border-radius: 12px;
+  border: 1px solid #dcefe3;
+}
+
+/* Horizontal scroll list */
+.org-list {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 8px 18px;
+  scroll-behavior: smooth;
+  align-items: center;
+}
+
+/* Scrollbar */
+.org-list::-webkit-scrollbar {
+  height: 8px;
+}
+.org-list::-webkit-scrollbar-thumb {
+  background: #c1e3d1;
+  border-radius: 6px;
+}
+
+/* Each item */
+.org-item {
+  flex: 0 0 auto;
+  width: 140px;
+  text-align: center;
+}
+.org-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Avatar styling */
+.org-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 4px solid transparent;
+  transition: border-color 0.2s, transform 0.12s;
+}
+.org-avatar:hover {
+  transform: translateY(-4px);
+}
+.org-avatar.selected {
+  border-color: var(--green-700);
+}
+
+.org-name {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #234;
+  font-size: 14px;
+}
+
+/* Placeholder image shared */
+.img-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/*///////////////////////////////////
+/* ---------- PROGRAM CARD ---------- */
+
+.program-card {
+  display: flex;
+  gap: 16px;
+  background: #ffffff;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  align-items: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin:10px 0px;
+}
+
+.program-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Image */
+.program-img-wrapper {
+  width: 110px;
+  height: 110px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.program-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content */
+.program-content {
+  flex: 1;
+  padding:12px
+}
+
+.program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.program-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.program-org {
+  font-size: 13px;
+  color: #6a6a6a;
+}
+
+.program-desc {
+  margin-top: 8px;
+  color: #444;
+  font-size: 14px;
+}
+
+.program-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.program-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green-700);
+}
+
+.program-book-btn {
+  background: #dff3e8;
+  border: none;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.program-book-btn:hover {
+  background: #cde6d8;
+}
+
+
+/* ---------- POSITION CARD ---------- */
+.position-card {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  border-radius: 10px;
+  align-items: flex-start;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  margin: 10px 0px;
+}
+
+.position-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.position-left { flex-shrink: 0; display:flex; align-items:center; justify-content:center; width:56px; }
+
+.position-icon { width:56px; height:56px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+
+/* Body */
+.position-body { flex:1; display:flex; flex-direction:column; gap:8px; }
+
+.position-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:12px;padding-bottom: 0px; }
+
+.position-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.position-org {
+  font-size: 13px;
+  color: #5b6b63;
+  white-space: nowrap;
+}
+
+/* Requirements text */
+.position-req {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.35;
+  padding:12px;
+}
+
+/* Actions */
+.position-actions { display:flex; justify-content:flex-end; }
+
+.btn-apply {
+  background: #dff3e8;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn-apply:hover { background: #cfe9d9; }
+
+.caregiver-card {
+  display: flex;
+  gap: 24px;
+  background: #fff;
+  border: 1px solid #e9eee7;
+  padding: 24px;
+  border-radius: 14px;
+ align-items: center; /* <— THIS aligns text vertically with image */
+  height: auto;                      /* ← FIXED HEIGHT */
+  box-sizing: border-box;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.caregiver-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+/* LARGE image */
+.caregiver-thumb {
+  width: 160px;                  /* ← BIGGER WIDTH */
+  height: 160px;                 /* ← BIGGER HEIGHT */
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.caregiver-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Body area */
+.caregiver-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;       /* centers text vertically */
+  gap: 12px;
+  height: 100%;
+}
+
+.caregiver-top {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;  
+}
+
+.caregiver-name {
+  margin: 0;
+  font-size: 20px;               /* larger text */
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.caregiver-meta {
+  font-size: 16px;
+  color: #6b6b6b;
+}
+
+.caregiver-exp {
+  font-size: 18px;
+  color: #333;
+}
+
+/* Contact button section */
+.caregiver-actions {
+  margin-top: auto;              /* pushes button to bottom */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-contact {
+  background: #dff3e8;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 22px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+.btn-contact:hover { background: #cfe9d9; }
+
+
+/* ---------- CAREGIVER CAROUSEL (UPDATED WIDTH) ---------- */
+
+.caregiver-carousel-root {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.carousel-btn {
+  background: #fff;
+  border: 1px solid #e2e8e0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+.carousel-btn:hover { background: #f6fdf4; }
+
+.caregiver-carousel-track {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* Each card ~50% width */
+.caregiver-carousel-item {
+  flex: 0 0 50%;       /* half the width */
+  max-width: 600px;    /* matches large card size */
+  min-width: 500px;    /* to prevent shrinking */
+}
