@@ -196,6 +196,7 @@ export default function ProgramsFA() {
           >
             ‹
           </button>
+        <div class="cards-wrapper"> 
           <div ref={progTrackRef} className="cards-track" role="list">
             {programs.map((p) => (
               <div key={p.id} className="program-card" role="listitem">
@@ -218,6 +219,7 @@ export default function ProgramsFA() {
               </div>
             ))}
           </div>
+        </div>  
           <button
             aria-label="next programs"
             className="slider-btn right"
@@ -265,6 +267,7 @@ export default function ProgramsFA() {
           >
             ‹
           </button>
+        <div class="cards-wrapper">  
           <div ref={faTrackRef} className="cards-track" role="list">
             {finAid.map((fa) => (
               <div key={fa.id} className="program-card" role="listitem">
@@ -287,6 +290,7 @@ export default function ProgramsFA() {
             ›
           </button>
         </div>
+      </div>
       )}
     </section>
 

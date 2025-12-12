@@ -10,8 +10,8 @@ export default function Footer() {
           display: "flex",
           flexWrap: "wrap",
           gap: "30px",
-          paddingTop: "20px",
-          paddingBottom: "20px",
+          padding: "80px",
+         
           fontSize: "14px",
           color: "#555",
         }}

@@ -4,6 +4,7 @@ import ProgramsFA from "../profilepagecomponents/organizationbox";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+
 export default function Organizationpage() {
 
   const location = useLocation();

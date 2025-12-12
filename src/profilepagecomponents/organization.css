@@ -1,3 +1,11 @@
+.page-container {
+  padding: 30px;
+  background: #f5f6fa;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+
 .programs-container {
   width: 100%;
   margin-top: 50px;
@@ -10,6 +18,8 @@
   padding: 20px 25px;
   margin-bottom: 30px;
   border: 1px solid #e6e6e6;
+  max-width: 1000px;
+
 }
 
 .section-box h3 {
@@ -78,27 +88,36 @@
 .slider-wrapper {
   position: relative;
   margin-top: 10px;
+  max-width: 850px;
 }
-
 .cards-track {
   display: flex;
   gap: 18px;
+  padding: 12px 6px;
   overflow-x: auto;
-  padding: 10px 6px;
-  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  
+}
+.cards-wrapper
+ { overflow: hidden;
+   width:100%;
+   padding:0 4px;
+   max-width: 900px;
+   margin: 18px 0;
+   }
+.cards-track { justify-content: flex-start; /* as above */ }
+.cards-track .program-card { flex: 0 0 250px; }
+.cards-wrapper.centered .cards-track { justify-content: center !important; overflow-x: visible; }
+.slider-wrapper.centered .slider-btn { display: none; }
+/* give each card a fixed basis so scrolling moves reliably */
+.cards-track .program-card {
+  flex: 0 0 250px;  /* match your existing .program-card width */
 }
 
-.cards-track { justify-content: flex-start; align-items: center; }
+/* don't hide nav buttons implicitly — only hide when wrapper truly centered */
 
-/* hide scrollbar (webkit) */
-.cards-track::-webkit-scrollbar {
-  height: 8px;
-}
-.cards-track::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.12);
-  border-radius: 8px;
-}
 
 .slider-btn {
   position: absolute;
