@@ -48,23 +48,26 @@ export const signupOrganization = async (body) => {
 
 // Fetch programs
 export const getPrograms = async () => {
-  const response = await fetch(`${BASE_URL}/programs`);
+  const response = await fetch(`${BASE_URL}/program/programs`);
   const data = await response.json();
-  return data.results;
+  const programs = data.results||data||[];
+  return {data:programs};
 };
 
 // Fetch physi centers
 export const getPhysicenters = async () => {
-  const response = await fetch(`${BASE_URL}/physi-centers${API_KEY}`);
+  const response = await fetch(`${BASE_URL}/GetAllcenters`);
   const data = await response.json();
-  return data.results;
+  const centers = data.results||data||[];
+  return {data:centers};
 };
 
 // Fetch relatives
 export const getRelatives = async () => {
-  const response = await fetch(`${BASE_URL}/relatives${API_KEY}`);
+  const response = await fetch(`${BASE_URL}/relatives`);
   const data = await response.json();
-  return data.results;
+  const relatives = data.results||data||[];
+  return {data:relatives};
 };
 
 export const updateRelative = async (id, body) => {
@@ -81,13 +84,13 @@ export const updateRelative = async (id, body) => {
 };
 
 export const fetchAvailablePrograms = async () => {
-  const response = await fetch(`${BASE_URL}/available-programs${API_KEY}`);
+  const response = await fetch(`${BASE_URL}/available-programs`);
   const data = await response.json();
   return data; 
 };
 
 export const fetchFinancialAid = async () => {
-  const response = await fetch(`${BASE_URL}/financial-aids${API_KEY}`);
+  const response = await fetch(`${BASE_URL}/financial-aids`);
   const data = await response.json();
   return data; 
 };
@@ -99,10 +102,76 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// export const getPrograms = () => api.get("/programs");
-export const getOrganizations = () => api.get("/organizations");
-export const getCenters = () => api.get("/centers");
-export const getFinancialAids = () => api.get("/financial-aids");
+
+
+export const getFinancialAids = async () => {
+  const response = await fetch(`${BASE_URL}/GetAllFinancialAids`);
+  const data = await response.json();
+  const FAs = data.results||data||[];
+  return {data:FAs};
+};
+
+
+export const getOrganizations = async () => {
+  const response = await fetch(`${BASE_URL}/Organizations`);
+  const data = await response.json();
+  const Organizations = data.results||data||[];
+  return {data:Organizations};
+};
+
+export const getCenters = async () => {
+  const response = await fetch(`${BASE_URL}/GetAllcenters`);
+  const data = await response.json();
+  const centers = data.results||data||[];
+  return {data:centers};
+}
+
+
+export const getTherapies = async () => {
+  const response = await fetch(`${BASE_URL}/Therapy/all`);
+  const data = await response.json();
+  const therapies = data.results||data||[];
+  return {data:therapies};
+}
+
+
+export const getcenter_Therapies = async (Cid) => {
+  const response = await fetch(`${BASE_URL}/Therapy/center/${Cid}/unjoined`);
+  const data = await response.json();
+  const therapies = data.results||data||[];
+  return {data:therapies};
+}
+
+
+export const getOrg_Programs = async (Oid) => {
+  const response = await fetch(`${BASE_URL}/Program/OrganizationPrograms/${Oid}`);
+  const data = await response.json();
+  const therapies = data.results||data||[];
+  return {data:therapies};
+}
+
+
+export const Patient_Reports = async (PSSN) => {
+  const response = await fetch(`${BASE_URL}/Report/GetReportsByPatient/${PSSN}`);
+  const data = await response.json();
+  const reports = data.results||data||[];
+  return {data:reports};
+}
+
+export const Patient_Therapies = async (PSSN) => {
+  const response = await fetch(`${BASE_URL}/Therapy/patient/${PSSN}`);
+  const data = await response.json();
+  const Patient_Therapies = data.results||data||[];
+  return {data:Patient_Therapies};
+}
+//needs real api
+export const Patient_Program = async (PSSN) => {
+  const response = await fetch(`${BASE_URL}/Therapy/patient/${PSSN}`);
+  const data = await response.json();
+  const Patient_Therapies = data.results||data||[];
+  return {data:Patient_Therapies};
+}
+
 
 
 export default api;
