@@ -1,17 +1,17 @@
 import React,{useEffect,useState,useRef} from "react";
-import{ getPrograms } from "../assets/api";
+import{ getPrograms } from "../assets/apis";
 import '../index.css';
 import programimg from "../assets/unsplash_VOUicg8Ejus.png"
 export default function Programfind(){
 
-const dummyPrograms = [
+  const dummyPrograms = [
   { id: 1, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
   { id: 2, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
   { id: 3, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
   { id: 4, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
   { id: 5, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
   { id: 6, name: "Physio Care Center", image: programimg, Price: "100$", S_date: "2025-12-04", E_date: "2025-01-04" },
-];
+  ];
 
 
     const[programs,setprograms]=useState(dummyPrograms);
@@ -29,8 +29,8 @@ const dummyPrograms = [
     };
 
      useEffect(() => {
-    let m = true;
-    const load = async () => {
+      let m = true;
+      const load = async () => {
       try {
         const res = await getPrograms();
         if (m && res.data?.length) setprograms(res.data);
@@ -45,7 +45,7 @@ const dummyPrograms = [
     };
     load();
     return () => (m = false);
-  }, []);
+       }, []);
 
 return (
     <section className="centers-strip">

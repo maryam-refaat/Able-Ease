@@ -1,6 +1,6 @@
 import React from 'react';
 import '../Org.css'; // path -> ../Org.css (Org.css lives next to OrganizationsPage.jsx)
-
+import{ getOrganizations } from '../assets/apis';
 // Simple placeholder image as data URL
 const SVG_AVATAR_DATAURL =
   "data:image/svg+xml;utf8," +

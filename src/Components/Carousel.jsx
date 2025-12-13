@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getCenters } from "../assets/api";
+import { getPrograms } from "../assets/apis";
 import "../index.css";
 
 export default function Carousel() {
@@ -18,14 +18,14 @@ export default function Carousel() {
     let mounted = true;
     async function load() {
       try {
-        const res = await getCenters();
+        const res = await getPrograms();
         if (!mounted) return;
         // support axios result shape (res.data) or direct array
         const data = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
         setItems(data.length ? data : fallback);
       } catch (err) {
         if (!mounted) return;
-        console.warn("getCenters failed — using fallback data", err);
+        console.warn("getPrograms failed — using fallback data", err);
         setItems(fallback);
       }
     }

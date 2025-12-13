@@ -5,6 +5,7 @@ import TherapyCenterCarousel from '../Components/TherapyCenterCarousel';
 import ProgramCard from '../Components/ProgramCard';
 // import ProgramList from '../Components/ProgramList';
 import Footer from '../Components/Footer';
+import { getCenters, getcenter_Therapies } from '../assets/apis';
 
 /* Safe dummy data */
 const DUMMY_Centers = [
@@ -24,9 +25,13 @@ const DUMMY_Therapies = [
 ];
 
 export default function TherapyCenters() {
-  // state: therapy centers and programs (now using DUMMY_Therapies)
-  const [therapyCenters] = useState(DUMMY_Centers);
-  const [programs] = useState(DUMMY_Therapies);
+  // state: therapy centers and programs (start with dummy data for immediate UI)
+  const [therapyCenters, setTherapyCenters] = useState(DUMMY_Centers);
+  const [programs, setPrograms] = useState(DUMMY_Therapies);
+  const [loadingCenters, setLoadingCenters] = useState(false);
+  const [loadingPrograms, setLoadingPrograms] = useState(false);
+  const [errorCenters, setErrorCenters] = useState(false);
+  const [errorPrograms, setErrorPrograms] = useState(false);
 
   // helper to extract center SSN from multiple possible field names
   const getCenterSSN = (item) => {
@@ -44,6 +49,61 @@ export default function TherapyCenters() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [therapyCenters]);
+
+  // load centers from API on mount (fall back to dummy centers on error)
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoadingCenters(true);
+      setErrorCenters(false);
+      try {
+        const res = await getCenters();
+        if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
+          setTherapyCenters(res.data);
+          const first = getCenterSSN(res.data[0]);
+          if (first) setSelectedCenter(first);
+        } else {
+          // keep dummy centers
+          setTherapyCenters(DUMMY_Centers);
+        }
+      } catch (err) {
+        console.error('getCenters failed, using dummy centers', err);
+        setTherapyCenters(DUMMY_Centers);
+        setErrorCenters(true);
+      } finally {
+        if (mounted) setLoadingCenters(false);
+      }
+    };
+    load();
+    return () => (mounted = false);
+  }, []);
+
+  // load therapies for selected center
+  useEffect(() => {
+    if (!selectedCenter) return;
+    let mounted = true;
+    const load = async () => {
+      setLoadingPrograms(true);
+      setErrorPrograms(false);
+      try {
+        const res = await getcenter_Therapies(selectedCenter);
+        if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
+          setPrograms(res.data);
+        } else {
+          // keep current programs (likely dummy)
+          if (!programs || programs.length === 0) setPrograms(DUMMY_Therapies);
+        }
+      } catch (err) {
+        console.error('getcenter_Therapies failed, using dummy therapies', err);
+        if (!programs || programs.length === 0) setPrograms(DUMMY_Therapies);
+        setErrorPrograms(true);
+      } finally {
+        if (mounted) setLoadingPrograms(false);
+      }
+    };
+    load();
+    return () => (mounted = false);
+  }, [selectedCenter]);
 
   // normalize programs so ProgramCard receives expected fields:
   // - centerSSN (for filtering)

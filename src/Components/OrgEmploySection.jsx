@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getOrganizations } from "../assets/api";
 import "../index.css";
+import { getEmployments } from "../assets/apis";
 
 export default function OrgEmploySection() {
   const [positions, setPositions] = useState([]);
@@ -22,48 +22,33 @@ export default function OrgEmploySection() {
     }
   ];
 
-  useEffect(() => {
-    let mounted = true;
+ useEffect(() => {
+  let mounted = true;
 
-    async function load() {
-      try {
-        const res = await getOrganizations(); // if API returns positions inside organizations
-        if (!mounted) return;
+  async function load() {
+    try {
+      const res = await getEmployments();
+      if (!mounted) return;
 
-        let data = Array.isArray(res.data) ? res.data : [];
+      const data = Array.isArray(res.data) ? res.data : [];
 
-        // Extract positions if API returns nested structures
-        let extracted = [];
+      // If data is empty, use fallback
+      setPositions(data.length ? data : fallback);
+      
+    } catch (err) {
+      if (!mounted) return;
+      console.warn("getEmployments failed — using fallback", err);
+      setPositions(fallback);
+    }
+  }
 
-        data.forEach(org => {
-          if (Array.isArray(org.positions)) {
-            org.positions.forEach(p => {
-              extracted.push({
-                positionId: p.positionId,
-                positionName: p.positionName,
-                requirements: p.requirements,
-                OrgName: org.Name ?? org.OrgName ?? "Unknown Org",
-                OrganizationSSN: org.OrganizationSSN ?? org.SSN
-              });
-            });
-          }
-        });
+  load();
+  return () => { mounted = false };
+}, []);
+
 
         // If no positions found, fallback
-        if (!extracted.length) extracted = fallback;
-
-        setPositions(extracted);
-      } catch (err) {
-        if (!mounted) return;
-        console.warn("getOrganizations failed — using fallback", err);
-        setPositions(fallback);
-      }
-    }
-
-    load();
-    return () => (mounted = false);
-  }, []);
-
+      
   return (
     <section id="org">
       <div className="container">

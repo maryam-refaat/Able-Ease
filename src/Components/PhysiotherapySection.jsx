@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getCenters } from "../assets/api";
 import "../index.css";
+import{getPhysicenters} from "../assets/apis";
 
 export default function PhysiotherapySection() {
   const [centers, setCenters] = useState([]);

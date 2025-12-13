@@ -7,6 +7,10 @@ import PositionCard from '../Components/PositionsCard';
 import CaregiverCarousel from '../Components/CaregiverCarousel';
 import Footer from '../Components/Footer';
 
+
+import { getOrganizations, getOrg_Programs, getOrg_CareGivers } from "../assets/apis";
+
+
 /* Safe dummy data */
 const DUMMY_ORGANIZATIONS = [
   { SSN: 'ORG-001', name: 'Physio Care Center', img: null },
@@ -29,34 +33,108 @@ const DUMMY_CAREGIVERS = [
 ];
 
 export default function OrganizationsPage() {
-  const [organizations] = useState(DUMMY_ORGANIZATIONS);
-  const [programs] = useState(DUMMY_PROGRAMS);
-  const [positions] = useState(DUMMY_POSITIONS);
-  const [caregivers] = useState(DUMMY_CAREGIVERS);
+  const [organizations, setOrganizations] = useState(DUMMY_ORGANIZATIONS);
+  const [programs, setPrograms] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [caregivers, setCaregivers] = useState([]);
 
-  const getOrgSSN = (item) => {
-    if (!item) return null;
-    return item.SSN ?? item.OrganizationSSN ?? item.organizationSSN ?? item.orgSSN ?? null;
-  };
+  const [loadingOrgs, setLoadingOrgs] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
+  const [errorOrgs, setErrorOrgs] = useState(false);
+  const [errorData, setErrorData] = useState(false);
+  const [selectedOrg, setSelectedOrg] = useState(null);
 
-  const [selectedOrg, setSelectedOrg] = useState(() => getOrgSSN(DUMMY_ORGANIZATIONS[0]) || null);
 
+
+  
+
+  // helper to read SSN from various shapes
+  const readSSN = (o) => o?.SSN ?? o?.OrganizationSSN ?? o?.organizationSSN ?? o?.id ?? null;
+
+  // Load organizations on mount
   useEffect(() => {
-    if (!selectedOrg && organizations && organizations.length) {
-      setSelectedOrg(getOrgSSN(organizations[0]) || null);
-    }
-  }, [organizations, selectedOrg]);
+    let mounted = true;
+    const load = async () => {
+      setLoadingOrgs(true);
+      setErrorOrgs(false);
+      try {
+        const res = await getOrganizations();
+        if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
+          setOrganizations(res.data);
+          // pick first org as selected if none selected
+          const firstSSN = readSSN(res.data[0]);
+          if (firstSSN) setSelectedOrg(firstSSN);
+        } else {
+          // fallback to dummy and pick first dummy
+          setOrganizations(DUMMY_ORGANIZATIONS);
+          if (!selectedOrg) setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
+        }
+      } catch (err) {
+        console.log("getOrganizations failed, using placeholders", err);
+        setOrganizations(DUMMY_ORGANIZATIONS);
+        if (!selectedOrg) setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
+        setErrorOrgs(true);
+      } finally {
+        if (mounted) setLoadingOrgs(false);
+      }
+    };
+    load();
+    return () => (mounted = false);
+  }, []);
 
-  const matchesOrg = (item) => {
-    const ssn = getOrgSSN(item);
-    return ssn && selectedOrg ? ssn === selectedOrg : false;
-  };
 
-  const filteredPrograms = Array.isArray(programs) ? programs.filter(matchesOrg) : [];
-  const filteredPositions = Array.isArray(positions) ? positions.filter(matchesOrg) : [];
-  const filteredCaregivers = Array.isArray(caregivers) ? caregivers.filter(matchesOrg) : [];
 
-  const selectedOrgName = organizations.find(o => getOrgSSN(o) === selectedOrg)?.name ?? '';
+     
+  // When selectedOrg changes, load its programs, positions and caregivers
+  useEffect(() => {
+    if (!selectedOrg) return;
+    let mounted = true;
+    setLoadingData(true);
+    setErrorData(false);
+
+    const loadAll = async () => {
+      try {
+        const [progRes, carRes] = await Promise.allSettled([
+          getOrg_Programs(selectedOrg),
+          getOrg_CareGivers(selectedOrg),
+        ]);
+
+        // Programs
+        if (mounted && progRes.status === 'fulfilled' && Array.isArray(progRes.value?.data) && progRes.value.data.length) {
+          setPrograms(progRes.value.data);
+        } else {
+          setPrograms(DUMMY_PROGRAMS);
+        }
+
+        // Positions: no dedicated API in `apis.js`, keep dummy fallback
+        setPositions(DUMMY_POSITIONS);
+
+        // Caregivers
+        if (mounted && carRes.status === 'fulfilled' && Array.isArray(carRes.value?.data) && carRes.value.data.length) {
+          setCaregivers(carRes.value.data);
+        } else {
+          setCaregivers(DUMMY_CAREGIVERS);
+        }
+      } catch (err) {
+        console.error('Error loading organization data', err);
+        setErrorData(true);
+        // fallback
+        setPrograms(DUMMY_PROGRAMS);
+        setPositions(DUMMY_POSITIONS);
+        setCaregivers(DUMMY_CAREGIVERS);
+      } finally {
+        if (mounted) setLoadingData(false);
+      }
+    };
+
+    loadAll();
+    return () => (mounted = false);
+  }, [selectedOrg]);
+  
+
+  
+
+  const selectedOrgName = organizations.find(o => readSSN(o) === selectedOrg)?.name ?? '';
 
   function handleBook(program) {
     console.log('Book', program);
@@ -68,50 +146,63 @@ export default function OrganizationsPage() {
   }
 
   return (
-    <div className="page-root" >
-     
-
-      <h1 style={{ color: '#27865d',paddingLeft:22 }}>Organizations</h1>
+    <div className="page-root">
+      <h1 style={{ color: '#27865d', paddingLeft: 22 }}>Organizations</h1>
 
       <section style={{ marginTop: 18 }}>
         <OrgCarousel
           organizations={organizations}
           onSelect={(ssn) => {
-            if (typeof ssn === 'string' && ssn.length) setSelectedOrg(ssn);
+            if (ssn) setSelectedOrg(ssn);
           }}
           selectedSSN={selectedOrg}
         />
       </section>
-    <div className="container-oragnizations">
-      <section style={{ marginTop: 30 }}>
-        <h2 style={{ color: '#27865d' }}>Programs for {selectedOrgName}</h2>
-        <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-          {filteredPrograms.length ? filteredPrograms.map(p => (
-            <ProgramCard key={p.id ?? p.Id ?? JSON.stringify(p)} program={p} orgName={selectedOrgName} onBook={handleBook} />
-          )) : <div style={{ color: '#666' }}>No programs for this organization.</div>}
-        </div>
-      </section>
 
-      <section style={{ marginTop: 28 }}>
-        <h2 style={{ color: '#27865d' }}>Open Positions</h2>
-        <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-          {filteredPositions.length ? filteredPositions.map(pos => (
-            <PositionCard key={pos.positionId ?? pos.id ?? JSON.stringify(pos)} pos={pos} onApply={handleApply} />
-          )) : <div style={{ color: '#666' }}>No open positions.</div>}
-        </div>
-      </section>
+      <div className="container-oragnizations">
+        <section style={{ marginTop: 30 }}>
+          <h2 style={{ color: '#27865d' }}>Programs for {selectedOrgName}</h2>
+          <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
+            {loadingData ? (
+              <div style={{ color: '#666' }}>Loading programs...</div>
+            ) : programs && programs.length ? (
+              programs.map((p) => (
+                <ProgramCard key={p.id ?? p.Id ?? JSON.stringify(p)} program={p} orgName={selectedOrgName} onBook={handleBook} />
+              ))
+            ) : (
+              <div style={{ color: '#666' }}>No programs for this organization.</div>
+            )}
+          </div>
+        </section>
 
-      <section style={{ marginTop: 28 }}>
-        <h2 style={{ color: '#27865d' }}>Care-Takers</h2>
-        <div style={{ marginTop: 12 }}>
-          {filteredCaregivers.length ? (
-            <CaregiverCarousel caregivers={filteredCaregivers} showCount={1} />
-          ) : <div style={{ color: '#666' }}>No caregivers for this organization.</div>}
-        </div>
-      </section>
+        <section style={{ marginTop: 28 }}>
+          <h2 style={{ color: '#27865d' }}>Open Positions</h2>
+          <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
+            {loadingData ? (
+              <div style={{ color: '#666' }}>Loading positions...</div>
+            ) : positions && positions.length ? (
+              positions.map((pos) => (
+                <PositionCard key={pos.positionId ?? pos.id ?? JSON.stringify(pos)} pos={pos} onApply={handleApply} />
+              ))
+            ) : (
+              <div style={{ color: '#666' }}>No open positions.</div>
+            )}
+          </div>
+        </section>
+
+        <section style={{ marginTop: 28 }}>
+          <h2 style={{ color: '#27865d' }}>Care-Takers</h2>
+          <div style={{ marginTop: 12 }}>
+            {loadingData ? (
+              <div style={{ color: '#666' }}>Loading caregivers...</div>
+            ) : caregivers && caregivers.length ? (
+              <CaregiverCarousel caregivers={caregivers} showCount={1} />
+            ) : (
+              <div style={{ color: '#666' }}>No caregivers for this organization.</div>
+            )}
+          </div>
+        </section>
       </div>
-      
-      
     </div>
   );
 }

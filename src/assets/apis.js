@@ -54,6 +54,15 @@ export const getPrograms = async () => {
   return {data:programs};
 };
 
+
+export const getEmployments = async () => {
+  const response = await fetch(`${BASE_URL}/program/programs`);
+  const data = await response.json();
+  const employments = data.results||data||[];
+  return {data:employments};
+};
+
+
 // Fetch physi centers
 export const getPhysicenters = async () => {
   const response = await fetch(`${BASE_URL}/GetAllcenters`);
@@ -150,22 +159,27 @@ export const getOrg_Programs = async (Oid) => {
   return {data:therapies};
 }
 
-
-export const Patient_Reports = async (PSSN) => {
+export const getOrg_CareGivers = async (Oid) => {
+  const response = await fetch(`${BASE_URL}/CareGiver/OrganizationCareGivers/${Oid}`);
+  const data = await response.json();
+  const therapies = data.results||data||[];
+  return {data:therapies};
+}
+export const getPatient_Reports = async (PSSN) => {
   const response = await fetch(`${BASE_URL}/Report/GetReportsByPatient/${PSSN}`);
   const data = await response.json();
   const reports = data.results||data||[];
   return {data:reports};
 }
 
-export const Patient_Therapies = async (PSSN) => {
+export const getPatient_Therapies = async (PSSN) => {
   const response = await fetch(`${BASE_URL}/Therapy/patient/${PSSN}`);
   const data = await response.json();
   const Patient_Therapies = data.results||data||[];
   return {data:Patient_Therapies};
 }
 //needs real api
-export const Patient_Program = async (PSSN) => {
+export const getPatient_Program = async (PSSN) => {
   const response = await fetch(`${BASE_URL}/Therapy/patient/${PSSN}`);
   const data = await response.json();
   const Patient_Therapies = data.results||data||[];
