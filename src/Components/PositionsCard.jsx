@@ -19,10 +19,12 @@ export default function PositionCard({ pos, onApply = () => {} }) {
     <div className="position-card" role="article" aria-labelledby={`pos-${id}`}>
       <div className="position-left">
         <div className="position-icon" aria-hidden>
-          {/* simple icon as SVG */}
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="4" width="20" height="16" rx="3" stroke="#27865d" strokeWidth="1.5" fill="#e6f7ee"/>
-            <path d="M7 9h10M7 13h6" stroke="#27865d" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* briefcase/job icon */}
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="8" width="18" height="12" rx="2" stroke="#27865d" strokeWidth="1.5" fill="#dff3e8"/>
+            <path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="#27865d" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M3 13h18" stroke="#27865d" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="12" cy="13" r="1.5" fill="#27865d"/>
           </svg>
         </div>
       </div>

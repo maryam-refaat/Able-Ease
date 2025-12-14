@@ -193,6 +193,25 @@ export const getPatient_Program = async (PSSN) => {
   return {data:Patient_Therapies};
 }
 
+export const getReceived_msgs = async (RSSN) => {
+  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}`/contact);
+  const data = await response.json();
+  const Recieved = data.results||data||[];
+  return {data:Recieved};
+}
 
+export const getSent_msgs = async (RSSN) => {
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`/contact);
+  const data = await response.json();
+  const Sent = data.results||data||[];
+  return {data:Sent};
+}
+
+export const getUser_data = async (RSSN) => {
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`/contact);
+  const data = await response.json();
+  const Sent = data.results||data||[];
+  return {data:Sent};
+}
 
 export default api;

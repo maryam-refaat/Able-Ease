@@ -136,10 +136,10 @@ export default function PatientReportsMedical() {
     <div className="with-sidebar">
       <div className="side-rect" aria-hidden="true">
         <div className="side-icons">
-          <button className="side-btn" aria-label="overview" onClick={() => navigate(-1)}>
+          <button className="side-btn" aria-label="overview" onClick={() => navigate('/patient-profile')}>
             <i className="fa-solid fa-user" aria-hidden="true"></i>
           </button>
-          <button className="side-btn" aria-label="messages" onClick={() => navigate('/') }>
+          <button className="side-btn" aria-label="messages" onClick={() => navigate('/messages') }>
             <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
           </button>
           <button className="side-btn" aria-label="reports" onClick={() => {/* already here */}}>

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "../profilepagecomponents/profile.css";
 import "./messages.css";
 import Footer from "../Components/Footer";
+import{getReceived_msgs, getSent_msgs} from "../assets/apis";
+
 
 //NO API YET, USING DEMO DATA
 //NO API YET, USING DEMO DATA

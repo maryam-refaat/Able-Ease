@@ -2,18 +2,11 @@ import React from 'react';
 import '../Org.css'; // path -> ../Org.css (Org.css lives next to OrganizationsPage.jsx)
 import{ getOrganizations } from '../assets/apis';
 // Simple placeholder image as data URL
-const SVG_AVATAR_DATAURL =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'>
-      <rect width='100' height='100' rx='12' fill='%23e6f4ea'/>
-      <circle cx='50' cy='36' r='18' fill='%2385c997'/>
-      <rect x='20' y='62' width='60' height='20' rx='6' fill='%2385c997'/>
-    </svg>`
-  );
+const SVG_AVATAR_DATAURL = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxMiIgZmlsbD0iI2RmZjNlOCIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iMzYiIHI9IjE4IiBmaWxsPSIjMjc4NjVkIi8+PHJlY3QgeD0iMjAiIHk9IjYyIiB3aWR0aD0iNjAiIGhlaWdodD0iMjAiIHJ4PSI2IiBmaWxsPSIjMjc4NjVkIi8+PC9zdmc+";
 
 function ImgOrPlaceholder({ src, alt }) {
-  return <img src={src || SVG_AVATAR_DATAURL} alt={alt || 'img'} className="img-placeholder" />;
+  const imgSrc = (src && src.trim()) ? src : SVG_AVATAR_DATAURL;
+  return <img key={imgSrc} src={imgSrc} alt={alt || 'img'} className="img-placeholder" style={{ background: 'transparent' }} />;
 }
 
 /**
@@ -33,6 +26,7 @@ export default function OrgCarousel({ organizations = [], onSelect = () => {}, s
         {organizations.map((org) => {
           const key = org.SSN ?? org.id ?? org.OrganizationSSN ?? org.Name;
           const name = org.name ?? org.Name ?? 'Unnamed';
+          const img = org.img ?? org.image ?? org.Image ?? org.photo ?? org.Photo ?? org.logo ?? org.Logo ?? null;
           return (
             <div key={key} className="org-item">
               <button
@@ -41,7 +35,7 @@ export default function OrgCarousel({ organizations = [], onSelect = () => {}, s
                 aria-pressed={selectedSSN === (org.SSN ?? org.OrganizationSSN ?? key)}
               >
                 <div className={`org-avatar ${selectedSSN === (org.SSN ?? org.OrganizationSSN ?? key) ? 'selected' : ''}`}>
-                  <ImgOrPlaceholder src={org.img} alt={name} />
+                  <ImgOrPlaceholder src={img} alt={name} />
                 </div>
                 <div className="org-name">{name}</div>
               </button>
