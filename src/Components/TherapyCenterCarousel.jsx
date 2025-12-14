@@ -24,17 +24,17 @@ export default function TherapyCenterCarousel({ TherapyCenters = [], onSelect = 
     <div className="org-carousel-root" role="region" aria-label="Organizations carousel">
       <div className="org-list">
         {TherapyCenters.map((Center) => {
-          const key = Center.SSN ?? Center.id ?? Center.CenterSSN ?? Center.Name;
-          const name = Center.name ?? Center.Name ?? 'Unnamed';
-          const img = Center.img ?? Center.image ?? Center.Image ?? Center.photo ?? Center.Photo ?? Center.logo ?? Center.Logo ?? null;
+          const ssn = Center.ssn ?? Center.SSN ?? Center.CenterSSN ?? Center.id;
+          const name = Center.name ?? 'Unnamed';
+          const img = Center.imageUrl ?? Center.img ?? Center.image ?? Center.logo ?? null;
           return (
-            <div key={key} className="org-item">
+            <div key={ssn} className="org-item">
               <button
                 className="org-button"
-                onClick={() => onSelect(Center.SSN ?? Center.CenterSSN ?? key)}
-                aria-pressed={selectedSSN === (Center.SSN ?? Center.CenterSSN ?? key)}
+                onClick={() => onSelect(ssn)}
+                aria-pressed={selectedSSN === ssn}
               >
-                <div className={`org-avatar ${selectedSSN === (Center.SSN ?? Center.CenterSSN ?? key) ? 'selected' : ''}`}>
+                <div className={`org-avatar ${selectedSSN === ssn ? 'selected' : ''}`}>
                   <ImgOrPlaceholder src={img} alt={name} />
                 </div>
                 <div className="org-name">{name}</div>
