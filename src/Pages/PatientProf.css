@@ -15,9 +15,9 @@
 }
 
 .welcome-box.centered h1 {
-  color: #0b6b47; /* green in screenshot */
-  font-size: 32px;
-  font-weight: 700;
+  color: #344d87; /* green in screenshot */
+  font-size: 26px;
+  font-weight: 600;
   margin: 0;
 }
 
@@ -285,6 +285,7 @@
   align-items: center;
   justify-content: center;
   z-index: 200;
+  padding-top: 95px;
 }
 
 .popup-card {

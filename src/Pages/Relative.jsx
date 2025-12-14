@@ -1,8 +1,9 @@
 import "../profilepagecomponents/profile.css";
 import  {RelativeCard}  from "../profilepagecomponents/relativebox";
 import  {MedicalBox}  from "../profilepagecomponents/medicalbox";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Footer from "../Components/Footer";
 
 export default function Relative() {
 
@@ -12,6 +13,7 @@ export default function Relative() {
   const [data, setData] = useState(relativeData || {});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -43,13 +45,13 @@ export default function Relative() {
     <div className="with-sidebar">
       <div className="side-rect" aria-hidden="true">
         <div className="side-icons">
-          <button className="side-btn" aria-label="overview">
-            <i className="fa-solid fa-th-large" aria-hidden="true"></i>
+          <button className="side-btn" aria-label="overview" onClick={() => navigate('/') }>
+            <i className="fa-solid fa-user" aria-hidden="true"></i>
           </button>
-          <button className="side-btn" aria-label="messages">
+          <button className="side-btn" aria-label="messages" onClick={() => navigate('/') }>
             <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
           </button>
-          <button className="side-btn" aria-label="reports">
+          <button className="side-btn" aria-label="reports" onClick={() => navigate('/patient-reports', { state: { patientData: data } })}>
             <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
           </button>
         </div>
@@ -63,6 +65,7 @@ export default function Relative() {
 
         <RelativeCard title= "Relative" data={data} />
         <MedicalBox />
+        <Footer />
       </div>
     </div>
   );

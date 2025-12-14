@@ -45,7 +45,7 @@ export default function Organizationpage() {
       <div className="side-rect" aria-hidden="true">
         <div className="side-icons">
           <button className="side-btn" aria-label="overview">
-            <i className="fa-solid fa-th-large" aria-hidden="true"></i>
+            <i className="fa-solid fa-user" aria-hidden="true"></i>
           </button>
           <button className="side-btn" aria-label="messages">
             <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>

@@ -94,7 +94,7 @@ margin: 0 auto;
   left: 18px;
   top: 120px;
   width: 56px;
-  height: 420px;
+  height: 320px;
   background: linear-gradient(180deg, #f0f6ff, #ffffff);
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
@@ -135,6 +135,17 @@ margin: 0 auto;
   margin-left: 100px;
 }
 
+/* Responsive: hide fixed sidebar on small screens and remove left margin */
+@media (max-width: 900px) {
+  .with-sidebar .side-rect {
+    display: none;
+  }
+  .with-sidebar .page-container {
+    margin-left: 0;
+    padding: 20px;
+  }
+}
+
 /* the column that contains your actual site */
 .site-content {
   width: 100%;
@@ -153,6 +164,7 @@ margin: 0 auto;
   font-size: 26px;
   font-weight: 600;
   margin: 0;
+  color:  #344d87 ;
 }
 .welcome-box p {
   margin-top: 5px;
@@ -341,4 +353,9 @@ margin: 0 auto;
 .error {
   color: red;
   font-size: 13px;
+}
+
+/* hide PatientCard edit actions when wrapped with .no-edit */
+.no-edit .patient-card__actions {
+  display: none;
 }

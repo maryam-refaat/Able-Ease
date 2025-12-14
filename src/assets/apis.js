@@ -172,6 +172,13 @@ export const getPatient_Reports = async (PSSN) => {
   return {data:reports};
 }
 
+export const getPatient_Medicalinfo = async (PSSN) => {
+  const response = await fetch(`${BASE_URL}/Report/GetReportsByPatient/${PSSN}`);
+  const data = await response.json();
+  const reports = data.results||data||[];
+  return {data:reports};
+}
+
 export const getPatient_Therapies = async (PSSN) => {
   const response = await fetch(`${BASE_URL}/Therapy/patient/${PSSN}`);
   const data = await response.json();

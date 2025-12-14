@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./PatientProf.css";
+import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
+
+import { getPatient_Program, getPatient_Therapies, getPatient_Reports } from "../assets/apis";
+import Footer from "../Components/Footer";
 
 export default function PatientProfile() {
   const location = useLocation();
@@ -15,14 +19,66 @@ export default function PatientProfile() {
   const [draft, setDraft] = useState({});
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       try {
         setIsLoading(true);
-        // const token = JSON.parse(localStorage.getItem("patientToken"));
-        // const fetchedData = await getPatientById(token); // replace when ready
-        // setData(fetchedData);
+
+        // Determine patient identifier (prefer route state, fall back to localStorage token/SSN)
+        const fromState = location.state?.patientData;
+        const candidateId = fromState?.id ?? fromState?.PSSN ?? fromState?.patientSSN ?? fromState?.ssn ?? null;
+
+        // If we have basic patient data from navigation state, use it as base
+        let base = fromState ? { ...fromState } : {};
+
+        // Try other common places for an identifier
+        const storedToken = (() => {
+          try {
+            return JSON.parse(localStorage.getItem("patientToken"));
+          } catch (e) {
+            return null;
+          }
+        })();
+
+        const storedSSN = localStorage.getItem("patientSSN") || null;
+
+        const patientId = candidateId || storedSSN || storedToken || null;
+
+        if (patientId) {
+          // fetch related patient resources in parallel
+          const [progRes, therapiesRes, reportsRes] = await Promise.all([
+            getPatient_Program(patientId).catch(() => ({ data: [] })),
+            getPatient_Therapies(patientId).catch(() => ({ data: [] })),
+            getPatient_Reports(patientId).catch(() => ({ data: [] })),
+          ]);
+
+          const programs = Array.isArray(progRes?.data) ? progRes.data : [];
+          const therapies = Array.isArray(therapiesRes?.data) ? therapiesRes.data : [];
+          const reports = Array.isArray(reportsRes?.data) ? reportsRes.data : [];
+
+          // normalize therapies -> sessions (best-effort mapping)
+          const sessions = therapies.map((t, i) => ({
+            id: t.id ?? t.therapyId ?? `t-${i}`,
+            title: t.name ?? t.title ?? t.therapyName ?? "Therapy",
+            location: t.location ?? t.centerLocation ?? t.center?.location ?? "",
+            state: t.state ?? t.status ?? "scheduled",
+          }));
+
+          const merged = {
+            ...base,
+            programs,
+            sessions,
+            reports,
+          };
+
+          setData(merged);
+        } else {
+          // no identifier found — keep state data if any, otherwise mark as error
+          if (Object.keys(base).length) setData(base);
+          else setIsError(true);
+        }
       } catch (error) {
         console.error("Error fetching patient data:", error);
         setIsError(true);
@@ -37,7 +93,7 @@ export default function PatientProfile() {
   const openEdit = () => {
     setDraft({
       
-         fullName:data.fullName||"",
+      fullName:data.fullName||"",
       email: data?.email || "",
       phone: data?.phone || "",
       gender: data?.gender || "",
@@ -71,7 +127,23 @@ export default function PatientProfile() {
   if (isError) return <div className="page-container">Error loading data.</div>;
 
   return (
-    <div className="page-container">
+    <>
+    <div className="with-sidebar">
+      <div className="side-rect" aria-hidden="true">
+        <div className="side-icons">
+          <button className="side-btn" aria-label="overview" onClick={() => navigate('/') }>
+            <i className="fa-solid fa-user" aria-hidden="true"></i>
+          </button>
+          <button className="side-btn" aria-label="messages" onClick={() => navigate('/messages') }>
+            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
+          </button>
+          <button className="side-btn" aria-label="reports" onClick={() => navigate('/patient-reports', { state: { patientData: data } })}>
+            <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div className="page-container">
       <header className="welcome-box centered">
         <h1>Welcome, {data?.fullName ? data.fullName.split(" ")[0] : "Patient"}</h1>
         <p>{new Date().toLocaleDateString()}</p>
@@ -175,6 +247,11 @@ export default function PatientProfile() {
           </div>
         </div>
       )}
+      
+     
+      </div>
     </div>
+     <Footer />
+    </>
   );
 }

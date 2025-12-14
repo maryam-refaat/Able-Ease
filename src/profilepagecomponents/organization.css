@@ -31,7 +31,7 @@
   display: flex;
   gap: 80px;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: left;
 }
 
 .program-card {
@@ -106,17 +106,17 @@
    padding:0 4px;
    max-width: 900px;
    margin: 18px 0;
-   }
+  }
 .cards-track { justify-content: flex-start; /* as above */ }
 .cards-track .program-card { flex: 0 0 250px; }
-.cards-wrapper.centered .cards-track { justify-content: center !important; overflow-x: visible; }
+.cards-wrapper.centered .cards-track { justify-content: left !important; overflow-x: hidden; }
 .slider-wrapper.centered .slider-btn { display: none; }
-/* give each card a fixed basis so scrolling moves reliably */
+
 .cards-track .program-card {
-  flex: 0 0 250px;  /* match your existing .program-card width */
+  flex: 0 0 250px;  
 }
 
-/* don't hide nav buttons implicitly — only hide when wrapper truly centered */
+
 
 
 .slider-btn {
@@ -143,7 +143,7 @@
 /* Make program cards not shrink so they keep consistent width in track */
 .cards-track .program-card { flex: 0 0 auto; }
 .cards-track {
-  justify-content: center;
+  justify-content: left;
 }
 /* Center when there isn't enough content to overflow */
 .cards-track.centered { justify-content: center; }
@@ -153,8 +153,8 @@
 
 /* Also center via the wrapper and remove horizontal scrolling when centered */
 .slider-wrapper.centered .cards-track {
-  justify-content: center !important;
-  overflow-x: visible; /* remove tiny scrollbar when centered */
+  justify-content: left !important;
+  overflow-x: hidden; /* remove tiny scrollbar when centered */
 }
 
 /* hide nav buttons when centered (no overflow) */

@@ -10,6 +10,8 @@ import OrganizationPage from './Pages/organization';
 import OrganizationsPage from './Pages/OrganizationsPage';
 import TherapyCenters from './Pages/TherapyCenters';
 import PatientProfile from './Pages/PatientProfile';
+import PatientReportsMedical from './Pages/PatientReports_medical';
+import Messages from './Pages/Messages';
 
 const router = createBrowserRouter([
   {
@@ -32,7 +34,16 @@ const router = createBrowserRouter([
         path: "/Home",
         element: <HomePage />
       },
-      {
+    ,{
+        path: "/organizations",
+        element: <OrganizationsPage />
+      },{
+        path: "/therapy-centers",
+        element: <TherapyCenters />
+      }
+    ]
+    
+  },  {
         path: "/relative-profile",
         element: <RelativePage />
       },
@@ -41,17 +52,17 @@ const router = createBrowserRouter([
         element: <PatientProfile />
       },
       {
+        path: "/patient-reports",
+        element: <PatientReportsMedical />
+      },
+      {
+        path: "/messages",
+        element: <Messages />
+      },
+      {
         path: "/organization-profile",
         element: <OrganizationPage />
-      },{
-        path: "/organizations",
-        element: <OrganizationsPage />
-      },{
-        path: "/therapy-centers",
-        element: <TherapyCenters />
       }
-    ]
-  },
   
 ]);
 
