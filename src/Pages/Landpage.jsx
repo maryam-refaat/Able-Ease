@@ -139,20 +139,20 @@ export default function Landpage() {
         <p style={{ fontSize: "20px", marginTop: "8px" }}>Top Searches</p>
 
         <div className="search-grid">
-          <div className="search-item">
+          <Link to="/all-programs" className="search-item">
             <FontAwesomeIcon icon={faSitemap} className="pictures" />
             <p className="label">Programs</p>
-          </div>
+          </Link>
 
           <div className="search-item">
             <FontAwesomeIcon icon={faCoins} className="pictures" />
             <p className="label">FAs</p>
           </div>
 
-          <div className="search-item">
+          <Link to="/all-therapies" className="search-item">
             <FontAwesomeIcon icon={faHandsHoldingChild} className="pictures" />
             <p className="label">Therapies</p>
-          </div>
+          </Link>
 
           <div className="search-item">
             <FontAwesomeIcon icon={faClipboardUser} className="pictures" />
@@ -164,10 +164,10 @@ export default function Landpage() {
             <p className="label">CTs</p>
           </div>
 
-          <div className="search-item">
+          <Link to="/organizations" className="search-item">
             <FontAwesomeIcon icon={faBuilding} className="pictures" />
             <p className="label">Organizations</p>
-          </div>
+          </Link>
         </div>
       </div>
 

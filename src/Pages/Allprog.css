@@ -1,0 +1,143 @@
+/* All Programs Page Styles */
+.all-programs-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f4ea 100%);
+  padding: 40px 40px;
+  padding-top: 100px;
+}
+
+.all-programs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.all-programs-title {
+  color: #27865d;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 8px rgba(39, 134, 93, 0.3);
+}
+
+.all-programs-loading,
+.all-programs-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 60px 20px;
+}
+
+/* Grid Layout - uses .programs-card from Org.css */
+.all-programs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button Extensions for AllProgram page */
+.all-programs-grid .program-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.all-programs-grid .program-fa-btn {
+  background: #dff3e8;
+  border: 1px solid #c1e3d1;
+  color: #168a48;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-weight: 600;
+}
+
+.all-programs-grid .program-fa-btn:hover {
+  background: #cde6d8;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .all-programs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 32px;
+  }
+  
+  .program-card {
+    flex-direction: column;
+    max-height: none;
+  }
+  
+  .program-img-wrapper {
+    width: 100%;
+    height: 220px;
+  }
+  
+  .program-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .program-book-btn,
+  .program-fa-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-programs-page {
+    padding: 30px 20px;
+  }
+
+  .all-programs-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .all-programs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  .program-content {
+    padding: 24px;
+  }
+
+  .program-title {
+    font-size: 1.25rem;
+  }
+
+  .program-price {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .all-programs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .program-img-wrapper {
+    height: 200px;
+  }
+
+  .program-content {
+    padding: 20px;
+  }
+}

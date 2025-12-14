@@ -14,7 +14,7 @@ export default function ProgramCard({ program, orgName, onBook = () => {} }) {
 
   // Normalize possible API shapes
   const title = program.name ?? program.Name ?? program.title ?? "Program";
-  const img = program.img ?? program.image ?? program.Image ?? null;
+  const img = program.imageUrl ?? program.img ?? program.image ?? null;
   const start = program.startDate ?? program.StartDate ?? program.start ?? program.start_date ?? "";
   const end = program.endDate ?? program.EndDate ?? program.end ?? program.end_date ?? "";
   const price = program.price ?? program.Price ?? program.cost ?? program.Cost ?? null;

@@ -214,4 +214,29 @@ export const getUser_data = async (USSN) => {
   return {data:UserData};
 }
 
+export const getAll_Programs = async (USSN) => {
+  const response = await fetch(`${BASE_URL}/User/data/${USSN}`);
+  const data = await response.json();
+  const progs = data.results||data||[];
+  return {data:progs};
+}
+
+export const getAll_Employments = async (USSN) => {
+  const response = await fetch(`${BASE_URL}/User/data/${USSN}`);
+  const data = await response.json();
+  const emps = data.results||data||[];
+  return {data:emps};
+}
+
+export const getAll_Therapies = async (USSN) => {
+  const response = await fetch(`${BASE_URL}/User/data/${USSN}`);
+  const data = await response.json();
+  const therapies = data.results||data||[];
+  return {data:therapies};
+}
+
+
+
+
+
 export default api;

@@ -123,12 +123,8 @@ export default function OrganizationsPage() {
           getOrg_CareGivers(selectedOrg),
         ]);
 
-        // Programs
-        if (
-          progRes.status === "fulfilled" &&
-          Array.isArray(progRes.value?.data) &&
-          progRes.value.data.length
-        ) {
+        // Programs - only show dummy on API failure, not on empty array
+        if (progRes.status === "fulfilled" && Array.isArray(progRes.value?.data)) {
           setPrograms(progRes.value.data);
         } else {
           setPrograms(DUMMY_PROGRAMS);
@@ -137,12 +133,8 @@ export default function OrganizationsPage() {
         // Positions (using dummy data for now)
         setPositions(DUMMY_POSITIONS);
 
-        // Caregivers
-        if (
-          carRes.status === "fulfilled" &&
-          Array.isArray(carRes.value?.data) &&
-          carRes.value.data.length
-        ) {
+        // Caregivers - only show dummy on API failure, not on empty array
+        if (carRes.status === "fulfilled" && Array.isArray(carRes.value?.data)) {
           setCaregivers(carRes.value.data);
         } else {
           setCaregivers(DUMMY_CAREGIVERS);

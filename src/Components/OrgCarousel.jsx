@@ -24,17 +24,17 @@ export default function OrgCarousel({ organizations = [], onSelect = () => {}, s
     <div className="org-carousel-root" role="region" aria-label="Organizations carousel">
       <div className="org-list">
         {organizations.map((org) => {
-          const key = org.SSN ?? org.id ?? org.OrganizationSSN ?? org.Name;
-          const name = org.name ?? org.Name ?? 'Unnamed';
-          const img = org.img ?? org.image ?? org.Image ?? org.photo ?? org.Photo ?? org.logo ?? org.Logo ?? null;
+          const ssn = org.ssn ?? org.SSN ?? org.OrganizationSSN ?? org.id;
+          const name = org.name ?? 'Unnamed';
+          const img = org.imageUrl ?? org.img ?? org.image ?? org.logo ?? null;
           return (
-            <div key={key} className="org-item">
+            <div key={ssn} className="org-item">
               <button
                 className="org-button"
-                onClick={() => onSelect(org.SSN ?? org.OrganizationSSN ?? key)}
-                aria-pressed={selectedSSN === (org.SSN ?? org.OrganizationSSN ?? key)}
+                onClick={() => onSelect(ssn)}
+                aria-pressed={selectedSSN === ssn}
               >
-                <div className={`org-avatar ${selectedSSN === (org.SSN ?? org.OrganizationSSN ?? key) ? 'selected' : ''}`}>
+                <div className={`org-avatar ${selectedSSN === ssn ? 'selected' : ''}`}>
                   <ImgOrPlaceholder src={img} alt={name} />
                 </div>
                 <div className="org-name">{name}</div>
