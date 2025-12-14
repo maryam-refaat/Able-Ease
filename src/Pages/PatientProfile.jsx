@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./PatientProf.css";
 import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
+import Sidebar from "../Components/Sidebar";
 
 import { getPatient_Program, getPatient_Therapies, getPatient_Reports } from "../assets/apis";
 import Footer from "../Components/Footer";
@@ -25,7 +26,7 @@ export default function PatientProfile() {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
-  
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -181,21 +182,7 @@ export default function PatientProfile() {
   return (
     <>
     <div className="with-sidebar">
-      <div className="side-rect" aria-hidden="true">
-        <div className="side-icons">
-          <button className="side-btn" aria-label="overview" onClick={() => navigate('/patient-profile') }>
-            <i className="fa-solid fa-user" aria-hidden="true"></i>
-          </button>
-          <button className="side-btn" aria-label="messages" onClick={() => navigate('/messages') }>
-            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
-          </button>
-          <button className="side-btn" aria-label="reports" onClick={() => navigate('/patient-reports', { state: { patientData: data } })}>
-            <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <div className="page-container">
+        <Sidebar userType="patient" />      <div className="page-container">
       <header className="welcome-box centered">
         <h1>Welcome, {data?.fullName ? data.fullName.split(" ")[0] : "Patient"}</h1>
         <p>{new Date().toLocaleDateString()}</p>

@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import { getRelatives, updateRelative } from "../assets/api";
 import "../profilepagecomponents/profile.css";
 
-export function RelativeCard({ title, data }) {
+export function RelativeCard({ title, data, onEdit }) {
 
   const [form, setForm] = useState({
     name: "",
     contact: "",
     email: "",
   });
-
-  const [isEditing, setIsEditing] = useState(false);
 
   
   useEffect(() => {
@@ -28,12 +26,6 @@ export function RelativeCard({ title, data }) {
     
     loadData();
   }, [data]);
-  
-  const handleSave = async () => {
-    // const token = localStorage.getItem("relativeToken");
-    // const updated = await updateRelative(token, form);
-    setIsEditing(false);
-  };
 
   return (
     <div className="relative-card">
@@ -53,33 +45,27 @@ export function RelativeCard({ title, data }) {
             </div>
           </div>
 
-          {!isEditing ? (
-            <button className="edit-btn" onClick={() => setIsEditing(true)}>
-              Edit
-            </button>
-          ) : (
-            <button className="save-btn" onClick={handleSave}>
-              Save
-            </button>
-          )}
+          <button className="edit-btn" onClick={onEdit}>
+            Edit
+          </button>
         </div>
 
         <div className="relative-input-grid">
           <div className="input-group">
             <label>Name</label>
             <input
-              disabled={!isEditing}
+              disabled
               value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              readOnly
             />
           </div>
 
           <div className="input-group">
             <label>Contact Info</label>
             <input
-              disabled={!isEditing}
+              disabled
               value={form.contact}
-              onChange={(e) => setForm({ ...form, contact: e.target.value })}
+              readOnly
             />
           </div>
         </div>

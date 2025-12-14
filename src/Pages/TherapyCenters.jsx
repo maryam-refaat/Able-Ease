@@ -62,18 +62,16 @@ export default function TherapyCenters() {
         } else {
           // keep dummy centers
           setTherapyCenters(DUMMY_Centers);
-          if (!selectedCenter) {
-            setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
-            setSelectedCenterName(DUMMY_Centers[0].name);
-          }
+          const firstSSN = getCenterSSN(DUMMY_Centers[0]);
+          setSelectedCenter(firstSSN);
+          setSelectedCenterName(DUMMY_Centers[0].name);
         }
       } catch (err) {
         console.error('getCenters failed, using dummy centers', err);
         setTherapyCenters(DUMMY_Centers);
-        if (!selectedCenter) {
-          setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
-          setSelectedCenterName(DUMMY_Centers[0].name);
-        }
+        const firstSSN = getCenterSSN(DUMMY_Centers[0]);
+        setSelectedCenter(firstSSN);
+        setSelectedCenterName(DUMMY_Centers[0].name);
         setErrorCenters(true);
       } finally {
         if (mounted) setLoadingCenters(false);
@@ -152,21 +150,21 @@ export default function TherapyCenters() {
           <TherapyCenterCarousel
             TherapyCenters={therapyCenters}
             onSelect={(ssn) => {
+              console.log('onSelect called with SSN:', ssn, 'current selectedCenter:', selectedCenter);
+              
               if (typeof ssn === 'string' && ssn.length && ssn !== selectedCenter) {
                 const center = therapyCenters.find(c => getCenterSSN(c) === ssn);
                 const name = center?.name ?? center?.Name ?? '';
                 
                 console.log('Therapy Center selected:', { ssn, name, center });
                 
-                // Smooth transition: set loading first, then update selection
+                // Clear data immediately and update selection
+                setPrograms([]);
                 setLoadingPrograms(true);
                 
-                // Small delay for smooth visual transition
-                setTimeout(() => {
-                  setSelectedCenter(ssn);
-                  setSelectedCenterName(name);
-                  setPrograms([]);
-                }, 150);
+                // Update selection which will trigger useEffect to fetch new data
+                setSelectedCenter(ssn);
+                setSelectedCenterName(name);
               }
             }}
             selectedSSN={selectedCenter}

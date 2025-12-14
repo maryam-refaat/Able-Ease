@@ -74,10 +74,22 @@ export default function RelativeSignUp() {
     try {
       setIsLoading(true);
 
+      // TODO: REMOVE WHEN API IS CONNECTED - simulate signup delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // const { value } = await signupRelative(data);
-      // localStorage.setItem("relativeToken", JSON.stringify(data));
+      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
+      // const res = await signupRelative(data);
+      // if (res?.error) throw new Error(res.error);
+      
+      // Store all relative info in localStorage for future navigation
+      localStorage.setItem("relativeSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
+      localStorage.setItem("userSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
+      localStorage.setItem("relativeName", data.fullName); // HANDLED BY API - use res.fullName from API response
+      localStorage.setItem("relativeEmail", data.email); // HANDLED BY API - use res.email from API response
+      localStorage.setItem("relativePhone", data.phone); // HANDLED BY API - use res.phone from API response
+      localStorage.setItem("relativeGender", data.gender); // HANDLED BY API - use res.gender from API response
+      localStorage.setItem("relativeAddress", data.address); // HANDLED BY API - use res.address from API response
+      localStorage.setItem("relativeData", JSON.stringify(data)); // HANDLED BY API - use JSON.stringify(res) from API response
       
       navigate("/relative-profile", { state: { relativeData: data } });
     } catch (error) {

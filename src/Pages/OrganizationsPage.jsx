@@ -62,7 +62,7 @@ export default function OrganizationsPage() {
         const res = await getOrganizations();
         if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
           setOrganizations(res.data);
-          // pick first org as selected if none selected
+          // pick first org as selected
           const firstSSN = readSSN(res.data[0]);
           const firstName = res.data[0]?.name ?? res.data[0]?.Name ?? '';
           if (firstSSN) {
@@ -72,18 +72,16 @@ export default function OrganizationsPage() {
         } else {
           // fallback to dummy and pick first dummy
           setOrganizations(DUMMY_ORGANIZATIONS);
-          if (!selectedOrg) {
-            setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
-            setSelectedOrgName(DUMMY_ORGANIZATIONS[0].name);
-          }
+          const firstSSN = readSSN(DUMMY_ORGANIZATIONS[0]);
+          setSelectedOrg(firstSSN);
+          setSelectedOrgName(DUMMY_ORGANIZATIONS[0].name);
         }
       } catch (err) {
         console.log("getOrganizations failed, using placeholders", err);
         setOrganizations(DUMMY_ORGANIZATIONS);
-        if (!selectedOrg) {
-          setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
-          setSelectedOrgName(DUMMY_ORGANIZATIONS[0].name);
-        }
+        const firstSSN = readSSN(DUMMY_ORGANIZATIONS[0]);
+        setSelectedOrg(firstSSN);
+        setSelectedOrgName(DUMMY_ORGANIZATIONS[0].name);
         setErrorOrgs(true);
       } finally {
         if (mounted) setLoadingOrgs(false);
@@ -94,6 +92,10 @@ export default function OrganizationsPage() {
   }, []);
 
 
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
      
   
@@ -167,23 +169,23 @@ export default function OrganizationsPage() {
 
   // Handle organization selection - update SSN and name, trigger data fetch via useEffect
   const handleOrgSelect = (ssn) => {
+    console.log('handleOrgSelect called with SSN:', ssn, 'current selectedOrg:', selectedOrg);
+    
     if (ssn && ssn !== selectedOrg) {
       const org = organizations.find(o => readSSN(o) === ssn);
       const name = org?.name ?? org?.Name ?? '';
       
       console.log('Organization selected:', { ssn, name, org });
       
-      // Smooth transition: set loading first, then update selection
+      // Clear data immediately and update selection
+      setPrograms([]);
+      setPositions([]);
+      setCaregivers([]);
       setLoadingData(true);
       
-      // Small delay for smooth visual transition
-      setTimeout(() => {
-        setSelectedOrg(ssn);
-        setSelectedOrgName(name);
-        setPrograms([]);
-        setPositions([]);
-        setCaregivers([]);
-      }, 150);
+      // Update selection which will trigger useEffect to fetch new data
+      setSelectedOrg(ssn);
+      setSelectedOrgName(name);
     }
   };
 

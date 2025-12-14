@@ -75,11 +75,15 @@ const AuthForm = () => {
       // localStorage.setItem("patientName", response.user.fullName);
       // localStorage.setItem("patientData", JSON.stringify(response.user));
       
-      // TODO: REMOVE WHEN API IS CONNECTED - Store demo patient data (HANDLED BY API)
+      // TODO: REMOVE WHEN API IS CONNECTED - Store demo user data (HANDLED BY API)
       if (loginType === "patient") {
         localStorage.setItem("patientSSN", "demo-patient-ssn-123"); // HANDLED BY API
         localStorage.setItem("userSSN", "demo-patient-ssn-123"); // HANDLED BY API
         localStorage.setItem("patientName", data.username); // HANDLED BY API
+      } else if (loginType === "relative") {
+        localStorage.setItem("relativeSSN", "demo-relative-ssn-456"); // HANDLED BY API
+        localStorage.setItem("userSSN", "demo-relative-ssn-456"); // HANDLED BY API
+        localStorage.setItem("relativeName", data.username); // HANDLED BY API
       }
       
       // Navigate based on login type

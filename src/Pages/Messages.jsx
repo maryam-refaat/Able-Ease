@@ -5,6 +5,7 @@ import "../profilepagecomponents/profile.css";
 import "./messages.css";
 import Footer from "../Components/Footer";
 import{getReceived_msgs, getSent_msgs,getUser_data} from "../assets/apis";
+import Sidebar from "../Components/Sidebar";
 
 
 //NO API YET, USING DEMO DATA
@@ -148,26 +149,66 @@ export default function Messages() {
   const [userNameCache, setUserNameCache] = useState({}); // Cache SSN -> Name
   const listRef = useRef(null);
   
-  // Get patient data from localStorage
-  const userSSN = localStorage.getItem("userSSN") || localStorage.getItem("patientSSN") || "current-user-ssn";
-  const [patientData] = useState(() => {
-    const storedDataStr = localStorage.getItem("patientData");
+  // Get user data from localStorage (patient or relative)
+  const [userData] = useState(() => {
+    // Check if relative data exists
+    const relativeDataStr = localStorage.getItem("relativeData");
+    const patientDataStr = localStorage.getItem("patientData");
+    
+    let data = null;
+    let userType = "patient"; // default
+    
+    // Try to load relative data first
     try {
-      return storedDataStr ? JSON.parse(storedDataStr) : {
-        fullName: localStorage.getItem("patientName") || "Patient Name",
-        email: localStorage.getItem("patientEmail") || "",
-        phone: localStorage.getItem("patientPhone") || "",
-        ssn: userSSN
-      };
+      if (relativeDataStr) {
+        data = JSON.parse(relativeDataStr);
+        userType = "relative";
+      }
     } catch (e) {
-      return {
-        fullName: localStorage.getItem("patientName") || "Patient Name",
-        email: localStorage.getItem("patientEmail") || "",
-        phone: localStorage.getItem("patientPhone") || "",
-        ssn: userSSN
-      };
+      console.error("Failed to parse relative data", e);
     }
+    
+    // If no relative data, try patient data
+    if (!data) {
+      try {
+        if (patientDataStr) {
+          data = JSON.parse(patientDataStr);
+          userType = "patient";
+        }
+      } catch (e) {
+        console.error("Failed to parse patient data", e);
+      }
+    }
+    
+    // Fallback to localStorage items
+    if (!data) {
+      const relativeName = localStorage.getItem("relativeName");
+      const patientName = localStorage.getItem("patientName");
+      const relativeSSN = localStorage.getItem("relativeSSN");
+      const patientSSN = localStorage.getItem("patientSSN");
+      
+      if (relativeName || relativeSSN) {
+        userType = "relative";
+        data = {
+          fullName: relativeName || "Relative Name",
+          email: localStorage.getItem("relativeEmail") || "",
+          phone: localStorage.getItem("relativePhone") || "",
+          ssn: relativeSSN || localStorage.getItem("userSSN") || "current-user-ssn"
+        };
+      } else {
+        data = {
+          fullName: patientName || "Patient Name",
+          email: localStorage.getItem("patientEmail") || "",
+          phone: localStorage.getItem("patientPhone") || "",
+          ssn: patientSSN || localStorage.getItem("userSSN") || "current-user-ssn"
+        };
+      }
+    }
+    
+    return { ...data, userType };
   });
+  
+  const userSSN = userData.ssn || localStorage.getItem("userSSN") || "current-user-ssn";
 
   // Fetch user name by SSN with caching
   const fetchUserName = async (ssn) => {
@@ -353,23 +394,11 @@ export default function Messages() {
   return (
     <>
       <div className="with-sidebar">
-        <div className="side-rect" aria-hidden="true">
-          <div className="side-icons">
-            <button className="side-btn" aria-label="overview" onClick={() => navigate('/patient-profile')}>
-              <i className="fa-solid fa-user" aria-hidden="true"></i>
-            </button>
-            <button className="side-btn" aria-label="messages" onClick={() => navigate('/messages')}>
-              <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
-            </button>
-            <button className="side-btn" aria-label="reports" onClick={() => navigate('/patient-reports')}>
-              <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
+        <Sidebar userType={userData.userType} />
 
         <div className="page-container messages-page">
           <header className="welcome-box centered">
-            <h1>Messages of {patientData.fullName?.split(' ')[0] || "Patient"}</h1>
+            <h1>Messages of {userData.fullName?.split(' ')[0] || "User"}</h1>
             <p>{new Date().toLocaleDateString()}</p>
           </header>
 

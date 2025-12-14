@@ -5,6 +5,7 @@ import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import { getPatient_Reports, getPatient_Medicalinfo } from "../assets/apis";
 import Footer from "../Components/Footer";
+import Sidebar from "../Components/Sidebar";
 
 export default function PatientReportsMedical() {
   const location = useLocation();
@@ -157,19 +158,7 @@ export default function PatientReportsMedical() {
 
   return (
     <div className="with-sidebar">
-      <div className="side-rect" aria-hidden="true">
-        <div className="side-icons">
-          <button className="side-btn" aria-label="overview" onClick={() => navigate('/patient-profile')}>
-            <i className="fa-solid fa-user" aria-hidden="true"></i>
-          </button>
-          <button className="side-btn" aria-label="messages" onClick={() => navigate('/messages') }>
-            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
-          </button>
-          <button className="side-btn" aria-label="reports" onClick={() => {/* already here */}}>
-            <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
+      <Sidebar userType="patient" />
 
       <div className="page-container">
         <header className="welcome-box centered">
