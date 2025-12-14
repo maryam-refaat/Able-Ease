@@ -39,16 +39,9 @@ export default function TherapyCenters() {
     return item.SSN ?? item.CenterSSN ?? item.centerSSN ?? item.center?.SSN ?? item.Organization?.SSN ?? null;
   };
 
-  // selected center SSN (initialize to first center)
+  // selected center SSN and name
   const [selectedCenter, setSelectedCenter] = useState(() => getCenterSSN(DUMMY_Centers[0]) || null);
-
-  // ensure selectedCenter gets set when therapyCenters change
-  useEffect(() => {
-    if (!selectedCenter && Array.isArray(therapyCenters) && therapyCenters.length) {
-      setSelectedCenter(getCenterSSN(therapyCenters[0]) || null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [therapyCenters]);
+  const [selectedCenterName, setSelectedCenterName] = useState(DUMMY_Centers[0]?.name ?? '');
 
   // load centers from API on mount (fall back to dummy centers on error)
   useEffect(() => {
@@ -61,14 +54,26 @@ export default function TherapyCenters() {
         if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
           setTherapyCenters(res.data);
           const first = getCenterSSN(res.data[0]);
-          if (first) setSelectedCenter(first);
+          const firstName = res.data[0]?.name ?? res.data[0]?.Name ?? '';
+          if (first) {
+            setSelectedCenter(first);
+            setSelectedCenterName(firstName);
+          }
         } else {
           // keep dummy centers
           setTherapyCenters(DUMMY_Centers);
+          if (!selectedCenter) {
+            setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
+            setSelectedCenterName(DUMMY_Centers[0].name);
+          }
         }
       } catch (err) {
         console.error('getCenters failed, using dummy centers', err);
         setTherapyCenters(DUMMY_Centers);
+        if (!selectedCenter) {
+          setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
+          setSelectedCenterName(DUMMY_Centers[0].name);
+        }
         setErrorCenters(true);
       } finally {
         if (mounted) setLoadingCenters(false);
@@ -90,12 +95,12 @@ export default function TherapyCenters() {
         if (mounted && res?.data && Array.isArray(res.data) && res.data.length) {
           setPrograms(res.data);
         } else {
-          // keep current programs (likely dummy)
-          if (!programs || programs.length === 0) setPrograms(DUMMY_Therapies);
+          // fallback to dummy data filtered by selected center
+          setPrograms(DUMMY_Therapies.filter(t => (t.centerSSN ?? t.CenterSSN) === selectedCenter));
         }
       } catch (err) {
         console.error('getcenter_Therapies failed, using dummy therapies', err);
-        if (!programs || programs.length === 0) setPrograms(DUMMY_Therapies);
+        setPrograms(DUMMY_Therapies.filter(t => (t.centerSSN ?? t.CenterSSN) === selectedCenter));
         setErrorPrograms(true);
       } finally {
         if (mounted) setLoadingPrograms(false);
@@ -130,8 +135,6 @@ export default function TherapyCenters() {
   // filter programs by selected center
   const filteredPrograms = normalizedPrograms.filter(p => p.centerSSN === selectedCenter);
 
-  const selectedCenterName = therapyCenters.find(c => getCenterSSN(c) === selectedCenter)?.name ?? '';
-
   // handler for booking (placeholder)
   function handleBook(program) {
     console.log('Book', program);
@@ -149,29 +152,41 @@ export default function TherapyCenters() {
           <TherapyCenterCarousel
             TherapyCenters={therapyCenters}
             onSelect={(ssn) => {
-              if (typeof ssn === 'string' && ssn.length) setSelectedCenter(ssn);
+              if (typeof ssn === 'string' && ssn.length && ssn !== selectedCenter) {
+                const center = therapyCenters.find(c => getCenterSSN(c) === ssn);
+                const name = center?.name ?? center?.Name ?? '';
+                
+                console.log('Therapy Center selected:', { ssn, name, center });
+                
+                // Smooth transition: set loading first, then update selection
+                setLoadingPrograms(true);
+                
+                // Small delay for smooth visual transition
+                setTimeout(() => {
+                  setSelectedCenter(ssn);
+                  setSelectedCenterName(name);
+                  setPrograms([]);
+                }, 150);
+              }
             }}
             selectedSSN={selectedCenter}
           />
         </section>
  <div className="container" style={{ padding: 22 }}>
         <section style={{ marginTop: 30 }}>
-          <h2 style={{ color: '#27865d' }}>Programs at {selectedCenterName || 'selected center'}</h2>
+          <h2 style={{ color: '#27865d' }}>Therapies at {selectedCenterName || 'selected center'}</h2>
 
           <div style={{ marginTop: 12 }}>
-            {filteredPrograms.length ? (
-              // If you add a ProgramList later, uncomment its import and this branch will use it.
-              typeof ProgramList === 'function' ? (
-                <ProgramList programs={filteredPrograms} onBook={handleBook} centerName={selectedCenterName} />
-              ) : (
-                <div style={{ display: 'grid', gap: 12 }}>
-                  {filteredPrograms.map(p => (
-                    <ProgramCard key={p.id ?? p.Id ?? JSON.stringify(p)} program={p} orgName={selectedCenterName} onBook={handleBook} />
-                  ))}
-                </div>
-              )
+            {loadingPrograms ? (
+              <div style={{ color: '#666' }}>Loading therapies...</div>
+            ) : filteredPrograms.length ? (
+              <div style={{ display: 'grid', gap: 12 }}>
+                {filteredPrograms.map(p => (
+                  <ProgramCard key={p.id ?? p.Id ?? JSON.stringify(p)} program={p} orgName={selectedCenterName} onBook={handleBook} />
+                ))}
+              </div>
             ) : (
-              <div style={{ color: '#666' }}>No programs for this therapy center.</div>
+              <div style={{ color: '#666' }}>No therapies for this center.</div>
             )}
           </div>
         </section>

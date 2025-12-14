@@ -194,24 +194,24 @@ export const getPatient_Program = async (PSSN) => {
 }
 
 export const getReceived_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}`/contact);
+  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}`);
   const data = await response.json();
   const Recieved = data.results||data||[];
   return {data:Recieved};
 }
 
 export const getSent_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`/contact);
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`);
   const data = await response.json();
   const Sent = data.results||data||[];
   return {data:Sent};
 }
 
-export const getUser_data = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`/contact);
+export const getUser_data = async (USSN) => {
+  const response = await fetch(`${BASE_URL}/User/data/${USSN}`);
   const data = await response.json();
-  const Sent = data.results||data||[];
-  return {data:Sent};
+  const UserData = data.results||data||[];
+  return {data:UserData};
 }
 
 export default api;

@@ -20,7 +20,12 @@ export default function PatientProfile() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
-
+  
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
+  
   useEffect(() => {
     async function fetchData() {
       try {
@@ -75,13 +80,60 @@ export default function PatientProfile() {
 
           setData(merged);
         } else {
-          // no identifier found — keep state data if any, otherwise mark as error
-          if (Object.keys(base).length) setData(base);
-          else setIsError(true);
+          // no identifier found — keep state data if any, otherwise use stored localStorage data
+          if (Object.keys(base).length) {
+            setData(base);
+          } else {
+            // Try to get stored patient data from localStorage
+            const storedDataStr = localStorage.getItem("patientData");
+            let storedData = null;
+            try {
+              storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
+            } catch (e) {
+              console.error("Failed to parse stored patient data", e);
+            }
+
+            // Set structure with stored data or demo data
+            const patientInfo = {
+              fullName: localStorage.getItem("patientName") || storedData?.fullName || "Patient Name",
+              email: localStorage.getItem("patientEmail") || storedData?.email || "patient@example.com",
+              phone: localStorage.getItem("patientPhone") || storedData?.phone || "+1 234 567 8900",
+              gender: localStorage.getItem("patientGender") || storedData?.gender || "Not specified",
+              address: localStorage.getItem("patientAddress") || storedData?.address || "Address not available",
+              birthDate: localStorage.getItem("patientBirthDate") || storedData?.birthDate || "",
+              ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
+              programs: [],
+              sessions: [],
+              reports: []
+            };
+            setData(patientInfo);
+          }
         }
       } catch (error) {
         console.error("Error fetching patient data:", error);
-        setIsError(true);
+        // Try to get stored patient data from localStorage
+        const storedDataStr = localStorage.getItem("patientData");
+        let storedData = null;
+        try {
+          storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
+        } catch (e) {
+          console.error("Failed to parse stored patient data", e);
+        }
+
+        // Set data with stored values instead of error
+        const patientInfo = {
+          fullName: localStorage.getItem("patientName") || storedData?.fullName || "Patient Name",
+          email: localStorage.getItem("patientEmail") || storedData?.email || "patient@example.com",
+          phone: localStorage.getItem("patientPhone") || storedData?.phone || "+1 234 567 8900",
+          gender: localStorage.getItem("patientGender") || storedData?.gender || "Not specified",
+          address: localStorage.getItem("patientAddress") || storedData?.address || "Address not available",
+          birthDate: localStorage.getItem("patientBirthDate") || storedData?.birthDate || "",
+          ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
+          programs: [],
+          sessions: [],
+          reports: []
+        };
+        setData(patientInfo);
       } finally {
         setIsLoading(false);
       }

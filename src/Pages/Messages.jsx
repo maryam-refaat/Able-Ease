@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../profilepagecomponents/profile.css";
 import "./messages.css";
 import Footer from "../Components/Footer";
-import{getReceived_msgs, getSent_msgs} from "../assets/apis";
+import{getReceived_msgs, getSent_msgs,getUser_data} from "../assets/apis";
 
 
 //NO API YET, USING DEMO DATA
@@ -74,24 +74,219 @@ const DEMO_CONVERSATIONS = [
       },
     ],
   },
+  {
+    id: "c4",
+    subject: "Question about therapy schedule",
+    participants: { from: "you@domain.com", to: "therapist@ablehub.org" },
+    snippet: "I wanted to ask if we can reschedule next week's session?",
+    unread: false,
+    messages: [
+      {
+        id: "m4",
+        from: "you@domain.com",
+        to: "therapist@ablehub.org",
+        subject: "Question about therapy schedule",
+        body: "Hi Sara, I wanted to ask if we can reschedule next week's session to Thursday afternoon instead of Tuesday? Please let me know if that works for you.",
+        datetime: "2025-12-12T16:45:00Z",
+        caregiver: "Sara Khan",
+        program: "Rehab for Seniors",
+        organization: "Able Learning Hub",
+      },
+    ],
+  },
+  {
+    id: "c5",
+    subject: "Payment confirmation",
+    participants: { from: "you@domain.com", to: "billing@sunrise.com" },
+    snippet: "I've completed the payment for invoice #INV-2025-12.",
+    unread: false,
+    messages: [
+      {
+        id: "m5",
+        from: "you@domain.com",
+        to: "billing@sunrise.com",
+        subject: "Payment confirmation",
+        body: "Hello, I've completed the payment for invoice #INV-2025-12 via bank transfer. The transaction ID is TXN789456123. Please confirm receipt.",
+        datetime: "2025-12-11T10:15:00Z",
+        caregiver: "",
+        program: "",
+        organization: "Sunrise Rehab",
+      },
+    ],
+  },
+  {
+    id: "c6",
+    subject: "Feedback on recent session",
+    participants: { from: "you@domain.com", to: "physio@centers.com" },
+    snippet: "Thank you for the excellent session yesterday!",
+    unread: false,
+    messages: [
+      {
+        id: "m6",
+        from: "you@domain.com",
+        to: "physio@centers.com",
+        subject: "Feedback on recent session",
+        body: "Thank you for the excellent session yesterday! The new exercises really helped with the balance improvement. Looking forward to continuing the program.",
+        datetime: "2025-12-13T08:30:00Z",
+        caregiver: "Alex Morgan",
+        program: "Balance Recovery",
+        organization: "Physio Care Center",
+      },
+    ],
+  },
 ];
 
 export default function Messages() {
   const navigate = useNavigate();
-  const [conversations, setConversations] = useState(DEMO_CONVERSATIONS);
+  const [conversations, setConversations] = useState([]);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [composeOpen, setComposeOpen] = useState(false);
   const [compose, setCompose] = useState({ to: "", subject: "", body: "" });
+  const [activeTab, setActiveTab] = useState("received"); // "received" or "sent"
+  const [loading, setLoading] = useState(true);
+  const [userNameCache, setUserNameCache] = useState({}); // Cache SSN -> Name
   const listRef = useRef(null);
+  
+  // Get patient data from localStorage
+  const userSSN = localStorage.getItem("userSSN") || localStorage.getItem("patientSSN") || "current-user-ssn";
+  const [patientData] = useState(() => {
+    const storedDataStr = localStorage.getItem("patientData");
+    try {
+      return storedDataStr ? JSON.parse(storedDataStr) : {
+        fullName: localStorage.getItem("patientName") || "Patient Name",
+        email: localStorage.getItem("patientEmail") || "",
+        phone: localStorage.getItem("patientPhone") || "",
+        ssn: userSSN
+      };
+    } catch (e) {
+      return {
+        fullName: localStorage.getItem("patientName") || "Patient Name",
+        email: localStorage.getItem("patientEmail") || "",
+        phone: localStorage.getItem("patientPhone") || "",
+        ssn: userSSN
+      };
+    }
+  });
+
+  // Fetch user name by SSN with caching
+  const fetchUserName = async (ssn) => {
+    if (!ssn || ssn === userSSN) return "You";
+    if (userNameCache[ssn]) return userNameCache[ssn];
+    
+    try {
+      const result = await getUser_data(ssn);
+      const userData = result?.data;
+      const name = userData?.Name || userData?.name || userData?.FullName || userData?.fullName || `User ${ssn.slice(0, 6)}`;
+      setUserNameCache(prev => ({ ...prev, [ssn]: name }));
+      return name;
+    } catch (err) {
+      console.error("Error fetching user name:", err);
+      return `User ${ssn.slice(0, 6)}`;
+    }
+  };
+
+  // Transform API message to conversation format
+  const transformMessage = async (msg, type) => {
+    const senderSSN = msg.SenderSSN || msg.senderSSN || msg.sender_SSN;
+    const receiverSSN = msg.ReceivedSSN || msg.receivedSSN || msg.receiver_SSN || msg.ReceiverSSN;
+    const subject = msg.Subject || msg.subject || "(no subject)";
+    const body = msg.Body || msg.body || msg.message || "";
+    const sentDate = msg.SentDate || msg.sentDate || msg.datetime || new Date().toISOString();
+    
+    const senderName = await fetchUserName(senderSSN);
+    const receiverName = await fetchUserName(receiverSSN);
+    
+    return {
+      id: msg.Id || msg.id || `msg-${senderSSN}-${Date.now()}`,
+      subject,
+      participants: {
+        from: type === "sent" ? "You" : senderName,
+        to: type === "sent" ? receiverName : "You",
+        fromSSN: senderSSN,
+        toSSN: receiverSSN
+      },
+      snippet: body.slice(0, 120),
+      unread: msg.messageStatus === 0 || msg.MessageStatus === 0 || false,
+      messages: [{
+        from: type === "sent" ? "You" : senderName,
+        to: type === "sent" ? receiverName : "You",
+        subject,
+        body,
+        datetime: sentDate,
+        senderSSN,
+        receiverSSN
+      }]
+    };
+  };
 
   useEffect(() => {
-    // If you have an API, fetch conversations here and setConversations(apiRes)
-    // Example:
-    // getConversations().then(res => setConversations(res.data || DEMO_CONVERSATIONS))
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
   }, []);
 
-  const filtered = conversations.filter(
+  useEffect(() => {
+    let mounted = true;
+    
+    const fetchMessages = async () => {
+      setLoading(true);
+      try {
+        const [receivedRes, sentRes] = await Promise.allSettled([
+          getReceived_msgs(userSSN),
+          getSent_msgs(userSSN)
+        ]);
+        
+        const receivedMsgs = receivedRes.status === "fulfilled" ? (receivedRes.value?.data || []) : [];
+        const sentMsgs = sentRes.status === "fulfilled" ? (sentRes.value?.data || []) : [];
+        
+        // If both API calls return empty, use demo data
+        if (receivedMsgs.length === 0 && sentMsgs.length === 0) {
+          if (mounted) {
+            setConversations(DEMO_CONVERSATIONS);
+            setLoading(false);
+          }
+          return;
+        }
+        
+        // Transform messages with user names
+        const receivedConverted = await Promise.all(
+          receivedMsgs.map(msg => transformMessage(msg, "received"))
+        );
+        const sentConverted = await Promise.all(
+          sentMsgs.map(msg => transformMessage(msg, "sent"))
+        );
+        
+        if (mounted) {
+          // Combine and sort by date
+          const allConversations = [...receivedConverted, ...sentConverted]
+            .sort((a, b) => new Date(b.messages[0].datetime) - new Date(a.messages[0].datetime));
+          setConversations(allConversations);
+        }
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+        if (mounted) {
+          setConversations(DEMO_CONVERSATIONS); // Fallback to demo
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    
+    fetchMessages();
+    return () => { mounted = false; };
+  }, [userSSN]);
+
+  // Filter by active tab (received or sent)
+  const tabFiltered = conversations.filter((c) => {
+    const lastMsg = c.messages[c.messages.length - 1];
+    if (activeTab === "received") {
+      return lastMsg.from !== "you@domain.com";
+    } else {
+      return lastMsg.from === "you@domain.com";
+    }
+  });
+
+  const filtered = tabFiltered.filter(
     (c) =>
       c.subject.toLowerCase().includes(query.toLowerCase()) ||
       c.snippet.toLowerCase().includes(query.toLowerCase()) ||
@@ -174,7 +369,7 @@ export default function Messages() {
 
         <div className="page-container messages-page">
           <header className="welcome-box centered">
-            <h1>Messages</h1>
+            <h1>Messages of {patientData.fullName?.split(' ')[0] || "Patient"}</h1>
             <p>{new Date().toLocaleDateString()}</p>
           </header>
 
@@ -190,9 +385,25 @@ export default function Messages() {
                 />
               </div>
 
+              <div className="inbox-tabs">
+                <button
+                  className={`tab-btn ${activeTab === "received" ? "active" : ""}`}
+                  onClick={() => setActiveTab("received")}
+                >
+                  Received
+                </button>
+                <button
+                  className={`tab-btn ${activeTab === "sent" ? "active" : ""}`}
+                  onClick={() => setActiveTab("sent")}
+                >
+                  Sent
+                </button>
+              </div>
+
               <div className="conversations">
-                {filtered.length === 0 && <div className="empty">No messages</div>}
-                {filtered.map((c) => (
+                {loading && <div className="empty">Loading messages...</div>}
+                {!loading && filtered.length === 0 && <div className="empty">No messages</div>}
+                {!loading && filtered.map((c) => (
                   <div
                     key={c.id}
                     className={`conversation-row ${c.id === selectedId ? "selected" : ""}`}

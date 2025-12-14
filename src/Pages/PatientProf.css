@@ -191,6 +191,9 @@
 /* Content area inside sections */
 .card-content {
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .card-content.horizontal {
@@ -251,9 +254,17 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.employment-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .avatar-circle {

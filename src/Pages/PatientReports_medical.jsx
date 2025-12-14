@@ -10,13 +10,27 @@ export default function PatientReportsMedical() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const patientData = location.state?.patientData || {};
+  // Get patient data from navigation state or localStorage
+  const getStoredPatientData = () => {
+    const storedDataStr = localStorage.getItem("patientData");
+    try {
+      return storedDataStr ? JSON.parse(storedDataStr) : {};
+    } catch (e) {
+      return {};
+    }
+  };
+
+  const patientData = location.state?.patientData || getStoredPatientData();
   const [data, setData] = useState(patientData || {});
   const [reports, setReports] = useState([]);
   const [medical, setMedical] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     async function load() {
       try {
@@ -87,10 +101,18 @@ export default function PatientReportsMedical() {
         const candidateId = patientData?.id ?? patientData?.PSSN ?? patientData?.ssn ?? (localStorage.getItem("patientSSN") || JSON.parse(localStorage.getItem("patientToken") || "null"));
 
         if (!candidateId) {
-          // No patient identifier — show demo data instead of throwing an error
+          // No patient identifier — load from localStorage and show demo data
+          const storedPatientInfo = {
+            fullName: localStorage.getItem("patientName") || "Patient Name",
+            email: localStorage.getItem("patientEmail") || "",
+            phone: localStorage.getItem("patientPhone") || "",
+            gender: localStorage.getItem("patientGender") || "",
+            address: localStorage.getItem("patientAddress") || "",
+            ssn: localStorage.getItem("patientSSN") || ""
+          };
           setReports(fallbackReports);
           setMedical(fallbackMedical);
-          setData(prev => ({ ...prev, ...patientData }));
+          setData({ ...storedPatientInfo, ...patientData });
           setIsLoading(false);
           return;
         }
@@ -128,6 +150,7 @@ export default function PatientReportsMedical() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
 
   if (isLoading) return <div className="page-container">Loading...</div>;
   if (isError) return <div className="page-container">Error loading reports.</div>;
@@ -161,6 +184,7 @@ export default function PatientReportsMedical() {
 
           <section className="card-section" style={{ marginTop: 18 }}>
             <h3>Medical Records</h3>
+            
             <div className="card-content">
               {medical.length ? (
                 medical.map((m, i) => (

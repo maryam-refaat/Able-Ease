@@ -64,11 +64,23 @@ const AuthForm = () => {
     try {
       setIsLoading(true);
 
+      // TODO: REMOVE WHEN API IS CONNECTED - simulate login delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // TODO: Replace with actual login API call
+      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
       // const response = await loginAPI(data);
       // localStorage.setItem("authToken", response.token);
+      // localStorage.setItem("patientSSN", response.user.ssn);
+      // localStorage.setItem("userSSN", response.user.ssn);
+      // localStorage.setItem("patientName", response.user.fullName);
+      // localStorage.setItem("patientData", JSON.stringify(response.user));
+      
+      // TODO: REMOVE WHEN API IS CONNECTED - Store demo patient data (HANDLED BY API)
+      if (loginType === "patient") {
+        localStorage.setItem("patientSSN", "demo-patient-ssn-123"); // HANDLED BY API
+        localStorage.setItem("userSSN", "demo-patient-ssn-123"); // HANDLED BY API
+        localStorage.setItem("patientName", data.username); // HANDLED BY API
+      }
       
       // Navigate based on login type
       switch(loginType) {

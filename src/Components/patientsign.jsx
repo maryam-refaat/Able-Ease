@@ -98,12 +98,25 @@ export default function PatientSignUp() {
     try {
       setIsLoading(true);
 
-      // simulate call
+      // TODO: REMOVE WHEN API IS CONNECTED - simulate call delay
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      // Example: call real API (uncomment and adapt)
+      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
       // const res = await signupPatient(data);
       // if (res?.error) throw new Error(res.error);
+      // Store API response: localStorage.setItem("patientSSN", res.ssn);
+      // Store API response: localStorage.setItem("userSSN", res.ssn);
+
+      // TODO: REMOVE WHEN API IS CONNECTED - Store all patient info in localStorage (API will handle this)
+      // When API is connected, these values should come from API response instead - use res.ssn from API response
+      localStorage.setItem("userSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
+      localStorage.setItem("patientName", data.fullName); // HANDLED BY API - use res.fullName from API response
+      localStorage.setItem("patientEmail", data.email); // HANDLED BY API - use res.email from API response
+      localStorage.setItem("patientPhone", data.phone); // HANDLED BY API - use res.phone from API response
+      localStorage.setItem("patientGender", data.gender); // HANDLED BY API - use res.gender from API response
+      localStorage.setItem("patientAddress", data.address); // HANDLED BY API - use res.address from API response
+      localStorage.setItem("patientBirthDate", data.birthDate); // HANDLED BY API - use res.birthDate from API response
+      localStorage.setItem("patientData", JSON.stringify(data)); // HANDLED BY API - use JSON.stringify(res) from API response
 
       // On success, navigate to profile or show success message.
       // Pass the created patient data (or token) via state if desired.
