@@ -19,7 +19,7 @@ export default function CaregiverCard({ care, onContact = () => {} }) {
 
   const id = care.id ?? care.ID ?? care.caregiverId ?? '';
   const name = care.name ?? care.Name ?? 'Unnamed';
-  const img = care.img ?? care.image ?? care.Image ?? care.photo ?? care.Photo ?? care.avatar ?? care.Avatar ?? null;
+  const img = care.imageUrl ?? care.img ?? care.image ?? care.photo ?? care.avatar ?? null;
   const experience = care.experience ?? care.Experience ?? care.years ?? '—';
   const age = care.age ?? care.Age ?? (care.BirthDate ? (new Date().getFullYear() - new Date(care.BirthDate).getFullYear()) : '—');
   const gender = care.Gender ?? care.gender ?? '';
