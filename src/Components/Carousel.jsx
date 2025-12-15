@@ -58,11 +58,7 @@ export default function Carousel() {
   return (
     <div className="carousel-wrapper container">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <h3 className="section-title" style={{ margin: 0 }}>Don’t miss coming programs &gt;&gt;</h3>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button type="button" className="carousel-arrow" onClick={handlePrev} aria-label="Previous">‹</button>
-          <button type="button" className="carousel-arrow" onClick={handleNext} aria-label="Next">›</button>
-        </div>
+        <h3 className="section-title" style={{ margin: 0 }}>Don't miss coming programs &gt;&gt;</h3>
       </div>
 
       <div className="carousel" aria-roledescription="carousel">

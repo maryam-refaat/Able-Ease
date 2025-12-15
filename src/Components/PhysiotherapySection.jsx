@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { getCenters } from "../assets/api";
 import "../index.css";
-import{getPhysicenters} from "../assets/apis";
+
+
 
 export default function PhysiotherapySection() {
   const [centers, setCenters] = useState([]);
 
   const fallback = [
     {
-      id: "C-01",
-      centerName: "Physio Care Cairo",
-      physicalTherapies: ["Hydrotherapy", "Manual Therapy"],
+      ssn: "CEN-001",
+      name: "Physio Care Cairo",
       location: "Cairo, Egypt",
+      imageUrl: null,
     },
     {
-      id: "C-02",
-      centerName: "Rehab Plus",
-      physicalTherapies: ["Exercise Therapy"],
+      ssn: "CEN-002",
+      name: "Rehab Plus",
       location: "Giza, Egypt",
+      imageUrl: null,
     },
   ];
 
@@ -28,7 +29,15 @@ export default function PhysiotherapySection() {
       try {
         const res = await getCenters();
         if (!mounted) return;
-        setCenters(Array.isArray(res.data) ? res.data : []);
+        
+        // Check if we got valid data from API
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setCenters(res.data);
+        } else {
+          // If API returns empty array or invalid data, use fallback
+          console.warn("getCenters returned empty/invalid data — using fallback");
+          setCenters(fallback);
+        }
       } catch (err) {
         if (!mounted) return;
         console.warn("getCenters failed — falling back", err);
@@ -58,7 +67,7 @@ export default function PhysiotherapySection() {
         {/* Grid of centers */}
         <div className="org-grid" style={{ marginTop: "20px" }}>
           {centers.map((c) => (
-            <div key={c.id} className="org-card">
+            <div key={c.ssn || c.id} className="org-card">
               
               {/* Placeholder image box */}
               <div
@@ -74,19 +83,17 @@ export default function PhysiotherapySection() {
                   color: "#777",
                 }}
               >
-                Image
+                {c.imageUrl ? (
+                  <img src={c.imageUrl} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                ) : (
+                  "Image"
+                )}
               </div>
 
-              <h4 className="h4">{c.centerName}</h4>
-
-              <p className="small" style={{ marginTop: "6px" }}>
-                {Array.isArray(c.physicalTherapies)
-                  ? c.physicalTherapies.join(", ")
-                  : ""}
-              </p>
+              <h4 className="h4">{c.name || c.centerName}</h4>
 
               <p className="small" style={{ marginTop: "10px", color: "#888" }}>
-                {c.location}
+                {c.location || "Location not available"}
               </p>
 
             </div>
