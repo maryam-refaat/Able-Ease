@@ -68,8 +68,8 @@ export default function AllEmployments() {
 
       try {
         const res = await getAll_Employments();
-        const empData = res?.data;
-
+        const empData = res?.data.data;
+ 
         if (mounted && Array.isArray(empData)) {
           setEmployments(empData);
         } else {
