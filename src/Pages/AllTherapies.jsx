@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getAll_Therapies } from "../assets/apis";
+import ConfirmationModal from "../Components/ConfirmationModal";
 import "../Org.css";
 import "./AllTherapies.css";
 
@@ -92,6 +95,15 @@ function ImgOrPlaceholder({ src, alt }) {
 export default function AllTherapies() {
   const [therapies, setTherapies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [selectedTherapy, setSelectedTherapy] = useState(null);
+
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -121,7 +133,30 @@ export default function AllTherapies() {
   }, []);
 
   const handleBook = (therapy) => {
-    alert(`Book: ${therapy.name}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedTherapy(therapy);
+      setShowBookModal(true);
+    }
+  };
+
+  const handleBookConfirm = () => {
+    console.log(`Booked therapy: ${selectedTherapy?.name}`);
+    alert("Your booking has been submitted successfully!");
+    setShowBookModal(false);
+    setSelectedTherapy(null);
+  };
+
+  const handleBookCancel = () => {
+    setShowBookModal(false);
+    setSelectedTherapy(null);
   };
 
   return (
@@ -192,6 +227,14 @@ export default function AllTherapies() {
           <div className="all-therapies-empty">No therapies available.</div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={showBookModal}
+        onConfirm={handleBookConfirm}
+        onCancel={handleBookCancel}
+        title="Confirm Booking"
+        message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?${(selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour) ? `\n\nPrice: $${selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour}/hr` : ''}`}
+      />
     </div>
   );
 }

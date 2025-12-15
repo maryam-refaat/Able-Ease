@@ -36,12 +36,7 @@ export default function Header({ onJoin }) {
     }
   };
 
-  // Disable Able-Ease link if logged in
-  const handleLogoClick = (e) => {
-    if (isLoggedIn) {
-      e.preventDefault();
-    }
-  };
+  // No need to disable landing page link anymore
 
   return (
     <>
@@ -52,7 +47,7 @@ export default function Header({ onJoin }) {
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
            <nav>
             <div className="logo">
-           <Link to="/Able-Ease" onClick={handleLogoClick} style={{ pointerEvents: isLoggedIn ? 'none' : 'auto', opacity: isLoggedIn ? 0.6 : 1 }}>Able-Ease</Link>
+           <Link to="/Able-Ease">Able-Ease</Link>
             </div>
             </nav>  
 

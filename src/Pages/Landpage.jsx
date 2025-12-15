@@ -1,5 +1,6 @@
 // Landpage.jsx
 import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from '../context/AuthContext';
 import './Landpage.css';
 
 // --- If you still have Swiper imports, you can remove or comment them out ---
@@ -176,9 +177,11 @@ export default function Landpage() {
 
       <p className="paragraph2"> Follow up by professional Care Takers whom are well trained to meet your standards </p>
       <Physicenterfind />
-       <div id="auth-form">
-         <AuthForm/>
-       </div>
+      {!useAuth().isLoggedIn && (
+        <div id="auth-form">
+          <AuthForm/>
+        </div>
+      )}
     </div>
   );
 }

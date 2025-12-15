@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../Org.css";
 import TherapyCenterCarousel from "../Components/TherapyCenterCarousel";
 import ProgramCard from "../Components/ProgramCard";
+import ConfirmationModal from "../Components/ConfirmationModal";
 import { getCenters, getcenter_Therapies } from "../assets/apis";
 
 /* Dummy fallback data */
@@ -31,6 +34,12 @@ export default function TherapyCenters() {
   const [loadingPrograms, setLoadingPrograms] = useState(false);
 
   const [selectedCenter, setSelectedCenter] = useState(null);
+
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [selectedTherapy, setSelectedTherapy] = useState(null);
+
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
 
   /* helper to extract center SSN */
   const getCenterSSN = (item) => {
@@ -129,7 +138,30 @@ export default function TherapyCenters() {
   };
 
   const handleBook = (program) => {
-    alert(`Book: ${program.name}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedTherapy(program);
+      setShowBookModal(true);
+    }
+  };
+
+  const handleBookConfirm = () => {
+    console.log(`Booked therapy: ${selectedTherapy?.name}`);
+    alert("Your booking has been submitted successfully!");
+    setShowBookModal(false);
+    setSelectedTherapy(null);
+  };
+
+  const handleBookCancel = () => {
+    setShowBookModal(false);
+    setSelectedTherapy(null);
   };
 
   /* =========================
@@ -169,6 +201,14 @@ export default function TherapyCenters() {
           )}
         </section>
       </div>
+
+      <ConfirmationModal
+        isOpen={showBookModal}
+        onConfirm={handleBookConfirm}
+        onCancel={handleBookCancel}
+        title="Confirm Booking"
+        message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?`}
+      />
     </div>
   );
 }

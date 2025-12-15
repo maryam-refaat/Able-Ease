@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "../Org.css";
 import OrgCarousel from "../Components/OrgCarousel";
 import ProgramCard from "../Components/ProgramCard";
 import PositionCard from "../Components/PositionsCard";
 import CaregiverCarousel from "../Components/CaregiverCarousel";
+import ConfirmationModal from "../Components/ConfirmationModal";
 
 import {
   getOrganizations,
@@ -66,6 +69,14 @@ export default function OrganizationsPage() {
   const [loadingData, setLoadingData] = useState(false);
 
   const [selectedOrg, setSelectedOrg] = useState(null);
+
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedPosition, setSelectedPosition] = useState(null);
+
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
 
   /* helper to read SSN from various shapes */
   const readSSN = (o) =>
@@ -177,11 +188,57 @@ export default function OrganizationsPage() {
   };
 
   const handleBook = (program) => {
-    alert(`Book: ${program.name}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedProgram(program);
+      setShowBookModal(true);
+    }
   };
 
   const handleApply = (pos) => {
-    alert(`Apply: ${pos.positionName}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedPosition(pos);
+      setShowApplyModal(true);
+    }
+  };
+
+  const handleBookConfirm = () => {
+    console.log(`Booked: ${selectedProgram?.name}`);
+    alert("Your booking has been submitted successfully!");
+    setShowBookModal(false);
+    setSelectedProgram(null);
+  };
+
+  const handleBookCancel = () => {
+    setShowBookModal(false);
+    setSelectedProgram(null);
+  };
+
+  const handleApplyConfirm = () => {
+    console.log(`Applied for: ${selectedPosition?.positionName}`);
+    alert("Your application has been submitted successfully!");
+    setShowApplyModal(false);
+    setSelectedPosition(null);
+  };
+
+  const handleApplyCancel = () => {
+    setShowApplyModal(false);
+    setSelectedPosition(null);
   };
 
   /* =========================
@@ -249,6 +306,22 @@ export default function OrganizationsPage() {
           )}
         </section>
       </div>
+
+      <ConfirmationModal
+        isOpen={showBookModal}
+        onConfirm={handleBookConfirm}
+        onCancel={handleBookCancel}
+        title="Confirm Booking"
+        message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?`}
+      />
+
+      <ConfirmationModal
+        isOpen={showApplyModal}
+        onConfirm={handleApplyConfirm}
+        onCancel={handleApplyCancel}
+        title="Confirm Application"
+        message="Confirm to Apply for this position and wait for the reply!!"
+      />
     </div>
   );
 }

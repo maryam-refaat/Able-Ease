@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import ConfirmationModal from "./ConfirmationModal";
 import "../index.css";
 import { getEmployments } from "../assets/apis";
 
 export default function OrgEmploySection() {
   const [positions, setPositions] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState(null);
+
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
 
   const fallback = [
     {
@@ -21,6 +29,33 @@ export default function OrgEmploySection() {
       OrgName: "Able Donor"
     }
   ];
+
+  const handleApply = (position) => {
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedPosition(position);
+      setShowModal(true);
+    }
+  };
+
+  const handleConfirm = () => {
+    console.log(`Applied for: ${selectedPosition?.positionName}`);
+    alert("Your application has been submitted successfully!");
+    setShowModal(false);
+    setSelectedPosition(null);
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    setSelectedPosition(null);
+  };
 
  useEffect(() => {
   let mounted = true;
@@ -74,7 +109,7 @@ export default function OrgEmploySection() {
               </p>
 
               <div style={{ marginTop: "14px", textAlign: "right" }}>
-                <button className="btn">Apply</button>
+                <button className="btn" onClick={() => handleApply(p)}>Apply</button>
               </div>
 
             </div>
@@ -82,6 +117,14 @@ export default function OrgEmploySection() {
         </div>
 
       </div>
+
+      <ConfirmationModal
+        isOpen={showModal}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        title="Confirm Application"
+        message="Confirm to Apply for this position and wait for the reply!!"
+      />
     </section>
   );
 }

@@ -25,10 +25,6 @@ export default function HomePage() {
  return (
     <div className="site-wrapper">
       <div className="site-content">
-        
-        <div className="search-bar-wrapper" style={{ marginTop: 8 }}>
-          <SearchBar value={search} onChange={(v) => handleSearch(v)} onSearch={() => handleSearch(search)} />
-        </div>
 
         <div className="hero">
           <Hero title="Ready to find" subtitle="your next big step !" />

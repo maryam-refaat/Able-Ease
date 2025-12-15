@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getAll_Employments } from "../assets/apis";
 import "../Org.css";
 import "./Allemps.css";
@@ -87,9 +89,22 @@ export default function AllEmployments() {
     return () => (mounted = false);
   }, []);
 
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
+
   const handleApply = (employment) => {
-    setSelectedEmployment(employment);
-    setShowModal(true);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedEmployment(employment);
+      setShowModal(true);
+    }
   };
 
   const handleConfirm = () => {
@@ -164,15 +179,15 @@ export default function AllEmployments() {
       {showModal && (
         <div className="modal-overlay" onClick={handleCancel}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Confirm Application</h2>
-            <p className="modal-message">
-              By confirming, your information will be sent to the organization and we will get back to you soon.
+            <h3>Confirm Application</h3>
+            <p>
+              Confirm to Apply for this position and wait for the reply!!
             </p>
             <div className="modal-actions">
-              <button className="modal-btn modal-confirm" onClick={handleConfirm}>
+              <button className="modal-confirm" onClick={handleConfirm}>
                 Confirm
               </button>
-              <button className="modal-btn modal-cancel" onClick={handleCancel}>
+              <button className="modal-cancel" onClick={handleCancel}>
                 Cancel
               </button>
             </div>

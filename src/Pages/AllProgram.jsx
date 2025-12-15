@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getAll_Programs } from "../assets/apis";
+import ConfirmationModal from "../Components/ConfirmationModal";
+import FAApplicationModal from "../Components/FAApplicationModal";
 import "../Org.css";
 import "./Allprog.css";
 
@@ -86,6 +90,16 @@ function ImgOrPlaceholder({ src, alt }) {
 export default function AllProgram() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [showFAModal, setShowFAModal] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+
+  const navigate = useNavigate();
+  const { isLoggedIn, userType } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -115,11 +129,57 @@ export default function AllProgram() {
   }, []);
 
   const handleBook = (program) => {
-    alert(`Book: ${program.name}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedProgram(program);
+      setShowBookModal(true);
+    }
   };
 
   const handleApplyFA = (program) => {
-    alert(`Apply for Financial Aid: ${program.name}`);
+    if (!isLoggedIn || userType !== "patient") {
+      navigate('/Able-Ease#auth-form');
+      setTimeout(() => {
+        const authElement = document.getElementById('auth-form');
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } else {
+      setSelectedProgram(program);
+      setShowFAModal(true);
+    }
+  };
+
+  const handleBookConfirm = () => {
+    console.log(`Booked: ${selectedProgram?.name}`);
+    alert("Your booking has been submitted successfully!");
+    setShowBookModal(false);
+    setSelectedProgram(null);
+  };
+
+  const handleBookCancel = () => {
+    setShowBookModal(false);
+    setSelectedProgram(null);
+  };
+
+  const handleFASubmit = (reason) => {
+    console.log(`Applied for FA: ${selectedProgram?.name}, Reason: ${reason}`);
+    alert(`Financial Aid application submitted for: ${selectedProgram?.name}\n\nYour reason: ${reason}`);
+    setShowFAModal(false);
+    setSelectedProgram(null);
+  };
+
+  const handleFACancel = () => {
+    setShowFAModal(false);
+    setSelectedProgram(null);
   };
 
   return (
@@ -191,6 +251,21 @@ export default function AllProgram() {
           <div className="all-programs-empty">No programs available.</div>
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={showBookModal}
+        onConfirm={handleBookConfirm}
+        onCancel={handleBookCancel}
+        title="Confirm Booking"
+        message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?${(selectedProgram?.price || selectedProgram?.Price) ? `\n\nPrice: $${selectedProgram?.price || selectedProgram?.Price}` : ''}`}
+      />
+
+      <FAApplicationModal
+        isOpen={showFAModal}
+        onSubmit={handleFASubmit}
+        onCancel={handleFACancel}
+        program={selectedProgram}
+      />
     </div>
   );
 }

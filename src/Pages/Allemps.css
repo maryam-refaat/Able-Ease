@@ -77,11 +77,11 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -89,22 +89,47 @@
   color: #27865d;
   font-size: 1.8rem;
   font-weight: 700;
+  margin: 0 0 24px 0;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(39, 134, 93, 0.1);
+}
+
+.modal-content h3 {
+  color: #27865d;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin: 0 0 20px 0;
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(39, 134, 93, 0.1);
+}
+
+.modal-content p {
+  color: #444;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 0 0 32px 0;
   text-align: center;
 }
 
+/* Make price text green in modal messages */
+.modal-content p strong {
+  color: #27865d;
+  font-weight: 700;
+}
+
 .modal-message {
-  color: #333;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin: 0 0 30px 0;
+  color: #444;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 0 0 32px 0;
   text-align: center;
 }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   justify-content: center;
+  margin-top: 8px;
 }
 
 .modal-btn {
@@ -118,24 +143,52 @@
 }
 
 .modal-confirm {
-  background: #27865d;
+  background: linear-gradient(135deg, #27865d 0%, #1e6b49 100%);
   color: white;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(39, 134, 93, 0.25);
 }
 
 .modal-confirm:hover {
-  background: #1e6b49;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #1e6b49 0%, #27865d 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(39, 134, 93, 0.4);
+}
+
+.modal-confirm:active {
+  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(39, 134, 93, 0.3);
 }
 
 .modal-cancel {
-  background: #e5e7eb;
-  color: #333;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #555;
+  padding: 14px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .modal-cancel:hover {
-  background: #d1d5db;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border-color: #9ca3af;
+}
+
+.modal-cancel:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive Design */
