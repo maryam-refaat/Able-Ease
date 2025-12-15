@@ -7,6 +7,7 @@ import RelativeSignUp from './relativesign';
 import Modal from "./modal";
 import CaretakerSignUp from './caretakersign';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AuthForm = () => {
   const [type, setType] = useState("");
@@ -15,6 +16,7 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const renderForm = () => {
     switch (type) {
@@ -76,6 +78,15 @@ const AuthForm = () => {
       // localStorage.setItem("patientData", JSON.stringify(response.user));
       
       // TODO: REMOVE WHEN API IS CONNECTED - Store demo user data (HANDLED BY API)
+      const userData = {
+        role: loginType, // patient, relative, caretaker, organization, physio
+        username: data.username,
+        ssn: loginType === "patient" ? "demo-patient-ssn-123" : "demo-relative-ssn-456"
+      };
+      
+      // Use AuthContext to store user data
+      login(userData);
+      
       if (loginType === "patient") {
         localStorage.setItem("patientSSN", "demo-patient-ssn-123"); // HANDLED BY API
         localStorage.setItem("userSSN", "demo-patient-ssn-123"); // HANDLED BY API

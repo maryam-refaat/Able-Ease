@@ -141,7 +141,8 @@ export default function AllProgram() {
               const endDate = program.endDate ?? program.EndDate ?? "";
               const price = program.price ?? program.Price ?? null;
               const location = program.location ?? program.Location ?? "";
-              const img = program.imageUrl ?? program.img ?? program.image ?? null;
+              const img =
+                program.imageUrl ?? program.img ?? program.image ?? null;
 
               return (
                 <div key={program.id} className="programs-card">
@@ -156,7 +157,9 @@ export default function AllProgram() {
                     </div>
 
                     <p className="program-desc">
-                      {(startDate || endDate) ? `📅 ${startDate || ""} → ${endDate || ""}` : "Dates not available"}
+                      {startDate || endDate
+                        ? `📅 ${startDate || ""} → ${endDate || ""}`
+                        : "Dates not available"}
                       {location && ` | 📍 ${location}`}
                     </p>
 

@@ -93,6 +93,11 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
   }, [images]);
 
   if (!images || images.length === 0) return null;
+  
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div
@@ -144,25 +149,15 @@ export default function Landpage() {
             <p className="label">Programs</p>
           </Link>
 
-          <div className="search-item">
-            <FontAwesomeIcon icon={faCoins} className="pictures" />
-            <p className="label">FAs</p>
-          </div>
-
           <Link to="/all-therapies" className="search-item">
             <FontAwesomeIcon icon={faHandsHoldingChild} className="pictures" />
             <p className="label">Therapies</p>
           </Link>
 
-          <div className="search-item">
+          <Link to="/all-employments" className="search-item">
             <FontAwesomeIcon icon={faClipboardUser} className="pictures" />
             <p className="label">Employment</p>
-          </div>
-
-          <div className="search-item">
-            <FontAwesomeIcon icon={faHandshakeAngle} className="pictures" />
-            <p className="label">CTs</p>
-          </div>
+          </Link>
 
           <Link to="/organizations" className="search-item">
             <FontAwesomeIcon icon={faBuilding} className="pictures" />
@@ -181,7 +176,9 @@ export default function Landpage() {
 
       <p className="paragraph2"> Follow up by professional Care Takers whom are well trained to meet your standards </p>
       <Physicenterfind />
-       <AuthForm/>
+       <div id="auth-form">
+         <AuthForm/>
+       </div>
     </div>
   );
 }

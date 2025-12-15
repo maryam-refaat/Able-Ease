@@ -1,0 +1,180 @@
+/* All Employments Page Styles */
+.all-employments-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f4ea 100%);
+  padding: 40px 40px;
+  padding-top: 100px;
+}
+
+.all-employments-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.all-employments-title {
+  color: #27865d;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 8px rgba(39, 134, 93, 0.3);
+}
+
+.all-employments-loading,
+.all-employments-empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 60px 20px;
+}
+
+/* Grid Layout - uses .position-card from Org.css */
+.all-employments-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  color: #27865d;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.modal-message {
+  color: #333;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-confirm {
+  background: #27865d;
+  color: white;
+}
+
+.modal-confirm:hover {
+  background: #1e6b49;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 134, 93, 0.3);
+}
+
+.modal-cancel {
+  background: #e5e7eb;
+  color: #333;
+}
+
+.modal-cancel:hover {
+  background: #d1d5db;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .all-employments-grid .position-card {
+    flex-direction: column;
+  }
+  
+  .all-employments-grid .position-left {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-employments-page {
+    padding: 30px 20px;
+  }
+
+  .all-employments-title {
+    font-size: 2rem;
+  }
+
+  .modal-content {
+    padding: 30px 20px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-message {
+    font-size: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-btn {
+    width: 100%;
+  }
+}

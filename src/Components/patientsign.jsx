@@ -2,11 +2,13 @@
 import React, { useState } from "react";
 import "../Components/signup.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 // import { signupPatient } from "../assets/api"; // uncomment when API exists
 
 export default function PatientSignUp() {
   const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -109,7 +111,22 @@ export default function PatientSignUp() {
 
       // TODO: REMOVE WHEN API IS CONNECTED - Store all patient info in localStorage (API will handle this)
       // When API is connected, these values should come from API response instead - use res.ssn from API response
-      localStorage.setItem("userSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
+      
+      // Store user data in AuthContext with role
+      const userData = {
+        role: "patient",
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        gender: data.gender,
+        address: data.address,
+        birthDate: data.birthDate,
+        ssn: data.ssn || "demo-patient-ssn-123" // Use API response ssn when available
+      };
+      
+      login(userData);
+      
+      localStorage.setItem("userSSN", userData.ssn); // HANDLED BY API - use res.ssn from API response
       localStorage.setItem("patientName", data.fullName); // HANDLED BY API - use res.fullName from API response
       localStorage.setItem("patientEmail", data.email); // HANDLED BY API - use res.email from API response
       localStorage.setItem("patientPhone", data.phone); // HANDLED BY API - use res.phone from API response

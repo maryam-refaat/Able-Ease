@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Header from "../Components/Header";
 import SearchBar from "../Components/search";
 import Hero from "../Components/hero";
@@ -16,6 +16,11 @@ export default function HomePage() {
   function handleSearch() {
     console.log("search for", search);
   }
+  
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
  return (
     <div className="site-wrapper">

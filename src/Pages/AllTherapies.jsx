@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAll_Therapies } from '../assets/apis';
+import { getAll_Therapies } from "../assets/apis";
 import "../Org.css";
 import "./AllTherapies.css";
 
@@ -136,16 +136,21 @@ export default function AllTherapies() {
             {therapies.map((therapy) => {
               const name = therapy.name ?? therapy.Name ?? "Therapy";
               const centerName =
-                therapy.centerName ??
-                therapy.CenterName ??
-                therapy.centername ??
+                therapy?.center?.name ??
+                therapy?.CenterName ??
+                therapy?.centername ??
                 "Center";
-              const pricePerHour = therapy.pricePerHour ?? therapy.PricePerHour ?? therapy.price ?? null;
+              const pricePerHour =
+                therapy.pricePerHour ??
+                therapy.PricePerHour ??
+                therapy.price ??
+                null;
               const duration = therapy.duration ?? therapy.Duration ?? "";
               const location = therapy.location ?? therapy.Location ?? "";
               const date = therapy.date ?? therapy.Date ?? "";
               const time = therapy.time ?? therapy.Time ?? "";
-              const img = therapy.imageUrl ?? therapy.img ?? therapy.image ?? null;
+              const img =
+                therapy.imageUrl ?? therapy.img ?? therapy.image ?? null;
 
               return (
                 <div key={therapy.id} className="programs-card">

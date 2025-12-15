@@ -11,6 +11,11 @@ export default function AboutUs() {
     });
   }, []);
 
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
+  
   return (
     <div className="about-container">
 

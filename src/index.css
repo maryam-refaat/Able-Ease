@@ -315,6 +315,29 @@ header .auth-buttons {
   background: #f1f1f1;
 }
 
+.auth-buttons .profile-btn {
+  background: linear-gradient(90deg, #a8d5f7 0%, #d4c5f7 50%, #ffe8a8 100%);
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(168, 213, 247, 0.6);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 18px;
+}
+
+.auth-buttons .profile-btn:hover {
+  background: linear-gradient(90deg, #ffe8a8 0%, #d4c5f7 50%, #a8d5f7 100%);
+  box-shadow: 0 0 25px rgba(168, 213, 247, 0.9);
+  transform: translateY(-2px);
+}
+
 /* ---------- SEARCH BAR ---------- */
 .search-bar-wrapper {
   padding: 40px 0;

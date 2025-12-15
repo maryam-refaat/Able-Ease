@@ -1,5 +1,5 @@
-
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 
 import Landpage from './Pages/Landpage';
 import AboutPage from "./Pages/About"
@@ -14,6 +14,7 @@ import PatientReportsMedical from './Pages/PatientReports_medical';
 import Messages from './Pages/Messages';
 import AllProgram from './Pages/AllProgram';
 import AllTherapies from './Pages/AllTherapies';
+import AllEmployments from './Pages/AllEmployments';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,9 @@ const router = createBrowserRouter([
       },{
         path: "/all-therapies",
         element: <AllTherapies />
+      },{
+        path: "/all-employments",
+        element: <AllEmployments />
       }
     ]
     
@@ -76,9 +80,9 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <RouterProvider router={router} />
-    </>
+    </AuthProvider>
   );
 }
 

@@ -110,6 +110,13 @@ export default function OrganizationsPage() {
   /* =========================
      Load Programs / Caregivers / Positions
      ========================= */
+     
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
+
+  
   useEffect(() => {
     if (!selectedOrg) return;
 

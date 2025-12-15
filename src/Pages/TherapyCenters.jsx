@@ -77,6 +77,11 @@ export default function TherapyCenters() {
   /* =========================
      Load Therapies
      ========================= */
+     
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
   useEffect(() => {
     if (!selectedCenter) return;
 

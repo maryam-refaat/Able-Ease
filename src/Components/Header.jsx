@@ -1,8 +1,48 @@
 import React from "react";
-import { Link } from "react-router-dom";   // ← ADD THIS
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 import "../index.css";
 
 export default function Header({ onJoin }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoggedIn, userType } = useAuth();
+
+  const handleAuthClick = () => {
+    navigate('/Able-Ease#auth-form');
+    setTimeout(() => {
+      const authElement = document.getElementById('auth-form');
+      if (authElement) {
+        authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  const handleProfileClick = () => {
+    switch (userType) {
+      case "relative":
+        navigate("/relative-profile");
+        break;
+      case "organization":
+        navigate("/organization-profile");
+        break;
+      case "therapyCenter":
+        navigate("/therapy-center-profile");
+        break;
+      case "patient":
+      default:
+        navigate("/patient-profile");
+        break;
+    }
+  };
+
+  // Disable Able-Ease link if logged in
+  const handleLogoClick = (e) => {
+    if (isLoggedIn) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <>
     <header>
@@ -12,7 +52,7 @@ export default function Header({ onJoin }) {
         <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
            <nav>
             <div className="logo">
-           <Link  to="/Able-Ease">Able-Ease</Link>
+           <Link to="/Able-Ease" onClick={handleLogoClick} style={{ pointerEvents: isLoggedIn ? 'none' : 'auto', opacity: isLoggedIn ? 0.6 : 1 }}>Able-Ease</Link>
             </div>
             </nav>  
 
@@ -27,8 +67,16 @@ export default function Header({ onJoin }) {
         
         {/* Right side: Auth buttons */}
         <div className="auth-buttons">
-          <button>Log in</button>
-          <button onClick={onJoin}>Join Us</button>
+          {isLoggedIn ? (
+            <button className="profile-btn" onClick={handleProfileClick} title="Profile">
+              <i className="fa-solid fa-user"></i>
+            </button>
+          ) : (
+            <>
+              <button onClick={handleAuthClick}>Log in</button>
+              <button onClick={handleAuthClick}>Join Us</button>
+            </>
+          )}
         </div>
 
       </div>
