@@ -440,4 +440,70 @@ export const getProgramPatients = async (programId, ssn) => {
   return data;
 };
 
+
+
+export const getReportByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/report/getReportsByPatient/${Pssn}`);
+  const data = await response.json();
+  const Patient_reports = data.results || data || [];
+  return { data: Patient_reports };
+};
+
+
+export const getTherapyByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/therapy/Patient/${Pssn}`);
+  const data = await response.json();
+  const Patient_therapies = data.results || data || [];
+  return { data: Patient_therapies };
+};
+
+export const getWorkByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/PatientWork/getby-patient/${Pssn}`);
+  const data = await response.json();
+  const Patient_work = data.results || data || [];
+  return { data: Patient_work };
+};
+
+export const getPatientDisability = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/Patientdisability/getpatientBisabilities/${Pssn}`);
+  const data = await response.json();
+  const Patient_disability = data.results || data || [];
+  return { data: Patient_disability };
+};
+
+export const getFAByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/FinancialAid/getFinancialAidsByPatient/${Pssn}`);
+  const data = await response.json();
+  const Patient_work = data.results || data || [];
+  return { data: Patient_work };
+};
+
+export const getProgramByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/getProgramByPatientSSN/${Pssn}`);
+  const data = await response.json();
+  const patient_prog = data.results || data || [];
+  return { data: patient_prog };
+};
+
+export const getMedicalInfoByPatient = async (Pssn) => {
+  const response = await fetch(`${BASE_URL}/MedicalInfo/GetMedicalInfoByPatient/${Pssn}`);
+  const data = await response.json();
+  const patient_prog = data.results || data || [];
+  return { data: patient_prog };
+};
+
+
+export const sendMssg = async (body) => {
+  const response = await fetch(`${BASE_URL}/Message/send/contact`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+  return data;
+};
+
 export default api;
