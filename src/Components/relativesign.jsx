@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./signup.css";
 import { useNavigate } from "react-router-dom";
 import { signupRelative } from "../assets/apis";
@@ -10,7 +10,47 @@ export default function RelativeSignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [patients, setPatients] = useState([]);
+  const [loadingPatients, setLoadingPatients] = useState(false);
   const formRef = React.useRef(null);
+
+  const baseApiUrl = "https://localhost:7040/api";
+
+  // Fetch patients with usernames
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setLoadingPatients(true);
+      try {
+        const url = `${baseApiUrl}/patients/getallpatientsusernames`;
+        const res = await fetch(url, { method: "GET" });
+        if (!res.ok) throw new Error(`Failed to load patients: ${res.status}`);
+        const json = await res.json();
+
+        const arr = Array.isArray(json?.data?.data)
+          ? json.data.data
+          : Array.isArray(json?.data)
+          ? json.data
+          : Array.isArray(json)
+          ? json
+          : [];
+
+        const mapped = arr
+          .filter(Boolean)
+          .map((p) => ({
+            patientSSN: p.patientSSN || p.ssn || p.SSN || p.id,
+            username: p.username || p.userName || "Unknown",
+          }))
+          .filter((x) => x.patientSSN && x.username);
+
+        setPatients(mapped);
+      } catch (e) {
+        console.error("Failed to load patients:", e);
+      } finally {
+        setLoadingPatients(false);
+      }
+    };
+    fetchPatients();
+  }, []);
 
   const handleCloseSuccess = () => {
     setIsSuccess(false);
@@ -142,12 +182,16 @@ export default function RelativeSignUp() {
 
       <div className="two-inputs">
         <input type="text" name="fullName" placeholder="Full Name" required />
-        <input
-          type="text"
-          name="relationship"
-          placeholder="Relationship to Patient"
-          required
-        />
+        <select name="relationship" required>
+          <option value="" disabled selected>
+            {loadingPatients ? "Loading patients..." : "Select Patient"}
+          </option>
+          {patients.map((patient) => (
+            <option key={patient.patientSSN} value={patient.patientSSN}>
+              {patient.username}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="two-inputs">

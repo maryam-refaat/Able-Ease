@@ -31,18 +31,8 @@ export const signupRelative = async (body) => {
 };
 
 // signup Organization
-export const signupOrganization = async (body) => {
-  const response = await fetch(`${BASE_URL}/organizations`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
 
-  const data = await response.json();
-  return data;
-};
+
 
 // Fetch programs
 export const getPrograms = async () => {
@@ -84,12 +74,6 @@ export const updateRelative = async (id, body) => {
     body: JSON.stringify(body),
   });
 
-  const data = await response.json();
-  return data;
-};
-
-export const fetchAvailablePrograms = async () => {
-  const response = await fetch(`${BASE_URL}/available-programs`);
   const data = await response.json();
   return data;
 };
@@ -296,4 +280,151 @@ export const signupPatient = async (body) => {
   const data = await response.json();
   return data;
 };
+
+export const signupOrganization = async (body) => {
+  const response = await fetch(`${BASE_URL}/organizations/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+export const loginAPI = async (body) => {
+  const response = await fetch(`${BASE_URL}/account/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+  return data;
+};
+
+export const getrelativebyid = async (ssn) => {
+  const response = await fetch(`${BASE_URL}/relative/getrelative/${ssn}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const fetchAvailablePrograms = async (ssn) => {
+  const response = await fetch(
+    `${BASE_URL}/program/organizationprograms/${ssn}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  // 👇 لو مفيش برامج
+  if (response.status === 404) {
+    return { data: [] };
+  }
+
+  // 👇 أي error تاني
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || "Failed to fetch programs");
+  }
+
+  // 👇 تأكد إن المحتوى JSON
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.includes("application/json")) {
+    return { data: [] };
+  }
+
+  const data = await response.json();
+  return { data };
+};
+
+
+export const addProgram = async (organizationSsn, formData) => {
+  const res = await fetch(
+    `https://localhost:7040/api/Program/AddProgram/${organizationSsn}`,
+    {
+      method: "POST",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    const error = await res.json();
+    console.error(error);
+    throw new Error("Add program failed: " + (error.title || res.statusText));
+  }
+
+  return res.json(); // should return the new program with ID
+};
+
+
+
+export const updateProgram = async (ssn, programId, formData) => {
+  const response = await fetch(
+    `${BASE_URL}/program/updateprogram/${ssn}/${programId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        // DO NOT set "Content-Type" for FormData
+      },
+      body: formData, // send as FormData
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(
+      `Update program failed: ${response.status} - ${JSON.stringify(err)}`
+    );
+  }
+
+  return response.json();
+};
+
+export const deletePatientFromProgram = async (programId, patientId, ssn) => {
+  const response = await fetch(
+    `${BASE_URL}/program/removepatientfromprogram/${ssn}/${programId}/${patientId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  const data = await response.text();
+  return data;
+};
+
+export const getProgramPatients = async (programId, ssn) => {
+  const response = await fetch(
+    `${BASE_URL}/program/getprogrampatients/${ssn}/${programId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+  return data;
+};
+
+
 export default api;
