@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getAll_Therapies } from "../assets/apis";
-import ConfirmationModal from "../Components/ConfirmationModal";
+import SessionConfirmationModal from "../Components/SessionConfirmationModal";
 import "../Org.css";
 import "./AllTherapies.css";
 
@@ -148,8 +148,7 @@ export default function AllTherapies() {
   };
 
   const handleBookConfirm = () => {
-    console.log(`Booked therapy: ${selectedTherapy?.name}`);
-    alert("Your booking has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowBookModal(false);
     setSelectedTherapy(null);
   };
@@ -228,12 +227,14 @@ export default function AllTherapies() {
         )}
       </div>
 
-      <ConfirmationModal
+      <SessionConfirmationModal
         isOpen={showBookModal}
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
-        title="Confirm Booking"
+        title="Confirm Session Booking"
         message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?${(selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour) ? `\n\nPrice: $${selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour}/hr` : ''}`}
+        therapy={selectedTherapy}
+        isBooking={true}
       />
     </div>
   );

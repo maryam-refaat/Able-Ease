@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ConfirmationModal from "./ConfirmationModal";
@@ -9,6 +9,7 @@ export default function OrgEmploySection() {
   const [positions, setPositions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const listRef = useRef(null);
 
   const navigate = useNavigate();
   const { isLoggedIn, userType } = useAuth();
@@ -22,6 +23,18 @@ export default function OrgEmploySection() {
       OrgName: "Able Donor"
     },
     {
+      positionId: 102,
+      positionName: "Assistant Therapist",
+      requirements: "High school diploma",
+      OrganizationSSN: "ORG-001",
+      OrgName: "Able Donor"
+    },{
+      positionId: 101,
+      positionName: "Physiotherapist",
+      requirements: "BSc physiotherapy; 2+ years",
+      OrganizationSSN: "ORG-001",
+      OrgName: "Able Donor"
+    }, {
       positionId: 102,
       positionName: "Assistant Therapist",
       requirements: "High school diploma",
@@ -46,8 +59,7 @@ export default function OrgEmploySection() {
   };
 
   const handleConfirm = () => {
-    console.log(`Applied for: ${selectedPosition?.positionName}`);
-    alert("Your application has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowModal(false);
     setSelectedPosition(null);
   };
@@ -87,35 +99,31 @@ export default function OrgEmploySection() {
   return (
     <section id="org">
       <div className="container">
-
-        {/* Title */}
         <h3 className="section-title">
           Find Organizations Ready to Employ &gt;
         </h3>
 
-        {/* Grid */}
-        <div className="org-grid">
-          {positions.map((p) => (
-            <div key={p.positionId} className="org-card">
+        <div className="carousel" aria-roledescription="carousel">
+          <div ref={listRef} className="carousel-list" role="list">
+            {positions.map((p) => (
+              <div key={p.positionId} className="carousel-item" role="listitem">
+                <h4 className="h4">{p.positionName}</h4>
 
-              <h4 className="h4">{p.positionName}</h4>
+                <p className="small" style={{ marginTop: "6px" }}>
+                  <strong>Organization:</strong> {p.OrgName}
+                </p>
 
-              <p className="small" style={{ marginTop: "6px" }}>
-                <strong>Organization:</strong> {p.OrgName}
-              </p>
+                <p className="small" style={{ marginTop: "6px" }}>
+                  <strong>Requirements:</strong> {p.requirements}
+                </p>
 
-              <p className="small" style={{ marginTop: "6px" }}>
-                <strong>Requirements:</strong> {p.requirements}
-              </p>
-
-              <div style={{ marginTop: "14px", textAlign: "right" }}>
-                <button className="btn" onClick={() => handleApply(p)}>Apply</button>
+                <div style={{ marginTop: "14px", textAlign: "right" }}>
+                  <button className="btn" onClick={() => handleApply(p)}>Apply</button>
+                </div>
               </div>
-
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
       </div>
 
       <ConfirmationModal
@@ -124,6 +132,8 @@ export default function OrgEmploySection() {
         onCancel={handleCancel}
         title="Confirm Application"
         message="Confirm to Apply for this position and wait for the reply!!"
+        program={selectedPosition}
+        isApply={true}
       />
     </section>
   );

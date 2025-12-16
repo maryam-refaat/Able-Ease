@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getAll_Employments } from "../assets/apis";
+import ConfirmationModal from "../Components/ConfirmationModal";
 import "../Org.css";
 import "./Allemps.css";
 
@@ -11,6 +12,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 1,
     position: "Physical Therapist",
     organizationName: "Sunrise Rehab Center",
+    organizationSSN: "ORG-001",
     requirements: "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
     imageUrl: null,
   },
@@ -18,6 +20,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 2,
     position: "Occupational Therapist",
     organizationName: "Hope Wellness Center",
+    organizationSSN: "ORG-002",
     requirements: "Master's degree in OT, state license required, pediatric experience preferred",
     imageUrl: null,
   },
@@ -25,6 +28,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 3,
     position: "Speech Therapist",
     organizationName: "Able Care Hub",
+    organizationSSN: "ORG-003",
     requirements: "CCC-SLP certification, experience with children and adults, bilingual a plus",
     imageUrl: null,
   },
@@ -32,6 +36,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 4,
     position: "Rehabilitation Aide",
     organizationName: "Physio Plus Center",
+    organizationSSN: "ORG-004",
     requirements: "High school diploma, patient care experience, strong communication skills",
     imageUrl: null,
   },
@@ -39,6 +44,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 5,
     position: "Registered Nurse",
     organizationName: "Care First Hospital",
+    organizationSSN: "ORG-005",
     requirements: "BSN degree, active RN license, 1+ year clinical experience",
     imageUrl: null,
   },
@@ -46,6 +52,7 @@ const DUMMY_EMPLOYMENTS = [
     id: 6,
     position: "Medical Social Worker",
     organizationName: "Community Health Services",
+    organizationSSN: "ORG-006",
     requirements: "MSW degree, LCSW license, healthcare experience required",
     imageUrl: null,
   },
@@ -108,11 +115,9 @@ export default function AllEmployments() {
   };
 
   const handleConfirm = () => {
-    const positionName = selectedEmployment?.subject ?? selectedEmployment?.Subject ?? selectedEmployment?.position ?? selectedEmployment?.Position ?? "Position";
-    console.log(`Applied for: ${positionName}`);
+    // Modal handles the API call, just close modal here
     setShowModal(false);
     setSelectedEmployment(null);
-    alert("Your application has been submitted successfully!");
   };
 
   const handleCancel = () => {
@@ -175,25 +180,15 @@ export default function AllEmployments() {
         )}
       </div>
 
-      {/* Confirmation Modal */}
-      {showModal && (
-        <div className="modal-overlay" onClick={handleCancel}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Confirm Application</h3>
-            <p>
-              Confirm to Apply for this position and wait for the reply!!
-            </p>
-            <div className="modal-actions">
-              <button className="modal-confirm" onClick={handleConfirm}>
-                Confirm
-              </button>
-              <button className="modal-cancel" onClick={handleCancel}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationModal
+        isOpen={showModal}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        title="Confirm Application"
+        message="Confirm to Apply for this position and wait for the reply!!"
+        program={selectedEmployment}
+        isApply={true}
+      />
     </div>
   );
 }

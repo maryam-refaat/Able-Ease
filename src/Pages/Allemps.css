@@ -191,6 +191,42 @@
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Session Modal Styles (Blue Theme) */
+.session-modal h3.session-title {
+  color: #1570ef;
+  text-shadow: 0 2px 4px rgba(21, 112, 239, 0.1);
+}
+
+.session-modal .modal-content p strong.session-price {
+  color: #1570ef;
+  font-weight: 700;
+}
+
+.session-confirm {
+  background: linear-gradient(135deg, #1570ef 0%, #0f5bc9 100%);
+  box-shadow: 0 4px 12px rgba(21, 112, 239, 0.25);
+}
+
+.session-confirm:hover {
+  background: linear-gradient(135deg, #0f5bc9 0%, #1570ef 100%);
+  box-shadow: 0 8px 24px rgba(21, 112, 239, 0.4);
+}
+
+.session-confirm:active {
+  box-shadow: 0 4px 12px rgba(21, 112, 239, 0.3);
+}
+
+.session-cancel {
+  background: linear-gradient(135deg, #e8f2ff 0%, #d4e5ff 100%);
+  color: #1570ef;
+  border: 1px solid #b3d4ff;
+}
+
+.session-cancel:hover {
+  background: linear-gradient(135deg, #d4e5ff 0%, #c0d9ff 100%);
+  border-color: #8fc2ff;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .all-employments-grid .position-card {

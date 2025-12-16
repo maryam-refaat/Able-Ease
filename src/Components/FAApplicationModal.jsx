@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import "../Pages/Allemps.css";
+import{ApplyForFA} from"../assets/apis";
 
 export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program }) {
   const [reason, setReason] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
-    if (reason.trim()) {
-      onSubmit(reason);
+  const handleSubmit = async () => {
+    if (!reason.trim()) return;
+
+    const userSSN = localStorage.getItem("userSSN");
+    const organizationSSN = program?.organizationSSN || program?.orgSSN || program?.OrganizationSSN || program?.OrgSSN;
+    const programName = program?.name || program?.centerName || program?.Name || program?.title || "Program";
+
+    if (!userSSN) {
+      alert("User information not found. Please log in again.");
+      return;
+    }
+
+    if (!organizationSSN) {
+      alert("Organization information not found.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const data = {
+        recieverSSN: organizationSSN,
+        senderSSN: userSSN,
+        Subject: programName,
+        body: reason
+      };
+
+      await ApplyForFA(data);
+      alert("Financial aid application submitted successfully!");
       setReason("");
+      onSubmit(reason); // Call parent callback
+    } catch (error) {
+      console.error("FA Application error:", error);
+      alert("Failed to submit application. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,15 +94,19 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
           <button 
             className="modal-confirm" 
             onClick={handleSubmit}
-            disabled={!reason.trim()}
+            disabled={!reason.trim() || isLoading}
             style={{
-              opacity: reason.trim() ? 1 : 0.6,
-              cursor: reason.trim() ? "pointer" : "not-allowed",
+              opacity: (reason.trim() && !isLoading) ? 1 : 0.6,
+              cursor: (reason.trim() && !isLoading) ? "pointer" : "not-allowed",
             }}
           >
-            Send Application
+            {isLoading ? "Submitting..." : "Send Application"}
           </button>
-          <button className="modal-cancel" onClick={handleCancel}>
+          <button 
+            className="modal-cancel" 
+            onClick={handleCancel}
+            disabled={isLoading}
+          >
             Cancel
           </button>
         </div>

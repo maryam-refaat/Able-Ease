@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import "../Org.css";
 import TherapyCenterCarousel from "../Components/TherapyCenterCarousel";
 import ProgramCard from "../Components/ProgramCard";
-import ConfirmationModal from "../Components/ConfirmationModal";
+import SessionConfirmationModal from "../Components/SessionConfirmationModal";
 import { getCenters, getcenter_Therapies } from "../assets/apis";
 
 /* Dummy fallback data */
@@ -153,8 +153,7 @@ export default function TherapyCenters() {
   };
 
   const handleBookConfirm = () => {
-    console.log(`Booked therapy: ${selectedTherapy?.name}`);
-    alert("Your booking has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowBookModal(false);
     setSelectedTherapy(null);
   };
@@ -202,12 +201,14 @@ export default function TherapyCenters() {
         </section>
       </div>
 
-      <ConfirmationModal
+      <SessionConfirmationModal
         isOpen={showBookModal}
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
-        title="Confirm Booking"
+        title="Confirm Session Booking"
         message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?`}
+        therapy={selectedTherapy}
+        isBooking={true}
       />
     </div>
   );

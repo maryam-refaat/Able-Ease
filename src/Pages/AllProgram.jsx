@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getAll_Programs } from "../assets/apis";
+import { getAll_Programs } from '../assets/apis';
 import ConfirmationModal from "../Components/ConfirmationModal";
 import FAApplicationModal from "../Components/FAApplicationModal";
 import "../Org.css";
@@ -159,8 +159,7 @@ export default function AllProgram() {
   };
 
   const handleBookConfirm = () => {
-    console.log(`Booked: ${selectedProgram?.name}`);
-    alert("Your booking has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowBookModal(false);
     setSelectedProgram(null);
   };
@@ -258,6 +257,8 @@ export default function AllProgram() {
         onCancel={handleBookCancel}
         title="Confirm Booking"
         message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?${(selectedProgram?.price || selectedProgram?.Price) ? `\n\nPrice: $${selectedProgram?.price || selectedProgram?.Price}` : ''}`}
+        program={selectedProgram}
+        isBooking={true}
       />
 
       <FAApplicationModal

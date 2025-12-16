@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../Components/signup.css";
+import "./signup.css";
 import { useNavigate } from "react-router-dom";
 
 export default function OrganizationSignUp() {
@@ -7,6 +7,16 @@ export default function OrganizationSignUp() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const formRef = React.useRef(null);
+
+  const handleCloseSuccess = () => {
+    setIsSuccess(false);
+    setAgree(false);
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -20,7 +30,8 @@ export default function OrganizationSignUp() {
       email: formData.get('email'),
       phone: formData.get('phone'),
       password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword')
+      confirmPassword: formData.get('confirmPassword'),
+      type: 'organization'
     };
 
     // Validation
@@ -69,10 +80,10 @@ export default function OrganizationSignUp() {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // TODO: Replace with actual API call
-      // const { value } = await signupOrganization(data);
-      // localStorage.setItem("organizationToken", JSON.stringify(data));
+      // const { value } = await signup(data);
+
       
-      navigate("/organization-profile", { state: { organizationData: data } });
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error during signup:", error);
       setIsError(true);
@@ -89,8 +100,26 @@ export default function OrganizationSignUp() {
     </div>
   }
 
+  if(isSuccess) {
+    return <div className="form-box"> 
+      <h2>Registration Successful!</h2>
+      <p style={{ textAlign: 'center', marginBottom: '20px', color: '#28a745', fontSize: '16px' }}>
+        ✓ Your organization account has been created successfully.
+      </p>
+      <p style={{ textAlign: 'center', marginBottom: '30px', fontSize: '15px' }}>
+        Please login with your credentials to access your account.
+      </p>
+      <button 
+        className="primary-btn" 
+        onClick={handleCloseSuccess}
+      >
+        OK
+      </button>
+    </div>
+  }
+
   return (
-    <form className="form-box" onSubmit={handleSubmit}>
+    <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
       <h2>Organization Sign Up</h2>
 
       <div className="two-inputs">

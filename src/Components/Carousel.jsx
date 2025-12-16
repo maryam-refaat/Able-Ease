@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getPrograms } from "../assets/apis";
+import { getPrograms } from '../assets/apis';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import ConfirmationModal from "./ConfirmationModal";
@@ -86,9 +86,7 @@ export default function Carousel() {
   };
 
   const handleBookConfirm = () => {
-    const programName = selectedProgram?.name || selectedProgram?.centerName || selectedProgram?.Name || selectedProgram?.title || "Program";
-    console.log(`Booked program: ${programName}`);
-    alert(`Successfully booked: ${programName}`);
+    // Modal handles the API call, just close modal here
     setShowBookModal(false);
     setSelectedProgram(null);
   };
@@ -182,6 +180,8 @@ export default function Carousel() {
         message={
           `Are you sure you want to book "${selectedProgram?.name || selectedProgram?.centerName || selectedProgram?.Name || selectedProgram?.title}"?${(selectedProgram?.price || selectedProgram?.Price) ? `\n\nPrice: $${selectedProgram?.price || selectedProgram?.Price}` : ''}`
         }
+        program={selectedProgram}
+        isBooking={true}
       />
 
       <FAApplicationModal

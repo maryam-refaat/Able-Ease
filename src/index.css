@@ -435,6 +435,12 @@ header .auth-buttons {
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
   scroll-snap-align: center;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
 }
 
 /* image placeholder */
@@ -446,7 +452,27 @@ header .auth-buttons {
 .small { color: #666; font-size: 13px; margin: 0; }
 
 /* buttons */
-.btn { background: #168a48; color: #fff; padding: 8px 12px; border: 0; border-radius: 10px; cursor: pointer; }
+.btn { 
+  background: linear-gradient(135deg, #168a48 0%, #1e6b49 100%);
+  color: #fff; 
+  padding: 8px 12px; 
+  border: 0; 
+  border-radius: 10px; 
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(22, 138, 72, 0.2);
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #1e6b49 0%, #27865d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(22, 138, 72, 0.35);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(22, 138, 72, 0.25);
+}
 .carousel-arrow {
   border: 1px solid #e6e6e6;
   background: #fff;
@@ -487,6 +513,12 @@ header .auth-buttons {
   padding: 16px;
   text-align: center;
   box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.org-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .org-card button {

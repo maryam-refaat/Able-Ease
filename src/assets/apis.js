@@ -249,25 +249,51 @@ export const AddPatientToProgram=async(PSSN,ProID,OSSN)=>{
   return data;
 }
 
-export const AddPatientToTherapy=async()=>{
+export const AddPatientToTherapy=async(body)=>{
   const response = await fetch(`${BASE_URL}/Program/AddPatienttoprogram`,{
-    method: "POST",
+    method: "PUT",
     headers: {
-      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token"),
     },
+    body: body,
   });
   const data = await response.json();
   return data;
 }
 
-export const ApplyForFA=async()=>{
+export const JobApplication=async(body,OSSN)=>{
+  const response = await fetch(`${BASE_URL}/message/send/${OSSN}/job-applications`,{
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json();
+  return data;
+}
+
+export const ApplyForFA=async(body)=>{
   const response = await fetch(`${BASE_URL}/message/send/financial-aid-application`,{
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(body),
   });
   const data = await response.json();
   return data;
 }
+export const signupPatient = async (body) => {
+  const response = await fetch(`${BASE_URL}/relatives`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+  return data;
+};
 export default api;

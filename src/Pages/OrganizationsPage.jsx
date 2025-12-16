@@ -197,7 +197,8 @@ export default function OrganizationsPage() {
         }
       }, 100);
     } else {
-      setSelectedProgram(program);
+      // Add organizationSSN to program for booking
+      setSelectedProgram({ ...program, organizationSSN: selectedOrg });
       setShowBookModal(true);
     }
   };
@@ -212,14 +213,14 @@ export default function OrganizationsPage() {
         }
       }, 100);
     } else {
-      setSelectedPosition(pos);
+      // Add organizationSSN to position for application
+      setSelectedPosition({ ...pos, organizationSSN: selectedOrg });
       setShowApplyModal(true);
     }
   };
 
   const handleBookConfirm = () => {
-    console.log(`Booked: ${selectedProgram?.name}`);
-    alert("Your booking has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowBookModal(false);
     setSelectedProgram(null);
   };
@@ -230,8 +231,7 @@ export default function OrganizationsPage() {
   };
 
   const handleApplyConfirm = () => {
-    console.log(`Applied for: ${selectedPosition?.positionName}`);
-    alert("Your application has been submitted successfully!");
+    // Modal handles the API call, just close modal here
     setShowApplyModal(false);
     setSelectedPosition(null);
   };
@@ -313,6 +313,8 @@ export default function OrganizationsPage() {
         onCancel={handleBookCancel}
         title="Confirm Booking"
         message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?`}
+        program={selectedProgram}
+        isBooking={true}
       />
 
       <ConfirmationModal
@@ -321,6 +323,8 @@ export default function OrganizationsPage() {
         onCancel={handleApplyCancel}
         title="Confirm Application"
         message="Confirm to Apply for this position and wait for the reply!!"
+        program={selectedPosition}
+        isApply={true}
       />
     </div>
   );

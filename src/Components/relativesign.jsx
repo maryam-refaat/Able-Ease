@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../components/signup.css";
+import "./signup.css";
 import { useNavigate } from "react-router-dom";
-import { signupRelative } from "../assets/api";
+import { signupRelative } from "../assets/apis";
 
 export default function RelativeSignUp() {
   const [agree, setAgree] = useState(false);
@@ -9,41 +9,47 @@ export default function RelativeSignUp() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const formRef = React.useRef(null);
+
+  const handleCloseSuccess = () => {
+    setIsSuccess(false);
+    setAgree(false);
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(e.target);
 
     const data = {
-      fullName: formData.get('fullName'),
-      relationship: formData.get('relationship'),
-      address: formData.get('address'),
-      city: formData.get('city'),
-      email: formData.get('email'),
-      phone: formData.get('phone'),
-      password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword'),
+      name: formData.get("fullName"),
+      patientSSN: formData.get("relationship"),
+      address: formData.get("address"),
+      email: formData.get("email"),
+      contactInfo: formData.get("phone"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      gender: formData.get("gender"),
+      birthDate: formData.get("birthDate"),
     };
 
     // Validation
-    if (!data.fullName || data.fullName.trim().length < 3) {
+    if (!data.name || data.name.trim().length < 3) {
       alert("Please enter a valid full name (at least 3 characters)");
       return;
     }
 
-    if (!data.relationship || data.relationship.trim().length < 2) {
+    if (!data.patientSSN || data.patientSSN.trim().length < 2) {
       alert("Please enter your relationship to the patient");
       return;
     }
 
     if (!data.address || data.address.trim().length < 5) {
       alert("Please enter a valid address");
-      return;
-    }
-
-    if (!data.city || data.city.trim().length < 2) {
-      alert("Please enter a valid city");
       return;
     }
 
@@ -54,7 +60,7 @@ export default function RelativeSignUp() {
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
-    if (!data.phone || !phoneRegex.test(data.phone)) {
+    if (!data.contactInfo || !phoneRegex.test(data.contactInfo)) {
       alert("Please enter a valid phone number (at least 10 digits)");
       return;
     }
@@ -70,56 +76,90 @@ export default function RelativeSignUp() {
     }
 
     console.log("Form Data Submitted: ", data);
-    
+
     try {
       setIsLoading(true);
 
-      // TODO: REMOVE WHEN API IS CONNECTED - simulate signup delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
-      // const res = await signupRelative(data);
-      // if (res?.error) throw new Error(res.error);
-      
-      // Store all relative info in localStorage for future navigation
-      localStorage.setItem("relativeSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
-      localStorage.setItem("userSSN", data.ssn); // HANDLED BY API - use res.ssn from API response
-      localStorage.setItem("relativeName", data.fullName); // HANDLED BY API - use res.fullName from API response
-      localStorage.setItem("relativeEmail", data.email); // HANDLED BY API - use res.email from API response
-      localStorage.setItem("relativePhone", data.phone); // HANDLED BY API - use res.phone from API response
-      localStorage.setItem("relativeGender", data.gender); // HANDLED BY API - use res.gender from API response
-      localStorage.setItem("relativeAddress", data.address); // HANDLED BY API - use res.address from API response
-      localStorage.setItem("relativeData", JSON.stringify(data)); // HANDLED BY API - use JSON.stringify(res) from API response
-      
-      navigate("/relative-profile", { state: { relativeData: data } });
+      const response = await signupRelative(data);
+      // localStorage.setItem("relativeToken", JSON.stringify(data));
+
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error during signup:", error);
       setIsError(true);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   }
 
-  if(isError ) {
-    return <div className="form-box"> 
-      <h2>Relative Sign Up</h2>
-      <p className="error-text"> An error occurred during signup. Please try again later. </p>
-    </div>
+  if (isError) {
+    return (
+      <div className="form-box">
+        <h2>Relative Sign Up</h2>
+        <p className="error-text">
+          {" "}
+          An error occurred during signup. Please try again later.{" "}
+        </p>
+      </div>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="form-box">
+        <h2>Registration Successful!</h2>
+        <p
+          style={{
+            textAlign: "center",
+            marginBottom: "20px",
+            color: "#28a745",
+            fontSize: "16px",
+          }}
+        >
+          ✓ Your relative account has been created successfully.
+        </p>
+        <p
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            fontSize: "15px",
+          }}
+        >
+          Please login with your credentials to access your account.
+        </p>
+        <button className="primary-btn" onClick={handleCloseSuccess}>
+          OK
+        </button>
+      </div>
+    );
   }
 
   return (
-    <form className="form-box" onSubmit={handleSubmit}>
+    <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
       <h2>Relative Sign Up</h2>
 
       <div className="two-inputs">
         <input type="text" name="fullName" placeholder="Full Name" required />
-        <input type="text" name="relationship" placeholder="Relationship to Patient" required />
+        <input
+          type="text"
+          name="relationship"
+          placeholder="Relationship to Patient"
+          required
+        />
       </div>
 
       <div className="two-inputs">
         <input type="text" name="address" placeholder="Address" required />
-        <input type="text" name="city" placeholder="City" required />
+        <select name="gender" required>
+          <option value="" disabled selected>
+            Select Gender
+          </option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
       <div className="two-inputs">
@@ -128,10 +168,22 @@ export default function RelativeSignUp() {
       </div>
 
       <div className="two-inputs">
-        <input type="password" name="password" placeholder="Password" required />
-        <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+        />
       </div>
-
+      <div className="two-inputs">
+        <input type="date" name="birthDate" placeholder="Birth Date" required />
+      </div>
       <label className="checkbox-row">
         <input
           type="checkbox"

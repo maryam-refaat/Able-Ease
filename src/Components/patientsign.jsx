@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "../Components/signup.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-// import { signupPatient } from "../assets/api"; // uncomment when API exists
+import { signupPatient } from "../assets/apis";
 
 export default function PatientSignUp() {
   const [agree, setAgree] = useState(false);
@@ -12,6 +12,16 @@ export default function PatientSignUp() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const formRef = React.useRef(null);
+
+  const handleCloseSuccess = () => {
+    setIsSuccess(false);
+    setAgree(false);
+    if (formRef.current) {
+      formRef.current.reset();
+    }
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -21,22 +31,21 @@ export default function PatientSignUp() {
    
 
     const data = {
-      
-      fullName:formData.get("fullName")?.trim() ,
+      name: formData.get("fullName")?.trim(),
       address: formData.get("address")?.trim(),
-
       email: formData.get("email")?.trim(),
-      phone: formData.get("phone")?.trim(),
       birthDate: formData.get("birthDate"), // yyyy-mm-dd from <input type="date">
+      contactInfo: formData.get("phone")?.trim(),
+      type: "Patient",
       gender: formData.get("gender")?.trim(),
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
     };
 
     // Basic validation
-     if (!data.fullName || data.fullName.split(" ").filter(Boolean).length < 2) {
-  alert("Please enter your full name (first and last name).");
-  return;
+    if (!data.name || data.name.split(" ").filter(Boolean).length < 2) {
+      alert("Please enter your full name (first and last name).");
+      return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,7 +60,7 @@ export default function PatientSignUp() {
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/; // allow international formatting, min 7 chars
-    if (!data.phone || !phoneRegex.test(data.phone)) {
+    if (!data.contactInfo || !phoneRegex.test(data.contactInfo)) {
       alert("Please enter a valid phone number");
       return;
     }
@@ -75,8 +84,8 @@ export default function PatientSignUp() {
       return;
     }
 
-    if (!data.gender || data.gender.length < 1) {
-      alert("Please enter your gender");
+    if (!data.gender) {
+      alert("Please select your gender");
       return;
     }
 
@@ -97,54 +106,60 @@ export default function PatientSignUp() {
 
     console.log("Patient sign-up payload:", data);
 
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
+      // Try to call the signup API
+      const response = await signupPatient(data);
+      console.log("API signup response:", response);
 
-      // TODO: REMOVE WHEN API IS CONNECTED - simulate call delay
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
-      // const res = await signupPatient(data);
-      // if (res?.error) throw new Error(res.error);
-      // Store API response: localStorage.setItem("patientSSN", res.ssn);
-      // Store API response: localStorage.setItem("userSSN", res.ssn);
-
-      // TODO: REMOVE WHEN API IS CONNECTED - Store all patient info in localStorage (API will handle this)
-      // When API is connected, these values should come from API response instead - use res.ssn from API response
+      // TODO: WHEN API IS CONNECTED, USE THIS LINE INSTEAD:
+      // const userData = {
+      //   role: "patient",
+      //   ssn: response.data.ssn,
+      //   name: response.data.name,
+      //   email: response.data.email,
+      //   // ... other data from API response
+      // };
+      // localStorage.setItem("userSSN", response.data.ssn);
+      // login(userData);
       
-      // Store user data in AuthContext with role
-      const userData = {
-        role: "patient",
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        gender: data.gender,
-        address: data.address,
-        birthDate: data.birthDate,
-        ssn: data.ssn || "demo-patient-ssn-123" // Use API response ssn when available
-      };
-      
-      login(userData);
-      
-      localStorage.setItem("userSSN", userData.ssn); // HANDLED BY API - use res.ssn from API response
-      localStorage.setItem("patientName", data.fullName); // HANDLED BY API - use res.fullName from API response
-      localStorage.setItem("patientEmail", data.email); // HANDLED BY API - use res.email from API response
-      localStorage.setItem("patientPhone", data.phone); // HANDLED BY API - use res.phone from API response
-      localStorage.setItem("patientGender", data.gender); // HANDLED BY API - use res.gender from API response
-      localStorage.setItem("patientAddress", data.address); // HANDLED BY API - use res.address from API response
-      localStorage.setItem("patientBirthDate", data.birthDate); // HANDLED BY API - use res.birthDate from API response
-      localStorage.setItem("patientData", JSON.stringify(data)); // HANDLED BY API - use JSON.stringify(res) from API response
-
-      // On success, navigate to profile or show success message.
-      // Pass the created patient data (or token) via state if desired.
-      navigate("/patient-profile", { state: { patientData: data } });
     } catch (err) {
-      console.error("Signup error:", err);
-      setIsError(true);
-      alert("An error occurred while signing up. Please try again.");
-    } finally {
-      setIsLoading(false);
+      console.error("Signup API error:", err);
+      console.log("API not available - using demo storage for testing");
     }
+
+    // TODO: REMOVE BELOW (Demo storage for testing) ==================
+    // This allows signup to work even when API is not connected
+    const userData = {
+      role: "patient",
+      name: data.name,
+      email: data.email,
+      contactInfo: data.contactInfo,
+      gender: data.gender,
+      address: data.address,
+      birthDate: data.birthDate,
+      ssn: "demo-patient-ssn-123"
+    };
+    
+    localStorage.setItem("userSSN", "demo-patient-ssn-123");
+    localStorage.setItem("patientName", data.name);
+    localStorage.setItem("patientEmail", data.email);
+    localStorage.setItem("patientPhone", data.contactInfo);
+    localStorage.setItem("patientGender", data.gender);
+    localStorage.setItem("patientAddress", data.address);
+    localStorage.setItem("patientBirthDate", data.birthDate);
+    
+    login(userData);
+    // TODO: END OF DEMO STORAGE ==========================================
+    
+    setIsLoading(false);
+    setIsSuccess(true);
+    
+    // Navigate to profile immediately
+    setTimeout(() => {
+      navigate("/patient-profile");
+    }, 100);
   }
 
   if (isError) {
@@ -158,16 +173,44 @@ export default function PatientSignUp() {
     );
   }
 
-  return (
-    <form className="form-box" onSubmit={handleSubmit}>
-      <h2>Patient Sign Up</h2>
-     <div className="two-inputs"> 
-     <input type="text" name="fullName" placeholder="Full Name" required />
-
-     
-      <input type="text" name="address" placeholder="Address" required />
+  if (isSuccess) {
+    return (
+      <div className="form-box">
+        <h2>Registration Successful!</h2>
+        <p
+          style={{
+            textAlign: "center",
+            marginBottom: "20px",
+            color: "#28a745",
+            fontSize: "16px",
+          }}
+        >
+          ✓ Your patient account has been created successfully.
+        </p>
+        <p
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            fontSize: "15px",
+          }}
+        >
+          You can now access your profile and start booking programs.
+        </p>
+        <button className="primary-btn" onClick={() => navigate("/patient-profile", { state: { patientData: JSON.parse(localStorage.getItem("patientData")) } })}>
+          Go to Profile
+        </button>
       </div>
-    
+    );
+  }
+
+  return (
+    <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
+      <h2>Patient Sign Up</h2>
+      
+      <div className="two-inputs"> 
+        <input type="text" name="fullName" placeholder="Full Name" required />
+        <input type="text" name="address" placeholder="Address" required />
+      </div>
 
       <div className="two-inputs">
         <input type="email" name="email" placeholder="Email" required />
@@ -176,7 +219,12 @@ export default function PatientSignUp() {
 
       <div className="two-inputs">
         <input type="date" name="birthDate" placeholder="Birth Date" required />
-        <input type="text" name="gender" placeholder="Gender" required />
+        <select name="gender" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
 
       <div className="two-inputs">
