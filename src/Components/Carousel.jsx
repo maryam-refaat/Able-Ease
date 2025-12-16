@@ -130,7 +130,15 @@ export default function Carousel() {
           {items.map((it, idx) => (
             <div className="carousel-item" key={it.organizationSSN ?? it.id ?? it.centerName ?? idx} role="listitem">
               <div className="media" aria-hidden="true">
-                <div className="media-placeholder">Image</div>
+                {(it.imgUrl || it.imageUrl || it.ImgUrl || it.ImageUrl) ? (
+                  <img 
+                    src={it.imgUrl || it.imageUrl || it.ImgUrl || it.ImageUrl} 
+                    alt={it.name || it.centerName || it.Name || it.title || "Program"} 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <div className="media-placeholder">Image</div>
+                )}
               </div>
 
               <h4 className="h4" style={{ marginTop: 8 }}>

@@ -36,7 +36,7 @@ export default function HomePage() {
         </section>
         </section>
 
-
+        
         <section className="container_employ"style={{ marginTop: 30 }}>
           <OrgEmploySection />
         </section>

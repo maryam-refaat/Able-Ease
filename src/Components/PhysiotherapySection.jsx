@@ -13,12 +13,16 @@ export default function PhysiotherapySection() {
       name: "Physio Care Cairo",
       location: "Cairo, Egypt",
       imageUrl: null,
+      contactInfo: "01234567890",
+      physicalTherapies: []
     },
     {
       ssn: "CEN-002",
       name: "Rehab Plus",
       location: "Giza, Egypt",
       imageUrl: null,
+      contactInfo: "01234567891",
+      physicalTherapies: []
     },
   ];
 
@@ -30,9 +34,13 @@ export default function PhysiotherapySection() {
         const res = await getCenters();
         if (!mounted) return;
         
+        // API returns array directly in res.data
+        const centersData = res?.data;
+        
         // Check if we got valid data from API
-        if (Array.isArray(res.data) && res.data.length > 0) {
-          setCenters(res.data);
+        if (Array.isArray(centersData) && centersData.length > 0) {
+          setCenters(centersData);
+          console.log("Centers loaded from API:", centersData);
         } else {
           // If API returns empty array or invalid data, use fallback
           console.warn("getCenters returned empty/invalid data — using fallback");
@@ -40,7 +48,7 @@ export default function PhysiotherapySection() {
         }
       } catch (err) {
         if (!mounted) return;
-        console.warn("getCenters failed — falling back", err);
+        console.error("getCenters failed — falling back", err);
         setCenters(fallback);
       }
     }
@@ -90,11 +98,17 @@ export default function PhysiotherapySection() {
                 )}
               </div>
 
-              <h4 className="h4">{c.name || c.centerName}</h4>
+              <h4 className="h4">{c.name}</h4>
 
-              <p className="small" style={{ marginTop: "10px", color: "#888" }}>
-                {c.location || "Location not available"}
+              <p className="small" style={{ marginTop: "6px", color: "#666" }}>
+                📍 {c.location}
               </p>
+
+              {c.contactInfo && (
+                <p className="small" style={{ marginTop: "4px", color: "#888" }}>
+                  📞 {c.contactInfo}
+                </p>
+              )}
 
             </div>
           ))}
