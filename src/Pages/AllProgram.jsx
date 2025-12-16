@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { getAll_Programs } from '../assets/apis';
+import { getAuthState } from "../context/AuthState";
+import { getAll_Programs } from "../assets/apis";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import FAApplicationModal from "../Components/FAApplicationModal";
 import "../Org.css";
@@ -95,7 +95,12 @@ export default function AllProgram() {
   const [selectedProgram, setSelectedProgram] = useState(null);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -130,11 +135,11 @@ export default function AllProgram() {
 
   const handleBook = (program) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -145,11 +150,11 @@ export default function AllProgram() {
 
   const handleApplyFA = (program) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -171,7 +176,9 @@ export default function AllProgram() {
 
   const handleFASubmit = (reason) => {
     console.log(`Applied for FA: ${selectedProgram?.name}, Reason: ${reason}`);
-    alert(`Financial Aid application submitted for: ${selectedProgram?.name}\n\nYour reason: ${reason}`);
+    alert(
+      `Financial Aid application submitted for: ${selectedProgram?.name}\n\nYour reason: ${reason}`
+    );
     setShowFAModal(false);
     setSelectedProgram(null);
   };
@@ -256,7 +263,13 @@ export default function AllProgram() {
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
         title="Confirm Booking"
-        message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?${(selectedProgram?.price || selectedProgram?.Price) ? `\n\nPrice: $${selectedProgram?.price || selectedProgram?.Price}` : ''}`}
+        message={`Are you sure you want to book "${
+          selectedProgram?.name || selectedProgram?.Name
+        }"?${
+          selectedProgram?.price || selectedProgram?.Price
+            ? `\n\nPrice: $${selectedProgram?.price || selectedProgram?.Price}`
+            : ""
+        }`}
         program={selectedProgram}
         isBooking={true}
       />

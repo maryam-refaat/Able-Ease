@@ -8,6 +8,7 @@ import Modal from "./loginmodal";
 import CaretakerSignUp from "./caretakersign";
 import { useNavigate } from "react-router-dom";
 import { loginAPI } from "../assets/apis";
+import { setAuthState } from "../context/AuthState";
 const BASE_URL = "http://localhost:5174"; // example: https://myserver.com/api
 
 const AuthForm = () => {
@@ -71,6 +72,19 @@ const AuthForm = () => {
       const response = await loginAPI(data);
       localStorage.setItem("authToken", response.token);
       localStorage.setItem("ssn", response.ssn);
+      // Normalize role to a consistent userType
+      const role = (response.role || "").toLowerCase();
+      const userTypeMap = {
+        organization: "organization",
+        relative: "relative",
+        caretaker: "caretaker",
+        physiotherapycenter: "therapyCenter",
+        patient: "patient",
+      };
+      const userType = userTypeMap[role] || null;
+
+      // Persist unified auth state and notify listeners
+      setAuthState({ isLoggedIn: true, userType, ssn: response.ssn });
 
       let url = "";
 
@@ -78,6 +92,12 @@ const AuthForm = () => {
         url = "/organization-profile";
       } else if (response.role == "Relative") {
         url = "/relative-profile";
+      } else if (response.role == "CareTaker") {
+        url = "/caretaker-profile";
+      } else if (response.role == "PhysiotherapyCenter") {
+        url = "/physio-profile";
+      } else if (response.role == "Patient") {
+        url = "/patient-profile";
       }
 
       navigate(url);

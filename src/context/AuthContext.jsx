@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -16,15 +16,15 @@ export const AuthProvider = ({ children }) => {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("ssn");
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
         setIsLoggedIn(true);
       } catch (error) {
-        console.error('Failed to parse stored user data:', error);
-        localStorage.removeItem('user');
+        console.error("Failed to parse stored user data:", error);
+        localStorage.removeItem("ssn");
       }
     }
   }, []);
@@ -32,13 +32,14 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem("ssn", JSON.stringify(userData.ssn));
   };
 
   const logout = () => {
     setUser(null);
     setIsLoggedIn(false);
-    localStorage.removeItem('user');
+    localStorage.removeItem("ssn");
+    localStorage.removeItem("authToken");
   };
 
   const value = {

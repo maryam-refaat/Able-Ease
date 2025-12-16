@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "../Pages/Allemps.css";
-import{ApplyForFA} from"../assets/apis";
+import { ApplyForFA } from "../assets/apis";
 
-export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program }) {
+export default function FAApplicationModal({
+  isOpen,
+  onSubmit,
+  onCancel,
+  program,
+}) {
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -11,9 +16,18 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
   const handleSubmit = async () => {
     if (!reason.trim()) return;
 
-    const userSSN = localStorage.getItem("userSSN");
-    const organizationSSN = program?.organizationSSN || program?.orgSSN || program?.OrganizationSSN || program?.OrgSSN;
-    const programName = program?.name || program?.centerName || program?.Name || program?.title || "Program";
+    const userSSN = localStorage.getItem("ssn");
+    const organizationSSN =
+      program?.organizationSSN ||
+      program?.orgSSN ||
+      program?.OrganizationSSN ||
+      program?.OrgSSN;
+    const programName =
+      program?.name ||
+      program?.centerName ||
+      program?.Name ||
+      program?.title ||
+      "Program";
 
     if (!userSSN) {
       alert("User information not found. Please log in again.");
@@ -29,10 +43,10 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
 
     try {
       const data = {
-        recieverSSN: organizationSSN,
+        receiverSSN: organizationSSN,
         senderSSN: userSSN,
-        Subject: programName,
-        body: reason
+        subject: programName,
+        body: reason,
       };
 
       await ApplyForFA(data);
@@ -52,7 +66,12 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
     onCancel();
   };
 
-  const programName = program?.name || program?.centerName || program?.Name || program?.title || "Program";
+  const programName =
+    program?.name ||
+    program?.centerName ||
+    program?.Name ||
+    program?.title ||
+    "Program";
   const price = program?.price || program?.Price;
 
   return (
@@ -68,7 +87,7 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
             </>
           )}
         </p>
-        
+
         <textarea
           className="fa-reason-input"
           placeholder="Please explain your reason for requesting financial aid..."
@@ -86,24 +105,24 @@ export default function FAApplicationModal({ isOpen, onSubmit, onCancel, program
             marginBottom: "16px",
             transition: "border-color 0.3s ease",
           }}
-          onFocus={(e) => e.target.style.borderColor = "#a8d5f7"}
-          onBlur={(e) => e.target.style.borderColor = "#ddd"}
+          onFocus={(e) => (e.target.style.borderColor = "#a8d5f7")}
+          onBlur={(e) => (e.target.style.borderColor = "#ddd")}
         />
 
         <div className="modal-actions">
-          <button 
-            className="modal-confirm" 
+          <button
+            className="modal-confirm"
             onClick={handleSubmit}
             disabled={!reason.trim() || isLoading}
             style={{
-              opacity: (reason.trim() && !isLoading) ? 1 : 0.6,
-              cursor: (reason.trim() && !isLoading) ? "pointer" : "not-allowed",
+              opacity: reason.trim() && !isLoading ? 1 : 0.6,
+              cursor: reason.trim() && !isLoading ? "pointer" : "not-allowed",
             }}
           >
             {isLoading ? "Submitting..." : "Send Application"}
           </button>
-          <button 
-            className="modal-cancel" 
+          <button
+            className="modal-cancel"
             onClick={handleCancel}
             disabled={isLoading}
           >

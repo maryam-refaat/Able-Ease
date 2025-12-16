@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import "../Org.css";
 import OrgCarousel from "../Components/OrgCarousel";
 import ProgramCard from "../Components/ProgramCard";
@@ -76,7 +76,12 @@ export default function OrganizationsPage() {
   const [selectedPosition, setSelectedPosition] = useState(null);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   /* helper to read SSN from various shapes */
   const readSSN = (o) =>
@@ -121,13 +126,12 @@ export default function OrganizationsPage() {
   /* =========================
      Load Programs / Caregivers / Positions
      ========================= */
-     
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
 
-  
   useEffect(() => {
     if (!selectedOrg) return;
 
@@ -142,7 +146,10 @@ export default function OrganizationsPage() {
         ]);
 
         // Programs - only show dummy on API failure, not on empty array
-        if (progRes.status === "fulfilled" && Array.isArray(progRes.value?.data)) {
+        if (
+          progRes.status === "fulfilled" &&
+          Array.isArray(progRes.value?.data)
+        ) {
           setPrograms(progRes.value.data);
         } else {
           setPrograms(DUMMY_PROGRAMS);
@@ -152,7 +159,10 @@ export default function OrganizationsPage() {
         setPositions(DUMMY_POSITIONS);
 
         // Caregivers - only show dummy on API failure, not on empty array
-        if (carRes.status === "fulfilled" && Array.isArray(carRes.value?.data)) {
+        if (
+          carRes.status === "fulfilled" &&
+          Array.isArray(carRes.value?.data)
+        ) {
           setCaregivers(carRes.value.data);
         } else {
           setCaregivers(DUMMY_CAREGIVERS);
@@ -173,7 +183,6 @@ export default function OrganizationsPage() {
 
   const selectedOrgName =
     organizations.find((o) => readSSN(o) === selectedOrg)?.name ?? "";
-  
 
   /* =========================
      Handlers
@@ -189,11 +198,11 @@ export default function OrganizationsPage() {
 
   const handleBook = (program) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -205,11 +214,11 @@ export default function OrganizationsPage() {
 
   const handleApply = (pos) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -312,7 +321,9 @@ export default function OrganizationsPage() {
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
         title="Confirm Booking"
-        message={`Are you sure you want to book "${selectedProgram?.name || selectedProgram?.Name}"?`}
+        message={`Are you sure you want to book "${
+          selectedProgram?.name || selectedProgram?.Name
+        }"?`}
         program={selectedProgram}
         isBooking={true}
       />

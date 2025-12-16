@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import ConfirmationModal from "./ConfirmationModal";
 import "../index.css";
 import { getAll_Employments } from "../assets/apis";
@@ -12,7 +12,12 @@ export default function OrgEmploySection() {
   const listRef = useRef(null);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   const DUMMY_EMPLOYMENTS = [
     {
@@ -20,7 +25,8 @@ export default function OrgEmploySection() {
       position: "Physical Therapist",
       organizationName: "Sunrise Rehab Center",
       organizationSSN: "ORG-001",
-      requirements: "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
+      requirements:
+        "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
       imageUrl: null,
     },
     {
@@ -28,7 +34,8 @@ export default function OrgEmploySection() {
       position: "Occupational Therapist",
       organizationName: "Hope Wellness Center",
       organizationSSN: "ORG-002",
-      requirements: "Master's degree in OT, state license required, pediatric experience preferred",
+      requirements:
+        "Master's degree in OT, state license required, pediatric experience preferred",
       imageUrl: null,
     },
     {
@@ -36,7 +43,8 @@ export default function OrgEmploySection() {
       position: "Speech Therapist",
       organizationName: "Able Care Hub",
       organizationSSN: "ORG-003",
-      requirements: "CCC-SLP certification, experience with children and adults, bilingual a plus",
+      requirements:
+        "CCC-SLP certification, experience with children and adults, bilingual a plus",
       imageUrl: null,
     },
     {
@@ -44,18 +52,19 @@ export default function OrgEmploySection() {
       position: "Rehabilitation Aide",
       organizationName: "Physio Plus Center",
       organizationSSN: "ORG-004",
-      requirements: "High school diploma, patient care experience, strong communication skills",
+      requirements:
+        "High school diploma, patient care experience, strong communication skills",
       imageUrl: null,
-    }
+    },
   ];
 
   const handleApply = (employment) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -82,7 +91,7 @@ export default function OrgEmploySection() {
       try {
         const res = await getAll_Employments();
         const empData = res?.data.data;
- 
+
         if (mounted && Array.isArray(empData)) {
           setEmployments(empData);
         } else {
@@ -98,7 +107,6 @@ export default function OrgEmploySection() {
     return () => (mounted = false);
   }, []);
 
-
   return (
     <section id="org">
       <div className="container">
@@ -109,7 +117,12 @@ export default function OrgEmploySection() {
         <div className="carousel" aria-roledescription="carousel">
           <div ref={listRef} className="carousel-list" role="list">
             {employments.map((employment) => {
-              const subject = employment.subject ?? employment.Subject ?? employment.position ?? employment.Position ?? "Position";
+              const subject =
+                employment.subject ??
+                employment.Subject ??
+                employment.position ??
+                employment.Position ??
+                "Position";
               const senderName =
                 employment.senderName ??
                 employment.SenderName ??
@@ -117,10 +130,19 @@ export default function OrgEmploySection() {
                 employment.OrganizationName ??
                 employment.organization ??
                 "Organization";
-              const body = employment.body ?? employment.Body ?? employment.requirements ?? employment.Requirements ?? "No requirements listed";
+              const body =
+                employment.body ??
+                employment.Body ??
+                employment.requirements ??
+                employment.Requirements ??
+                "No requirements listed";
 
               return (
-                <div key={employment.id ?? employment.positionId} className="carousel-item" role="listitem">
+                <div
+                  key={employment.id ?? employment.positionId}
+                  className="carousel-item"
+                  role="listitem"
+                >
                   <h4 className="h4">{subject}</h4>
 
                   <p className="small" style={{ marginTop: "6px" }}>
@@ -132,7 +154,12 @@ export default function OrgEmploySection() {
                   </p>
 
                   <div style={{ marginTop: "14px", textAlign: "right" }}>
-                    <button className="btn" onClick={() => handleApply(employment)}>Apply</button>
+                    <button
+                      className="btn"
+                      onClick={() => handleApply(employment)}
+                    >
+                      Apply
+                    </button>
                   </div>
                 </div>
               );

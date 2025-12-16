@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getCenters } from "../assets/api";
+import { getCenters } from "../assets/apis";
 import "../index.css";
-
-
 
 export default function PhysiotherapySection() {
   const [centers, setCenters] = useState([]);
@@ -14,7 +12,7 @@ export default function PhysiotherapySection() {
       location: "Cairo, Egypt",
       imageUrl: null,
       contactInfo: "01234567890",
-      physicalTherapies: []
+      physicalTherapies: [],
     },
     {
       ssn: "CEN-002",
@@ -22,7 +20,7 @@ export default function PhysiotherapySection() {
       location: "Giza, Egypt",
       imageUrl: null,
       contactInfo: "01234567891",
-      physicalTherapies: []
+      physicalTherapies: [],
     },
   ];
 
@@ -33,17 +31,19 @@ export default function PhysiotherapySection() {
       try {
         const res = await getCenters();
         if (!mounted) return;
-        
+
         // API returns array directly in res.data
         const centersData = res?.data;
-        
+
         // Check if we got valid data from API
         if (Array.isArray(centersData) && centersData.length > 0) {
           setCenters(centersData);
           console.log("Centers loaded from API:", centersData);
         } else {
           // If API returns empty array or invalid data, use fallback
-          console.warn("getCenters returned empty/invalid data — using fallback");
+          console.warn(
+            "getCenters returned empty/invalid data — using fallback"
+          );
           setCenters(fallback);
         }
       } catch (err) {
@@ -60,9 +60,14 @@ export default function PhysiotherapySection() {
   return (
     <section id="physio">
       <div className="container">
-        
         {/* Title row */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <h3 className="section-title" style={{ margin: 0 }}>
             Physiotherapy Centers
           </h3>
@@ -76,7 +81,6 @@ export default function PhysiotherapySection() {
         <div className="org-grid" style={{ marginTop: "20px" }}>
           {centers.map((c) => (
             <div key={c.ssn || c.id} className="org-card">
-              
               {/* Placeholder image box */}
               <div
                 style={{
@@ -92,7 +96,16 @@ export default function PhysiotherapySection() {
                 }}
               >
                 {c.imageUrl ? (
-                  <img src={c.imageUrl} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                  <img
+                    src={c.imageUrl}
+                    alt={c.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                    }}
+                  />
                 ) : (
                   "Image"
                 )}
@@ -105,15 +118,16 @@ export default function PhysiotherapySection() {
               </p>
 
               {c.contactInfo && (
-                <p className="small" style={{ marginTop: "4px", color: "#888" }}>
+                <p
+                  className="small"
+                  style={{ marginTop: "4px", color: "#888" }}
+                >
                   📞 {c.contactInfo}
                 </p>
               )}
-
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

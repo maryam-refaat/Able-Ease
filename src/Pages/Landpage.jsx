@@ -1,7 +1,7 @@
 // Landpage.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from '../context/AuthContext';
-import './Landpage.css';
+import { getAuthState } from "../context/AuthState";
+import "./Landpage.css";
 
 // --- If you still have Swiper imports, you can remove or comment them out ---
 // import { Swiper, SwiperSlide } from 'swiper/react';
@@ -10,10 +10,10 @@ import './Landpage.css';
 // import 'swiper/css/pagination';
 // import { Navigation, Autoplay } from 'swiper';
 
-import pic from '../assets/unsplash_Qbp4GeJib5A.png';
+import pic from "../assets/unsplash_Qbp4GeJib5A.png";
 
 import Programfind from "../Components/program_find";
-import Physicenterfind from '../Components/physiocenter';
+import Physicenterfind from "../Components/physiocenter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSitemap,
@@ -21,10 +21,10 @@ import {
   faHandsHoldingChild,
   faClipboardUser,
   faHandshakeAngle,
-  faBuilding
+  faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
-import AuthForm from '../Components/Login';
-import { Link } from 'react-router-dom';
+import AuthForm from "../Components/Login";
+import { Link } from "react-router-dom";
 
 /** SimpleCarousel: no external deps, autoplay + arrows + dots + basic swipe */
 function SimpleCarousel({ images = [], autoDelay = 3000 }) {
@@ -73,7 +73,10 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
       if (Math.abs(dx) > 20) moved = true;
     };
     const onTouchEnd = (e) => {
-      if (!moved) { startAuto(); return; }
+      if (!moved) {
+        startAuto();
+        return;
+      }
       const endX = (e.changedTouches && e.changedTouches[0].clientX) || 0;
       const dx = endX - startX;
       if (dx > 40) prev();
@@ -94,7 +97,7 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
   }, [images]);
 
   if (!images || images.length === 0) return null;
-  
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -107,7 +110,10 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
       onMouseEnter={stopAuto}
       onMouseLeave={startAuto}
     >
-      <div className="slides" style={{ transform: `translateX(-${index * 100}%)` }}>
+      <div
+        className="slides"
+        style={{ transform: `translateX(-${index * 100}%)` }}
+      >
         {images.map((src, i) => (
           <div className="slide" key={i}>
             <img src={src} alt={`slide-${i}`} />
@@ -115,8 +121,16 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
         ))}
       </div>
 
-      <button className="carousel-arrow prev" onClick={prev} aria-label="Previous">‹</button>
-      <button className="carousel-arrow next" onClick={next} aria-label="Next">›</button>
+      <button
+        className="carousel-arrow prev"
+        onClick={prev}
+        aria-label="Previous"
+      >
+        ‹
+      </button>
+      <button className="carousel-arrow next" onClick={next} aria-label="Next">
+        ›
+      </button>
 
       <div className="carousel-dots">
         {images.map((_, i) => (
@@ -133,6 +147,12 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
 }
 
 export default function Landpage() {
+  const [{ isLoggedIn }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
   return (
     <div className="landpage-container">
       <p className="paragraph">
@@ -175,11 +195,15 @@ export default function Landpage() {
       {/* SimpleCarousel usage */}
       <SimpleCarousel images={[pic, pic, pic]} autoDelay={3000} />
 
-      <p className="paragraph2"> Follow up by professional Care Takers whom are well trained to meet your standards </p>
+      <p className="paragraph2">
+        {" "}
+        Follow up by professional Care Takers whom are well trained to meet your
+        standards{" "}
+      </p>
       <Physicenterfind />
-      {!useAuth().isLoggedIn && (
+      {!isLoggedIn && (
         <div id="auth-form">
-          <AuthForm/>
+          <AuthForm />
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import { getAll_Employments } from "../assets/apis";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import "../Org.css";
@@ -13,7 +13,8 @@ const DUMMY_EMPLOYMENTS = [
     position: "Physical Therapist",
     organizationName: "Sunrise Rehab Center",
     organizationSSN: "ORG-001",
-    requirements: "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
+    requirements:
+      "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
     imageUrl: null,
   },
   {
@@ -21,7 +22,8 @@ const DUMMY_EMPLOYMENTS = [
     position: "Occupational Therapist",
     organizationName: "Hope Wellness Center",
     organizationSSN: "ORG-002",
-    requirements: "Master's degree in OT, state license required, pediatric experience preferred",
+    requirements:
+      "Master's degree in OT, state license required, pediatric experience preferred",
     imageUrl: null,
   },
   {
@@ -29,7 +31,8 @@ const DUMMY_EMPLOYMENTS = [
     position: "Speech Therapist",
     organizationName: "Able Care Hub",
     organizationSSN: "ORG-003",
-    requirements: "CCC-SLP certification, experience with children and adults, bilingual a plus",
+    requirements:
+      "CCC-SLP certification, experience with children and adults, bilingual a plus",
     imageUrl: null,
   },
   {
@@ -37,7 +40,8 @@ const DUMMY_EMPLOYMENTS = [
     position: "Rehabilitation Aide",
     organizationName: "Physio Plus Center",
     organizationSSN: "ORG-004",
-    requirements: "High school diploma, patient care experience, strong communication skills",
+    requirements:
+      "High school diploma, patient care experience, strong communication skills",
     imageUrl: null,
   },
   {
@@ -64,7 +68,6 @@ export default function AllEmployments() {
   const [showModal, setShowModal] = useState(false);
   const [selectedEmployment, setSelectedEmployment] = useState(null);
 
-  
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -78,7 +81,7 @@ export default function AllEmployments() {
       try {
         const res = await getAll_Employments();
         const empData = res?.data.data;
- 
+
         if (mounted && Array.isArray(empData)) {
           setEmployments(empData);
         } else {
@@ -97,15 +100,20 @@ export default function AllEmployments() {
   }, []);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   const handleApply = (employment) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -135,7 +143,12 @@ export default function AllEmployments() {
         ) : employments.length ? (
           <div className="all-employments-grid">
             {employments.map((employment) => {
-              const subject = employment.subject ?? employment.Subject ?? employment.position ?? employment.Position ?? "Position";
+              const subject =
+                employment.subject ??
+                employment.Subject ??
+                employment.position ??
+                employment.Position ??
+                "Position";
               const senderName =
                 employment.senderName ??
                 employment.SenderName ??
@@ -143,15 +156,22 @@ export default function AllEmployments() {
                 employment.OrganizationName ??
                 employment.organization ??
                 "Organization";
-              const body = employment.body ?? employment.Body ?? employment.requirements ?? employment.Requirements ?? "No requirements listed";
-              const img = employment.imageUrl ?? employment.img ?? employment.image ?? null;
+              const body =
+                employment.body ??
+                employment.Body ??
+                employment.requirements ??
+                employment.Requirements ??
+                "No requirements listed";
+              const img =
+                employment.imageUrl ??
+                employment.img ??
+                employment.image ??
+                null;
 
               return (
                 <div key={employment.id} className="position-card">
                   <div className="position-left">
-                    <div className="position-icon">
-                      💼
-                    </div>
+                    <div className="position-icon">💼</div>
                   </div>
 
                   <div className="position-body">

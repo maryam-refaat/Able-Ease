@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import { getAll_Therapies } from "../assets/apis";
 import SessionConfirmationModal from "../Components/SessionConfirmationModal";
 import "../Org.css";
@@ -97,9 +97,14 @@ export default function AllTherapies() {
   const [loading, setLoading] = useState(false);
   const [showBookModal, setShowBookModal] = useState(false);
   const [selectedTherapy, setSelectedTherapy] = useState(null);
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -134,11 +139,11 @@ export default function AllTherapies() {
 
   const handleBook = (therapy) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -232,7 +237,15 @@ export default function AllTherapies() {
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
         title="Confirm Session Booking"
-        message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?${(selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour) ? `\n\nPrice: $${selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour}/hr` : ''}`}
+        message={`Are you sure you want to book "${
+          selectedTherapy?.name || selectedTherapy?.Name
+        }"?${
+          selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour
+            ? `\n\nPrice: $${
+                selectedTherapy?.pricePerHour || selectedTherapy?.PricePerHour
+              }/hr`
+            : ""
+        }`}
         therapy={selectedTherapy}
         isBooking={true}
       />
