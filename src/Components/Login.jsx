@@ -92,8 +92,8 @@ const AuthForm = () => {
         url = "/organization-profile";
       } else if (response.role == "Relative") {
         url = "/relative-profile";
-      } else if (response.role == "CareTaker") {
-        url = "/caretaker-profile";
+      } else if (response.role == "Caregiver") {
+        url = "/caregiver-profile";
       } else if (response.role == "PhysiotherapyCenter") {
         url = "/physio-profile";
       } else if (response.role == "Patient") {

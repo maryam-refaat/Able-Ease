@@ -141,11 +141,12 @@ export const getOrg_CareGivers = async (Oid) => {
 };
 
 export const getOrg_Proposals = async (Oid) => {
-  const response = await fetch(`${BASE_URL}/message/sent/${Oid}/job-proposals`);
+  const response = await fetch(`${BASE_URL}/Message/sent/${Oid}/job-proposals`);
   const data = await response.json();
-  const therapies = data.results || data || [];
-  return { data: therapies };
+  const proposals = data.results || data.data || [];
+  return { data: proposals };
 };
+
 export const getPatient_Reports = async (PSSN) => {
   const response = await fetch(
     `${BASE_URL}/Report/GetReportsByPatient/${PSSN}`
@@ -236,7 +237,7 @@ export const AddPatientToProgram = async (PSSN, ProID, OSSN) => {
 
 export const AddPatientToTherapy = async (body) => {
   const formData = new FormData();
-  
+
   // Add all fields to FormData
   formData.append("Name", body.Name || "");
   formData.append("duration", body.duration || 0);
@@ -299,14 +300,58 @@ export const signupPatient = async (body) => {
 };
 
 export const signupOrganization = async (body) => {
-  const response = await fetch(`${BASE_URL}/organizations/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+  const isFormData = body instanceof FormData;
 
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(
+    `${BASE_URL}/Organizations/register`,
+    requestConfig
+  );
+  const data = await response.json();
+  return data;
+};
+
+export const signupCaregiver = async (body) => {
+  const isFormData = body instanceof FormData;
+
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(`${BASE_URL}/Caregiver/register`, requestConfig);
+  const data = await response.json();
+  return data;
+};
+
+export const signupTherapy = async (body) => {
+  const isFormData = body instanceof FormData;
+
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(`${BASE_URL}/Center/register`, requestConfig);
   const data = await response.json();
   return data;
 };

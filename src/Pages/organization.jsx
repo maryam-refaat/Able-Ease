@@ -4,11 +4,13 @@ import AvailablePrograms from "../Components/AvailablePrograms";
 import FinancialAid from "../Components/FinancialAidOrg";
 import CareGiverBox from "../Components/CareGiverbox";
 import AvailableLocationsBox from "../Components/AvailablePositions";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { setAuthState } from "../context/AuthState";
 import { useEffect, useState } from "react";
 
 export default function Organizationpage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const organizationData = location.state?.organizationData;
 
   const [appear, setAppear] = useState(0);
@@ -16,6 +18,12 @@ export default function Organizationpage() {
   const [data, setData] = useState(organizationData || {});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+    navigate("/");
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -88,6 +96,16 @@ export default function Organizationpage() {
             onClick={() => setAppear(0)}
           >
             <i className="fa-solid fa-user" aria-hidden="true"></i>
+          </button>
+          <button
+            className="side-btn"
+            aria-label="logout"
+            onClick={handleLogout}
+          >
+            <i
+              className="fa-solid fa-right-from-bracket"
+              aria-hidden="true"
+            ></i>
           </button>
         </div>
       </div>

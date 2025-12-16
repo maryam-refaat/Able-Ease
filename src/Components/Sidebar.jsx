@@ -23,8 +23,11 @@ export default function Sidebar({ userType = "patient" }) {
   const profileRoute = getProfileRoute();
 
   const handleLogout = () => {
+    // Clear all localStorage
+    localStorage.clear();
+    // Set auth state to logged out
     setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    localStorage.removeItem("authToken");
+    // Navigate to home
     navigate("/");
   };
 

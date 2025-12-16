@@ -4,6 +4,7 @@ import "./PatientProf.css";
 import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
+import { setAuthState } from "../context/AuthState";
 
 import {
   getPatient_Program,
@@ -25,6 +26,15 @@ export default function PatientProfile() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear all localStorage
+    localStorage.clear();
+    // Set auth state to logged out
+    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+    // Navigate to home
+    navigate("/");
+  };
 
   useEffect(() => {
     // Scroll to top when component mounts

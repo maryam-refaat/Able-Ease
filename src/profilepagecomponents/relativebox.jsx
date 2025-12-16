@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getRelatives, updateRelative } from "../assets/apis.js";
 import "./profile.css";
 
-export function RelativeCard({ title, data }) {
+export function RelativeCard({ title, data, disableFetch = false }) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
@@ -19,21 +19,24 @@ export function RelativeCard({ title, data }) {
 
   const baseApiUrl = "https://localhost:7040/api";
 
-  // Helper function to extract SSN from JWT token
-  const getSSNFromToken = (token) => {
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-      ];
-    } catch (e) {
-      console.error("Failed to decode token:", e);
-      return null;
-    }
-  };
-
   useEffect(() => {
     const loadRelativeData = async () => {
+      if (disableFetch) {
+        // Populate from provided data only and skip API calls
+        if (data) {
+          setForm({
+            name: data.name || "",
+            contact: data.contactInfo || "",
+            email: data.email || "",
+            address: data.address || "",
+            gender: data.gender || "",
+            birthDate: data.birthDate || "",
+            patientSSN: data.patientSSN || "",
+            patientName: data.patientName || "",
+          });
+        }
+        return;
+      }
       setLoading(true);
       try {
         const token = localStorage.getItem("authToken");
@@ -142,7 +145,13 @@ export function RelativeCard({ title, data }) {
           <>
             <div className="relative-top-row">
               <div className="relative-user">
-                <img src="" className="relative-avatar" />
+                {form.imageUrl ? (
+                  <img
+                    src={form.imageUrl}
+                    alt="avatar"
+                    className="relative-avatar"
+                  />
+                ) : null}
 
                 <div>
                   <h2 className="relative-title">{title}</h2>
