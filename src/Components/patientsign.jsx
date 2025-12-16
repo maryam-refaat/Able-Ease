@@ -2,13 +2,12 @@
 import React, { useState } from "react";
 import "../Components/signup.css";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '../context/AuthContext';
+import { setAuthState } from "../context/AuthState";
 import { signupPatient } from "../assets/apis";
 
 export default function PatientSignUp() {
   const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -28,7 +27,6 @@ export default function PatientSignUp() {
     setIsError(false);
 
     const formData = new FormData(e.target);
-   
 
     const data = {
       name: formData.get("fullName")?.trim(),
@@ -76,9 +74,14 @@ export default function PatientSignUp() {
       alert("Invalid birth date");
       return;
     }
-    const age = new Date().getFullYear() - birth.getFullYear() -
+    const age =
+      new Date().getFullYear() -
+      birth.getFullYear() -
       (new Date().getMonth() < birth.getMonth() ||
-       (new Date().getMonth() === birth.getMonth() && new Date().getDate() < birth.getDate()) ? 1 : 0);
+      (new Date().getMonth() === birth.getMonth() &&
+        new Date().getDate() < birth.getDate())
+        ? 1
+        : 0);
     if (age < 0 || age > 120) {
       alert("Please enter a realistic birth date");
       return;
@@ -123,7 +126,6 @@ export default function PatientSignUp() {
       // };
       // localStorage.setItem("userSSN", response.data.ssn);
       // login(userData);
-      
     } catch (err) {
       console.error("Signup API error:", err);
       console.log("API not available - using demo storage for testing");
@@ -131,31 +133,31 @@ export default function PatientSignUp() {
 
     // TODO: REMOVE BELOW (Demo storage for testing) ==================
     // This allows signup to work even when API is not connected
-    const userData = {
-      role: "patient",
-      name: data.name,
-      email: data.email,
-      contactInfo: data.contactInfo,
-      gender: data.gender,
-      address: data.address,
-      birthDate: data.birthDate,
-      ssn: "demo-patient-ssn-123"
-    };
-    
-    localStorage.setItem("userSSN", "demo-patient-ssn-123");
-    localStorage.setItem("patientName", data.name);
-    localStorage.setItem("patientEmail", data.email);
-    localStorage.setItem("patientPhone", data.contactInfo);
-    localStorage.setItem("patientGender", data.gender);
-    localStorage.setItem("patientAddress", data.address);
-    localStorage.setItem("patientBirthDate", data.birthDate);
-    
-    login(userData);
+    // const userData = {
+    //   role: "patient",
+    //   name: data.name,
+    //   email: data.email,
+    //   contactInfo: data.contactInfo,
+    //   gender: data.gender,
+    //   address: data.address,
+    //   birthDate: data.birthDate,
+    //   ssn: "demo-patient-ssn-123"
+    // };
+
+    // localStorage.setItem("userSSN", "demo-patient-ssn-123");
+    // localStorage.setItem("patientName", data.name);
+    // localStorage.setItem("patientEmail", data.email);
+    // localStorage.setItem("patientPhone", data.contactInfo);
+    // localStorage.setItem("patientGender", data.gender);
+    // localStorage.setItem("patientAddress", data.address);
+    // localStorage.setItem("patientBirthDate", data.birthDate);
+
+    // login(userData);
     // TODO: END OF DEMO STORAGE ==========================================
-    
+
     setIsLoading(false);
     setIsSuccess(true);
-    
+
     // Navigate to profile immediately
     setTimeout(() => {
       navigate("/patient-profile");
@@ -196,7 +198,16 @@ export default function PatientSignUp() {
         >
           You can now access your profile and start booking programs.
         </p>
-        <button className="primary-btn" onClick={() => navigate("/patient-profile", { state: { patientData: JSON.parse(localStorage.getItem("patientData")) } })}>
+        <button
+          className="primary-btn"
+          onClick={() =>
+            navigate("/patient-profile", {
+              state: {
+                patientData: JSON.parse(localStorage.getItem("patientData")),
+              },
+            })
+          }
+        >
           Go to Profile
         </button>
       </div>
@@ -206,8 +217,8 @@ export default function PatientSignUp() {
   return (
     <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
       <h2>Patient Sign Up</h2>
-      
-      <div className="two-inputs"> 
+
+      <div className="two-inputs">
         <input type="text" name="fullName" placeholder="Full Name" required />
         <input type="text" name="address" placeholder="Address" required />
       </div>
@@ -228,8 +239,18 @@ export default function PatientSignUp() {
       </div>
 
       <div className="two-inputs">
-        <input type="password" name="password" placeholder="Password" required />
-        <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+        />
       </div>
 
       <label className="checkbox-row">
@@ -241,7 +262,11 @@ export default function PatientSignUp() {
         <span>Accept privacy & policy terms</span>
       </label>
 
-      <button disabled={!agree || isLoading} className="primary-btn" type="submit">
+      <button
+        disabled={!agree || isLoading}
+        className="primary-btn"
+        type="submit"
+      >
         {isLoading ? "Signing Up..." : "Sign Up"}
       </button>
     </form>

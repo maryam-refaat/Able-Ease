@@ -3,16 +3,15 @@ import "../Pages/Allemps.css"; // Reusing modal styles
 import { AddPatientToProgram } from "../assets/apis";
 import { JobApplication } from "../assets/apis";
 
-
-export default function ConfirmationModal({ 
-  isOpen, 
-  onConfirm, 
-  onCancel, 
-  title, 
+export default function ConfirmationModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+  title,
   message,
   program = null, // Pass program/position data
   isBooking = false, // Flag to determine if this is a booking modal
-  isApply = false // Flag to determine if this is a job application
+  isApply = false, // Flag to determine if this is a job application
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [qualifications, setQualifications] = useState("");
@@ -23,19 +22,20 @@ export default function ConfirmationModal({
   const formatMessage = (msg) => {
     if (!msg) return msg;
     // Replace "Price: $XX" or "$XX" patterns with strong tags
-    return msg.replace(/(\$\d+(?:\.\d{2})?(?:\/hr)?)/g, '<strong>$1</strong>')
-              .replace(/(Price:)/g, '<strong>$1</strong>');
+    return msg
+      .replace(/(\$\d+(?:\.\d{2})?(?:\/hr)?)/g, "<strong>$1</strong>")
+      .replace(/(Price:)/g, "<strong>$1</strong>");
   };
 
   const handleConfirm = async () => {
     // If this is a booking modal and program data is provided, handle API call
     if (isBooking && program) {
-      const patientSSN = localStorage.getItem("userSSN");
+      const patientSSN = localStorage.getItem("ssn");
       const programID = program?.id;
       const orgSSN = program?.organizationSSN;
 
       if (!patientSSN) {
-        alert("Patient information not found. Please log in again.");
+        alert("Please log in ");
         onCancel();
         return;
       }
@@ -43,11 +43,17 @@ export default function ConfirmationModal({
       setIsLoading(true);
       try {
         const programName = program?.name || program?.Name || "Program";
-        console.log(`Booking program: ${programName}, PatientSSN: ${patientSSN}, ProgramID: ${programID}, OrgSSN: ${orgSSN}`);
-        
-        const response = await AddPatientToProgram(patientSSN, programID, orgSSN);
+        console.log(
+          `Booking program: ${programName}, PatientSSN: ${patientSSN}, ProgramID: ${programID}, OrgSSN: ${orgSSN}`
+        );
+
+        const response = await AddPatientToProgram(
+          patientSSN,
+          programID,
+          orgSSN
+        );
         console.log("Booking response:", response);
-        
+
         alert(`Successfully booked: ${programName}`);
         onConfirm(); // Close modal on success
       } catch (error) {
@@ -58,7 +64,10 @@ export default function ConfirmationModal({
       }
     } else if (isApply) {
       // Handle job application
-      const orgSSN = program?.organizationSSN || program?.OrganizationSSN;
+      const orgSSN =
+        program?.organizationSSN ||
+        program?.OrganizationSSN ||
+        program?.senderSSN;
 
       if (!orgSSN) {
         alert("Organization information not found.");
@@ -73,8 +82,13 @@ export default function ConfirmationModal({
 
       setIsLoading(true);
       try {
-        const userSSN = localStorage.getItem("userSSN");
-        const positionTitle = program?.positionName || program?.PositionName || program?.position || program?.Position || "Position";
+        const userSSN = localStorage.getItem("ssn");
+        const positionTitle =
+          program?.positionName ||
+          program?.PositionName ||
+          program?.position ||
+          program?.Position ||
+          "Position";
 
         if (!userSSN) {
           alert("User information not found. Please log in again.");
@@ -87,12 +101,12 @@ export default function ConfirmationModal({
           receiverSSN: orgSSN,
           senderSSN: userSSN,
           body: qualifications.trim(),
-          Subject: `${positionTitle} application`
+          subject: `${positionTitle} application`,
         };
 
-        const response = await JobApplication(body, orgSSN);
+        const response = await JobApplication(body);
         console.log("Job application response:", response);
-        
+
         alert("Job application submitted successfully!");
         setQualifications("");
         onConfirm(); // Close modal on success
@@ -112,20 +126,20 @@ export default function ConfirmationModal({
     <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
-        <p 
+        <p
           style={{ whiteSpace: "pre-line" }}
           dangerouslySetInnerHTML={{ __html: formatMessage(message) }}
         />
-        
+
         {isApply && (
           <div style={{ marginBottom: "16px" }}>
-            <label 
-              htmlFor="qualifications" 
-              style={{ 
-                display: "block", 
-                marginBottom: "8px", 
+            <label
+              htmlFor="qualifications"
+              style={{
+                display: "block",
+                marginBottom: "8px",
                 fontWeight: "600",
-                fontSize: "0.95rem"
+                fontSize: "0.95rem",
               }}
             >
               Your Qualifications
@@ -145,28 +159,38 @@ export default function ConfirmationModal({
                 fontFamily: "inherit",
                 resize: "vertical",
                 transition: "border-color 0.3s ease",
-                boxSizing: "border-box"
+                boxSizing: "border-box",
               }}
-              onFocus={(e) => e.target.style.borderColor = "#a8d5f7"}
-              onBlur={(e) => e.target.style.borderColor = "#ddd"}
+              onFocus={(e) => (e.target.style.borderColor = "#a8d5f7")}
+              onBlur={(e) => (e.target.style.borderColor = "#ddd")}
             />
           </div>
         )}
 
         <div className="modal-actions">
-          <button 
-            className="modal-confirm" 
+          <button
+            className="modal-confirm"
             onClick={handleConfirm}
             disabled={isLoading || (isApply && !qualifications.trim())}
             style={{
-              opacity: (isLoading || (isApply && !qualifications.trim())) ? 0.6 : 1,
-              cursor: (isLoading || (isApply && !qualifications.trim())) ? "not-allowed" : "pointer"
+              opacity:
+                isLoading || (isApply && !qualifications.trim()) ? 0.6 : 1,
+              cursor:
+                isLoading || (isApply && !qualifications.trim())
+                  ? "not-allowed"
+                  : "pointer",
             }}
           >
-            {isLoading ? (isBooking ? "Booking..." : isApply ? "Applying..." : "Processing...") : "Confirm"}
+            {isLoading
+              ? isBooking
+                ? "Booking..."
+                : isApply
+                ? "Applying..."
+                : "Processing..."
+              : "Confirm"}
           </button>
-          <button 
-            className="modal-cancel" 
+          <button
+            className="modal-cancel"
             onClick={onCancel}
             disabled={isLoading}
           >

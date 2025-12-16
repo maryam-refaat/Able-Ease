@@ -32,8 +32,6 @@ export const signupRelative = async (body) => {
 
 // signup Organization
 
-
-
 // Fetch programs
 export const getPrograms = async () => {
   const response = await fetch(`${BASE_URL}/program/programs`);
@@ -222,31 +220,47 @@ export const getAll_Therapies = async (USSN) => {
   return { data: therapies };
 };
 
-export const AddPatientToProgram=async(PSSN,ProID,OSSN)=>{
-  const response = await fetch(`${BASE_URL}/Program/AddPatienttoprogram/${OSSN}/${ProID}/${PSSN}`,{
+export const AddPatientToProgram = async (PSSN, ProID, OSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Program/AddPatienttoprogram/${OSSN}/${ProID}/${PSSN}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const data = await response.text();
+  return data;
+};
+
+export const AddPatientToTherapy = async (body) => {
+  const formData = new FormData();
+  
+  // Add all fields to FormData
+  formData.append("Name", body.Name || "");
+  formData.append("duration", body.duration || 0);
+  formData.append("PricePerHour", body.PricePerHour || 0);
+  formData.append("Doctorname", body.Doctorname || "");
+  formData.append("therapyDetails", body.therapyDetails || "");
+  formData.append("Date", body.Date || "");
+  if (body.PatientSSN) formData.append("PatientSSN", body.PatientSSN);
+  formData.append("CenterID", body.CenterID || "");
+  if (body.Image) formData.append("Image", body.Image);
+
+  const response = await fetch(`${BASE_URL}/therapy/add`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("authToken"),
     },
+    body: formData,
   });
   const data = await response.json();
   return data;
-}
+};
 
-export const AddPatientToTherapy=async(body)=>{
-  const response = await fetch(`${BASE_URL}/Program/AddPatienttoprogram`,{
-    method: "PUT",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("token"),
-    },
-    body: body,
-  });
-  const data = await response.json();
-  return data;
-}
-
-export const JobApplication=async(body,OSSN)=>{
-  const response = await fetch(`${BASE_URL}/message/send/${OSSN}/job-applications`,{
+export const JobApplication = async (body) => {
+  const response = await fetch(`${BASE_URL}/message/send/job-application`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -255,21 +269,24 @@ export const JobApplication=async(body,OSSN)=>{
   });
   const data = await response.json();
   return data;
-}
+};
 
-export const ApplyForFA=async(body)=>{
-  const response = await fetch(`${BASE_URL}/message/send/financial-aid-application`,{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+export const ApplyForFA = async (body) => {
+  const response = await fetch(
+    `${BASE_URL}/message/send/financial-aid-application`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }
+  );
   const data = await response.json();
   return data;
-}
+};
 export const signupPatient = async (body) => {
-  const response = await fetch(`${BASE_URL}/relatives`, {
+  const response = await fetch(`${BASE_URL}/patients/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -350,7 +367,6 @@ export const fetchAvailablePrograms = async (ssn) => {
   return { data };
 };
 
-
 export const addProgram = async (organizationSsn, formData) => {
   const res = await fetch(
     `https://localhost:7040/api/Program/AddProgram/${organizationSsn}`,
@@ -370,8 +386,6 @@ export const addProgram = async (organizationSsn, formData) => {
 
   return res.json(); // should return the new program with ID
 };
-
-
 
 export const updateProgram = async (ssn, programId, formData) => {
   const response = await fetch(
@@ -425,6 +439,5 @@ export const getProgramPatients = async (programId, ssn) => {
   const data = await response.json();
   return data;
 };
-
 
 export default api;

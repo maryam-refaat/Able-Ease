@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import "../Pages/Allemps.css"; // Reusing modal styles
 import { AddPatientToTherapy } from "../assets/apis";
 
-export default function SessionConfirmationModal({ 
-  isOpen, 
-  onConfirm, 
-  onCancel, 
-  title, 
+export default function SessionConfirmationModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+  title,
   message,
   therapy = null,
-  isBooking = false
+  isBooking = false,
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,13 +19,17 @@ export default function SessionConfirmationModal({
   const formatMessage = (msg) => {
     if (!msg) return msg;
     // Replace "Price: $XX" or "$XX" patterns with strong tags for blue styling
-    return msg.replace(/(\$\d+(?:\.\d{2})?(?:\/hr)?)/g, '<strong class="session-price">$1</strong>')
-              .replace(/(Price:)/g, '<strong class="session-price">$1</strong>');
+    return msg
+      .replace(
+        /(\$\d+(?:\.\d{2})?(?:\/hr)?)/g,
+        '<strong class="session-price">$1</strong>'
+      )
+      .replace(/(Price:)/g, '<strong class="session-price">$1</strong>');
   };
 
   const handleConfirm = async () => {
     if (isBooking && therapy) {
-      const patientSSN = localStorage.getItem("userSSN");
+      const patientSSN = localStorage.getItem("ssn");
 
       if (!patientSSN) {
         alert("Patient information not found. Please log in again.");
@@ -43,13 +47,13 @@ export default function SessionConfirmationModal({
           therapyDetails: therapy?.therapyDetails || "",
           Date: therapy?.date || therapy?.Date || "",
           PatientSSN: patientSSN,
-          Image: therapy?.image || therapy?.Image || "",
-          CenterID: therapy?.centerID || therapy?.CenterID || therapy?.centerId || ""
+          CenterID:
+            therapy?.centerID || therapy?.CenterID || therapy?.centerId || "",
         };
 
         const response = await AddPatientToTherapy(body);
         console.log("Therapy booking response:", response);
-        
+
         alert("Therapy session booked successfully!");
         onConfirm();
       } catch (error) {
@@ -65,22 +69,25 @@ export default function SessionConfirmationModal({
 
   return (
     <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content session-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-content session-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="session-title">{title}</h3>
-        <p 
+        <p
           style={{ whiteSpace: "pre-line" }}
           dangerouslySetInnerHTML={{ __html: formatMessage(message) }}
         />
         <div className="modal-actions">
-          <button 
-            className="modal-confirm session-confirm" 
+          <button
+            className="modal-confirm session-confirm"
             onClick={handleConfirm}
             disabled={isLoading}
           >
             {isLoading ? "Booking..." : "Confirm"}
           </button>
-          <button 
-            className="modal-cancel session-cancel" 
+          <button
+            className="modal-cancel session-cancel"
             onClick={onCancel}
             disabled={isLoading}
           >

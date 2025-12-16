@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import "../Org.css";
 import TherapyCenterCarousel from "../Components/TherapyCenterCarousel";
 import ProgramCard from "../Components/ProgramCard";
@@ -29,7 +29,7 @@ const DUMMY_Therapies = [
 export default function TherapyCenters() {
   const [therapyCenters, setTherapyCenters] = useState(DUMMY_Centers);
   const [programs, setPrograms] = useState([]);
-  
+
   const [loadingCenters, setLoadingCenters] = useState(false);
   const [loadingPrograms, setLoadingPrograms] = useState(false);
 
@@ -39,7 +39,12 @@ export default function TherapyCenters() {
   const [selectedTherapy, setSelectedTherapy] = useState(null);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
   /* helper to extract center SSN */
   const getCenterSSN = (item) => {
@@ -86,7 +91,7 @@ export default function TherapyCenters() {
   /* =========================
      Load Therapies
      ========================= */
-     
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -139,11 +144,11 @@ export default function TherapyCenters() {
 
   const handleBook = (program) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
@@ -206,7 +211,9 @@ export default function TherapyCenters() {
         onConfirm={handleBookConfirm}
         onCancel={handleBookCancel}
         title="Confirm Session Booking"
-        message={`Are you sure you want to book "${selectedTherapy?.name || selectedTherapy?.Name}"?`}
+        message={`Are you sure you want to book "${
+          selectedTherapy?.name || selectedTherapy?.Name
+        }"?`}
         therapy={selectedTherapy}
         isBooking={true}
       />

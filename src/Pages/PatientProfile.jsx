@@ -5,7 +5,11 @@ import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
 
-import { getPatient_Program, getPatient_Therapies, getPatient_Reports } from "../assets/apis";
+import {
+  getPatient_Program,
+  getPatient_Therapies,
+  getPatient_Reports,
+} from "../assets/apis";
 import Footer from "../Components/Footer";
 
 export default function PatientProfile() {
@@ -21,7 +25,7 @@ export default function PatientProfile() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -34,7 +38,12 @@ export default function PatientProfile() {
 
         // Determine patient identifier (prefer route state, fall back to localStorage token/SSN)
         const fromState = location.state?.patientData;
-        const candidateId = fromState?.id ?? fromState?.PSSN ?? fromState?.patientSSN ?? fromState?.ssn ?? null;
+        const candidateId =
+          fromState?.id ??
+          fromState?.PSSN ??
+          fromState?.patientSSN ??
+          fromState?.ssn ??
+          null;
 
         // If we have basic patient data from navigation state, use it as base
         let base = fromState ? { ...fromState } : {};
@@ -42,13 +51,13 @@ export default function PatientProfile() {
         // Try other common places for an identifier
         const storedToken = (() => {
           try {
-            return JSON.parse(localStorage.getItem("patientToken"));
+            return JSON.parse(localStorage.getItem("authToken"));
           } catch (e) {
             return null;
           }
         })();
 
-        const storedSSN = localStorage.getItem("patientSSN") || null;
+        const storedSSN = localStorage.getItem("ssn") || null;
 
         const patientId = candidateId || storedSSN || storedToken || null;
 
@@ -61,14 +70,19 @@ export default function PatientProfile() {
           ]);
 
           const programs = Array.isArray(progRes?.data) ? progRes.data : [];
-          const therapies = Array.isArray(therapiesRes?.data) ? therapiesRes.data : [];
-          const reports = Array.isArray(reportsRes?.data) ? reportsRes.data : [];
+          const therapies = Array.isArray(therapiesRes?.data)
+            ? therapiesRes.data
+            : [];
+          const reports = Array.isArray(reportsRes?.data)
+            ? reportsRes.data
+            : [];
 
           // normalize therapies -> sessions (best-effort mapping)
           const sessions = therapies.map((t, i) => ({
             id: t.id ?? t.therapyId ?? `t-${i}`,
             title: t.name ?? t.title ?? t.therapyName ?? "Therapy",
-            location: t.location ?? t.centerLocation ?? t.center?.location ?? "",
+            location:
+              t.location ?? t.centerLocation ?? t.center?.location ?? "",
             state: t.state ?? t.status ?? "scheduled",
           }));
 
@@ -96,16 +110,34 @@ export default function PatientProfile() {
 
             // Set structure with stored data or demo data
             const patientInfo = {
-              fullName: localStorage.getItem("patientName") || storedData?.fullName || "Patient Name",
-              email: localStorage.getItem("patientEmail") || storedData?.email || "patient@example.com",
-              phone: localStorage.getItem("patientPhone") || storedData?.phone || "+1 234 567 8900",
-              gender: localStorage.getItem("patientGender") || storedData?.gender || "Not specified",
-              address: localStorage.getItem("patientAddress") || storedData?.address || "Address not available",
-              birthDate: localStorage.getItem("patientBirthDate") || storedData?.birthDate || "",
+              fullName:
+                localStorage.getItem("patientName") ||
+                storedData?.fullName ||
+                "Patient Name",
+              email:
+                localStorage.getItem("patientEmail") ||
+                storedData?.email ||
+                "patient@example.com",
+              phone:
+                localStorage.getItem("patientPhone") ||
+                storedData?.phone ||
+                "+1 234 567 8900",
+              gender:
+                localStorage.getItem("patientGender") ||
+                storedData?.gender ||
+                "Not specified",
+              address:
+                localStorage.getItem("patientAddress") ||
+                storedData?.address ||
+                "Address not available",
+              birthDate:
+                localStorage.getItem("patientBirthDate") ||
+                storedData?.birthDate ||
+                "",
               ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
               programs: [],
               sessions: [],
-              reports: []
+              reports: [],
             };
             setData(patientInfo);
           }
@@ -123,16 +155,34 @@ export default function PatientProfile() {
 
         // Set data with stored values instead of error
         const patientInfo = {
-          fullName: localStorage.getItem("patientName") || storedData?.fullName || "Patient Name",
-          email: localStorage.getItem("patientEmail") || storedData?.email || "patient@example.com",
-          phone: localStorage.getItem("patientPhone") || storedData?.phone || "+1 234 567 8900",
-          gender: localStorage.getItem("patientGender") || storedData?.gender || "Not specified",
-          address: localStorage.getItem("patientAddress") || storedData?.address || "Address not available",
-          birthDate: localStorage.getItem("patientBirthDate") || storedData?.birthDate || "",
+          fullName:
+            localStorage.getItem("patientName") ||
+            storedData?.fullName ||
+            "Patient Name",
+          email:
+            localStorage.getItem("patientEmail") ||
+            storedData?.email ||
+            "patient@example.com",
+          phone:
+            localStorage.getItem("patientPhone") ||
+            storedData?.phone ||
+            "+1 234 567 8900",
+          gender:
+            localStorage.getItem("patientGender") ||
+            storedData?.gender ||
+            "Not specified",
+          address:
+            localStorage.getItem("patientAddress") ||
+            storedData?.address ||
+            "Address not available",
+          birthDate:
+            localStorage.getItem("patientBirthDate") ||
+            storedData?.birthDate ||
+            "",
           ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
           programs: [],
           sessions: [],
-          reports: []
+          reports: [],
         };
         setData(patientInfo);
       } finally {
@@ -145,12 +195,11 @@ export default function PatientProfile() {
 
   const openEdit = () => {
     setDraft({
-      
-      fullName:data.fullName||"",
+      fullName: data.fullName || "",
       email: data?.email || "",
       phone: data?.phone || "",
       gender: data?.gender || "",
-      address: data?.address || ""
+      address: data?.address || "",
     });
     setModalError("");
     setEditing(true);
@@ -181,116 +230,152 @@ export default function PatientProfile() {
 
   return (
     <>
-    <div className="with-sidebar">
-        <Sidebar userType="patient" />      <div className="page-container">
-      <header className="welcome-box centered">
-        <h1>Welcome, {data?.fullName ? data.fullName.split(" ")[0] : "Patient"}</h1>
-        <p>{new Date().toLocaleDateString()}</p>
-      </header>
+      <div className="with-sidebar">
+        <Sidebar userType="patient" />{" "}
+        <div className="page-container">
+          <header className="welcome-box centered">
+            <h1>
+              Welcome,{" "}
+              {data?.fullName ? data.fullName.split(" ")[0] : "Patient"}
+            </h1>
+            <p>{new Date().toLocaleDateString()}</p>
+          </header>
 
-      {/* Patient card (edit button inside card) */}
-      <PatientCard data={data} onEdit={openEdit} />
+          {/* Patient card (edit button inside card) */}
+          <PatientCard data={data} onEdit={openEdit} />
 
-      {/* Program section */}
-      <section className="card-section">
-        <h3>Patient Program if enrolled</h3>
-        <div className="card-content">
-          {data.programs?.length ? (
-            data.programs.map((p) => (
-              <div key={p.id} className="program-card big">
-                <div className="program-title">{p.name}</div>
-                <div className="program-state">State: {p.state}</div>
+          {/* Program section */}
+          <section className="card-section">
+            <h3>Patient Program if enrolled</h3>
+            <div className="card-content">
+              {data.programs?.length ? (
+                data.programs.map((p) => (
+                  <div key={p.id} className="program-card big">
+                    <div className="program-title">{p.name}</div>
+                    <div className="program-state">State: {p.state}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-card">No enrolled program</div>
+              )}
+            </div>
+          </section>
+
+          {/* sessions */}
+          <section className="card-section">
+            <h3>Coming sessions</h3>
+            <div className="card-content horizontal">
+              {data.sessions?.length ? (
+                data.sessions.map((s) => (
+                  <div key={s.id} className="session-card">
+                    <div className="session-title">{s.title}</div>
+                    <div className="session-loc">{s.location}</div>
+                    <div className="session-state">{s.state}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-card">No upcoming sessions</div>
+              )}
+            </div>
+          </section>
+
+          {/* employment */}
+          <section className="card-section">
+            <h3>Employment (position and organization)</h3>
+            <div className="employment-card">
+              <div className="avatar-circle">👤</div>
+              <div>
+                <div className="employment-title">
+                  {data?.employment?.position || "Job description"}{" "}
+                  {data?.employment?.since && `since ${data.employment.since}`}
+                </div>
+                <div className="employment-sub">
+                  {data?.employment?.organization || "manager details"}
+                </div>
               </div>
-            ))
-          ) : (
-            <div className="empty-card">No enrolled program</div>
+            </div>
+          </section>
+
+          {/* edit modal */}
+          {editing && (
+            <div className="popup-overlay">
+              <div className="popup-card">
+                <h3>Edit patient</h3>
+
+                <div className="popup-input-group">
+                  <label>Full name</label>
+                  <input
+                    value={draft.fullName}
+                    onChange={(e) =>
+                      setDraft({ ...draft, fullName: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="popup-row">
+                  <div className="popup-input-group">
+                    <label>Email</label>
+                    <input
+                      value={draft.email}
+                      onChange={(e) =>
+                        setDraft({ ...draft, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="popup-input-group">
+                    <label>Phone</label>
+                    <input
+                      value={draft.phone}
+                      onChange={(e) =>
+                        setDraft({ ...draft, phone: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="popup-input-group">
+                  <label>Gender</label>
+                  <input
+                    value={draft.gender}
+                    onChange={(e) =>
+                      setDraft({ ...draft, gender: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="popup-input-group">
+                  <label>Address</label>
+                  <input
+                    value={draft.address}
+                    onChange={(e) =>
+                      setDraft({ ...draft, address: e.target.value })
+                    }
+                  />
+                </div>
+
+                {modalError && <div className="error">{modalError}</div>}
+
+                <div className="popup-actions">
+                  <button
+                    className="close-btn"
+                    onClick={() => setEditing(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="add-btn"
+                    onClick={handleSave}
+                    disabled={saving}
+                  >
+                    {saving ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
-      </section>
-
-      {/* sessions */}
-      <section className="card-section">
-        <h3>Coming sessions</h3>
-        <div className="card-content horizontal">
-          {data.sessions?.length ? (
-            data.sessions.map((s) => (
-              <div key={s.id} className="session-card">
-                <div className="session-title">{s.title}</div>
-                <div className="session-loc">{s.location}</div>
-                <div className="session-state">{s.state}</div>
-              </div>
-            ))
-          ) : (
-            <div className="empty-card">No upcoming sessions</div>
-          )}
-        </div>
-      </section>
-
-      {/* employment */}
-      <section className="card-section">
-        <h3>Employment (position and organization)</h3>
-        <div className="employment-card">
-          <div className="avatar-circle">👤</div>
-          <div>
-            <div className="employment-title">
-              {data?.employment?.position || "Job description"}{" "}
-              {data?.employment?.since && `since ${data.employment.since}`}
-            </div>
-            <div className="employment-sub">{data?.employment?.organization || "manager details"}</div>
-          </div>
-        </div>
-      </section>
-
-      {/* edit modal */}
-      {editing && (
-        <div className="popup-overlay">
-          <div className="popup-card">
-            <h3>Edit patient</h3>
-
-            <div className="popup-input-group">
-              <label>Full name</label>
-              <input value={draft.fullName} onChange={(e) => setDraft({ ...draft, fullName: e.target.value })} />
-            </div>
-
-            <div className="popup-row">
-              <div className="popup-input-group">
-                <label>Email</label>
-                <input value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
-              </div>
-              <div className="popup-input-group">
-                <label>Phone</label>
-                <input value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="popup-input-group">
-              <label>Gender</label>
-              <input value={draft.gender} onChange={(e) => setDraft({ ...draft, gender: e.target.value })} />
-            </div>
-
-            <div className="popup-input-group">
-              <label>Address</label>
-              <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} />
-            </div>
-
-            {modalError && <div className="error">{modalError}</div>}
-
-            <div className="popup-actions">
-              <button className="close-btn" onClick={() => setEditing(false)}>
-                Close
-              </button>
-              <button className="add-btn" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-     
       </div>
-    </div>
-     <Footer />
+      <Footer />
     </>
   );
 }

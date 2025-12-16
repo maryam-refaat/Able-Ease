@@ -1,59 +1,74 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { getAuthState } from "../context/AuthState";
 import ConfirmationModal from "./ConfirmationModal";
 import "../index.css";
-import { getEmployments } from "../assets/apis";
+import { getAll_Employments } from "../assets/apis";
 
 export default function OrgEmploySection() {
-  const [positions, setPositions] = useState([]);
+  const [employments, setEmployments] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState(null);
+  const [selectedEmployment, setSelectedEmployment] = useState(null);
   const listRef = useRef(null);
 
   const navigate = useNavigate();
-  const { isLoggedIn, userType } = useAuth();
+  const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
+  useEffect(() => {
+    const handler = () => setLocalAuth(getAuthState());
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
 
-  const fallback = [
+  const DUMMY_EMPLOYMENTS = [
     {
-      positionId: 101,
-      positionName: "Physiotherapist",
-      requirements: "BSc physiotherapy; 2+ years",
-      OrganizationSSN: "ORG-001",
-      OrgName: "Able Donor"
+      id: 1,
+      position: "Physical Therapist",
+      organizationName: "Sunrise Rehab Center",
+      organizationSSN: "ORG-001",
+      requirements:
+        "Bachelor's degree in Physical Therapy, 2+ years experience, CPR certified",
+      imageUrl: null,
     },
     {
-      positionId: 102,
-      positionName: "Assistant Therapist",
-      requirements: "High school diploma",
-      OrganizationSSN: "ORG-001",
-      OrgName: "Able Donor"
-    },{
-      positionId: 101,
-      positionName: "Physiotherapist",
-      requirements: "BSc physiotherapy; 2+ years",
-      OrganizationSSN: "ORG-001",
-      OrgName: "Able Donor"
-    }, {
-      positionId: 102,
-      positionName: "Assistant Therapist",
-      requirements: "High school diploma",
-      OrganizationSSN: "ORG-001",
-      OrgName: "Able Donor"
-    }
+      id: 2,
+      position: "Occupational Therapist",
+      organizationName: "Hope Wellness Center",
+      organizationSSN: "ORG-002",
+      requirements:
+        "Master's degree in OT, state license required, pediatric experience preferred",
+      imageUrl: null,
+    },
+    {
+      id: 3,
+      position: "Speech Therapist",
+      organizationName: "Able Care Hub",
+      organizationSSN: "ORG-003",
+      requirements:
+        "CCC-SLP certification, experience with children and adults, bilingual a plus",
+      imageUrl: null,
+    },
+    {
+      id: 4,
+      position: "Rehabilitation Aide",
+      organizationName: "Physio Plus Center",
+      organizationSSN: "ORG-004",
+      requirements:
+        "High school diploma, patient care experience, strong communication skills",
+      imageUrl: null,
+    },
   ];
 
-  const handleApply = (position) => {
+  const handleApply = (employment) => {
     if (!isLoggedIn || userType !== "patient") {
-      navigate('/Able-Ease#auth-form');
+      navigate("/Able-Ease#auth-form");
       setTimeout(() => {
-        const authElement = document.getElementById('auth-form');
+        const authElement = document.getElementById("auth-form");
         if (authElement) {
-          authElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 100);
     } else {
-      setSelectedPosition(position);
+      setSelectedEmployment(employment);
       setShowModal(true);
     }
   };
@@ -61,41 +76,37 @@ export default function OrgEmploySection() {
   const handleConfirm = () => {
     // Modal handles the API call, just close modal here
     setShowModal(false);
-    setSelectedPosition(null);
+    setSelectedEmployment(null);
   };
 
   const handleCancel = () => {
     setShowModal(false);
-    setSelectedPosition(null);
+    setSelectedEmployment(null);
   };
 
- useEffect(() => {
-  let mounted = true;
+  useEffect(() => {
+    let mounted = true;
 
-  async function load() {
-    try {
-      const res = await getEmployments();
-      if (!mounted) return;
+    const loadEmployments = async () => {
+      try {
+        const res = await getAll_Employments();
+        const empData = res?.data.data;
 
-      const data = Array.isArray(res.data) ? res.data : [];
+        if (mounted && Array.isArray(empData)) {
+          setEmployments(empData);
+        } else {
+          setEmployments(DUMMY_EMPLOYMENTS);
+        }
+      } catch (err) {
+        console.error("getAll_Employments failed", err);
+        setEmployments(DUMMY_EMPLOYMENTS);
+      }
+    };
 
-      // If data is empty, use fallback
-      setPositions(data.length ? data : fallback);
-      
-    } catch (err) {
-      if (!mounted) return;
-      console.warn("getEmployments failed — using fallback", err);
-      setPositions(fallback);
-    }
-  }
+    loadEmployments();
+    return () => (mounted = false);
+  }, []);
 
-  load();
-  return () => { mounted = false };
-}, []);
-
-
-        // If no positions found, fallback
-      
   return (
     <section id="org">
       <div className="container">
@@ -105,23 +116,54 @@ export default function OrgEmploySection() {
 
         <div className="carousel" aria-roledescription="carousel">
           <div ref={listRef} className="carousel-list" role="list">
-            {positions.map((p) => (
-              <div key={p.positionId} className="carousel-item" role="listitem">
-                <h4 className="h4">{p.positionName}</h4>
+            {employments.map((employment) => {
+              const subject =
+                employment.subject ??
+                employment.Subject ??
+                employment.position ??
+                employment.Position ??
+                "Position";
+              const senderName =
+                employment.senderName ??
+                employment.SenderName ??
+                employment.organizationName ??
+                employment.OrganizationName ??
+                employment.organization ??
+                "Organization";
+              const body =
+                employment.body ??
+                employment.Body ??
+                employment.requirements ??
+                employment.Requirements ??
+                "No requirements listed";
 
-                <p className="small" style={{ marginTop: "6px" }}>
-                  <strong>Organization:</strong> {p.OrgName}
-                </p>
+              return (
+                <div
+                  key={employment.id ?? employment.positionId}
+                  className="carousel-item"
+                  role="listitem"
+                >
+                  <h4 className="h4">{subject}</h4>
 
-                <p className="small" style={{ marginTop: "6px" }}>
-                  <strong>Requirements:</strong> {p.requirements}
-                </p>
+                  <p className="small" style={{ marginTop: "6px" }}>
+                    <strong>Organization:</strong> {senderName}
+                  </p>
 
-                <div style={{ marginTop: "14px", textAlign: "right" }}>
-                  <button className="btn" onClick={() => handleApply(p)}>Apply</button>
+                  <p className="small" style={{ marginTop: "6px" }}>
+                    <strong>Requirements:</strong> {body}
+                  </p>
+
+                  <div style={{ marginTop: "14px", textAlign: "right" }}>
+                    <button
+                      className="btn"
+                      onClick={() => handleApply(employment)}
+                    >
+                      Apply
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -132,7 +174,7 @@ export default function OrgEmploySection() {
         onCancel={handleCancel}
         title="Confirm Application"
         message="Confirm to Apply for this position and wait for the reply!!"
-        program={selectedPosition}
+        program={selectedEmployment}
         isApply={true}
       />
     </section>
