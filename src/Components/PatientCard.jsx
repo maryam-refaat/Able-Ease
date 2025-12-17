@@ -2,7 +2,7 @@ import React from "react";
 import "../Pages/PatientProf.css";
 import { useState,useEffect } from "react";
 
-export default function PatientCard({ title = "Patient", data = {}, onEdit }) {
+export default function PatientCard({ title = "Patient", data = {}, onEdit, showAvatar = true, showEdit = true }) {
   const [form, setForm] = useState({
     fullName: "",
     contact: "",
@@ -32,11 +32,13 @@ export default function PatientCard({ title = "Patient", data = {}, onEdit }) {
       <div className="patient-card__content">
         <div className="patient-card__top">
           <div className="patient-card__left" style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <img
-              src={data.avatar || "/profile-placeholder.png"}
-              alt="avatar"
-              className="patient-card__avatar"
-            />
+            {showAvatar && (
+              <img
+                src={data.avatar || "/profile-placeholder.png"}
+                alt="avatar"
+                className="patient-card__avatar"
+              />
+            )}
             <div className="patient-card__meta">
               <div className="patient-card__title">{title}</div>
               <div className="patient-card__email">{form.email}</div>
@@ -44,9 +46,11 @@ export default function PatientCard({ title = "Patient", data = {}, onEdit }) {
           </div>
 
           <div className="patient-card__actions">
-            <button className="patient-card__edit" onClick={onEdit}>
-              Edit
-            </button>
+            {onEdit && showEdit && (
+              <button className="patient-card__edit" onClick={onEdit}>
+                Edit
+              </button>
+            )}
           </div>
         </div>
 

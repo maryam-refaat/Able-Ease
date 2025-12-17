@@ -7,7 +7,7 @@ import './AdminProfile.css';
 
 const AdminProfile = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const displayName = user?.username || user?.name || user?.email || 'Admin';
 
@@ -279,15 +279,31 @@ const AdminProfile = () => {
   return (
     <div className="admin-page">
       <div className="page-container">
-        <header className="welcome-box centered">
+        <header className="welcome-box centered" style={{ position: 'relative' }}>
           <h1>Welcome, {displayName.split(' ')[0] || 'Admin'}</h1>
           <p>{new Date().toLocaleDateString()}</p>
+          <button
+            className="btn"
+            onClick={() => {
+              localStorage.setItem('auth.isLoggedIn','false');
+              logout();
+              window.dispatchEvent(new Event('auth-changed'));
+              navigate('/');
+            }}
+            style={{ position: 'absolute', right: 16, top: 12, padding: '8px 12px', borderRadius: 8, background: '#dc2626', color: 'white' }}
+            title="Logout"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
         </header>
 
         <div style={{ marginTop: 16 }}>
           <PatientCard
             title="Administrator"
             data={{ fullName: displayName, email: user?.email || '', avatar: null }}
+            showAvatar={false}
+            showEdit={false}
           />
 
           <div style={{ marginTop: 12 }}>

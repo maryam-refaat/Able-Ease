@@ -220,12 +220,14 @@ export default function Landpage() {
       <br />
       <br />
 
-      {/* SimpleCarousel usage */}
+      <h2  className="program-title" style={{ paddingLeft: "160px",paddingBottom:"20px" }}>Meet Our Care Givers</h2>
+
+      
       <SimpleCarousel images={[pic, pic, pic]} autoDelay={3000} />
 
       <p className="paragraph2">
         {" "}
-        Follow up by professional Care Takers whom are well trained to meet your
+        Follow up by professionals whom are well trained to meet your
         standards{" "}
       </p>
       <Physicenterfind />

@@ -115,7 +115,7 @@ export default function Programfind() {
 
           <div className="program-cards" ref={scrollRef} aria-live="polite">
             {programs.map((c) => (
-              <div key={c.id} className="program-card" onClick={handleCardClick}>
+              <div key={c.id} className="program-card2" onClick={handleCardClick}>
                 <img
                   src={c.imageUrl || c.image || programimg}
                   alt={c.name}
