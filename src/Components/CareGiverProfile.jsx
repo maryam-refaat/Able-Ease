@@ -24,7 +24,7 @@ export default function CaregiverProfile() {
         }
 
         const response = await fetch(
-          `https://localhost:7040/api/caregiver/getcaregiver/${caregiverSSN}`,
+          `https://localhost:7040/api/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -33,12 +33,15 @@ export default function CaregiverProfile() {
         );
 
         if (!response.ok) {
-          const text = await response.text();
-          throw new Error(text || `Failed: ${response.status}`);
+          throw new Error(`Failed: ${response.status}`);
         }
 
         const json = await response.json();
-        setData(json?.data || json || {});
+        const caregiverData = json?.data || json || {};
+        setData(caregiverData);
+
+        // Save to localStorage
+        localStorage.setItem("caregiverData", JSON.stringify(caregiverData));
       } catch (error) {
         console.error("Error fetching caregiver data:", error);
         setIsError(true);
@@ -71,7 +74,9 @@ export default function CaregiverProfile() {
         <RelativeCard title="Caregiver" data={data} disableFetch={true} />
         <PatientsBox
           patients={data?.patients}
-          onAddReport={(p) => console.log("Add report for", p)}
+          programId={data?.programId}
+          programOrganizationSSN={data?.programOrganizationSSN}
+          caregiverSSN={data?.ssn}
         />
       </div>
     </div>

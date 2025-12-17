@@ -4,6 +4,32 @@ const API_KEY = "";
 const BASE_URL = "https://localhost:7040/api"; // example: https://myserver.com/api
 
 // Fetch a single patient by SSN
+export const fetchAvailabletherapiesJoined = async (id) => {
+  const response = await fetch(`${BASE_URL}/Therapy/center/${id}/joined`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+  const data = await response.json();
+  return { data: data || [] };
+};
+
+export const deleteTherapy = async (therapyId) => {
+  const response = await fetch(`${BASE_URL}/Therapy/delete/${therapyId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
 export const getPatientBySSN = async (ssn) => {
   if (!ssn) return { data: null };
 
@@ -77,7 +103,7 @@ export const getEmployments = async () => {
 
 // Fetch physi centers
 export const getPhysicenters = async () => {
-  const response = await fetch(`${BASE_URL}/GetAllcenters`);
+  const response = await fetch(`${BASE_URL}/center/GetAllcenters`);
   const data = await response.json();
   const centers = data.results || data || [];
   return { data: centers };
@@ -226,14 +252,22 @@ export const getPatient_Program = async (PSSN) => {
 };
 
 export const getReceived_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}/contact`);
+  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}/contact`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
   const result = await response.json();
   const Recieved = result.data || result.results || result || [];
   return { data: Recieved };
 };
 
 export const getSent_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}/contact`);
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}/contact`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
   const result = await response.json();
   const Sent = result.data || result.results || result || [];
   return { data: Sent };
@@ -349,7 +383,7 @@ export const getAll_Therapies = async (USSN) => {
 
 export const AddPatientToProgram = async (PSSN, ProID, OSSN) => {
   const response = await fetch(
-    `${BASE_URL}/Program/AddPatienttoprogram/${OSSN}/${ProID}/${PSSN}`,
+    `${BASE_URL}/Program/AddPatientToProgram/${OSSN}/${ProID}/${PSSN}`,
     {
       method: "POST",
       headers: {
@@ -677,7 +711,7 @@ export const fetchAvailabletherapies = async (centerSSN) => {
 };
 
 export const addtherapy = async (formData) => {
-  const response = await fetch(`${BASE_URL}/therapy/add`, {
+  const response = await fetch(`${BASE_URL}/Therapy/add`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -688,8 +722,7 @@ export const addtherapy = async (formData) => {
 };
 
 export const updatetherapy = async (formData) => {
-  const therapyId = formData.get("Id") || formData.get("id");
-  const response = await fetch(`${BASE_URL}/therapy/update/${therapyId}`, {
+  const response = await fetch(`${BASE_URL}/Therapy/update`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -882,9 +915,18 @@ export const sendMssg = async (body) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
     },
     body: JSON.stringify(body),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error("Send message error:", errorData);
+    throw new Error(
+      errorData.message || `HTTP error! status: ${response.status}`
+    );
+  }
 
   const data = await response.json();
   return data;

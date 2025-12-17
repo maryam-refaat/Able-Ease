@@ -36,6 +36,7 @@ export default function PatientReportsMedical() {
   const [reports, setReports] = useState([]);
   const [medical, setMedical] = useState([]);
   const [disabilities, setDisabilities] = useState([]);
+  const [assessments, setAssessments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -88,6 +89,59 @@ export default function PatientReportsMedical() {
         const r = Array.isArray(rRes?.data) ? rRes.data : [];
         const rawMedical = Array.isArray(mRes?.data) ? mRes.data : [];
         const rawDisabilities = Array.isArray(dRes?.data) ? dRes.data : [];
+
+        // Fetch assessments
+        try {
+          const assessmentRes = await fetch(
+            `https://localhost:7040/api/Assessment/GetAssessmentPatientsByPatient/${storedSSN}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            }
+          );
+
+          if (assessmentRes.ok) {
+            const assessmentData = await assessmentRes.json();
+            const rawAssessments = Array.isArray(assessmentData)
+              ? assessmentData
+              : [];
+
+            // Fetch program names for each assessment
+            const assessmentsWithPrograms = await Promise.all(
+              rawAssessments.map(async (assessment) => {
+                try {
+                  const programRes = await fetch(
+                    `https://localhost:7040/api/Program/ProgramByID/${assessment.assessmentProgramOrganizationSSN}/${assessment.assessmentProgramId}`,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                          "authToken"
+                        )}`,
+                      },
+                    }
+                  );
+
+                  if (programRes.ok) {
+                    const programData = await programRes.json();
+                    return {
+                      ...assessment,
+                      programName: programData.name || "Unknown Program",
+                    };
+                  }
+                } catch (error) {
+                  console.error("Error fetching program:", error);
+                }
+                return { ...assessment, programName: "Unknown Program" };
+              })
+            );
+
+            setAssessments(assessmentsWithPrograms);
+          }
+        } catch (error) {
+          console.error("Error fetching assessments:", error);
+          setAssessments([]);
+        }
 
         // normalize disabilities using API schema
         const normalizedDisabilities = rawDisabilities.map((dis, i) => ({
@@ -369,6 +423,70 @@ export default function PatientReportsMedical() {
                 ))
               ) : (
                 <div className="empty-card">No medical info available</div>
+              )}
+            </div>
+          </section>
+
+          <section className="card-section" style={{ marginTop: 18 }}>
+            <h3>Assessments</h3>
+            <div className="card-content">
+              {assessments.length ? (
+                assessments.map((assessment, i) => (
+                  <div
+                    key={assessment.assessmentId ?? i}
+                    className="employment-card"
+                    style={{ position: "relative" }}
+                  >
+                    <div className="avatar-circle">📊</div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        className="employment-title"
+                        style={{ fontWeight: 700, fontSize: "18px" }}
+                      >
+                        {assessment.programName}
+                      </div>
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 16,
+                          right: 16,
+                          fontSize: 13,
+                          color: "#666",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {assessment.assessmentDate
+                          ? new Date(
+                              assessment.assessmentDate
+                            ).toLocaleDateString()
+                          : "—"}
+                      </div>
+
+                      <div style={{ marginTop: 12 }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "6px 16px",
+                            background:
+                              assessment.grade >= 80
+                                ? "#28a745"
+                                : assessment.grade >= 60
+                                ? "#ffc107"
+                                : "#dc3545",
+                            color: "white",
+                            borderRadius: "20px",
+                            fontSize: "16px",
+                            fontWeight: 700,
+                          }}
+                        >
+                          Grade: {assessment.grade ?? "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-card">No assessments available</div>
               )}
             </div>
           </section>

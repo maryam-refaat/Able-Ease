@@ -136,7 +136,19 @@ export default function PatientProfile() {
         const therapies = Array.isArray(therapiesRes?.data)
           ? therapiesRes.data
           : [];
-        const rawWork = Array.isArray(workRes?.data) ? workRes.data : [];
+
+        // Handle both array and single object responses for work data
+        let rawWork = [];
+        if (workRes?.data) {
+          if (Array.isArray(workRes.data)) {
+            rawWork = workRes.data;
+          } else if (typeof workRes.data === "object") {
+            // If it's a single object, wrap it in an array
+            rawWork = [workRes.data];
+          }
+        }
+
+        console.log("rawWork after normalization:", rawWork);
 
         // normalize programs mapping with API field names
         const programs = rawPrograms.map((p, i) => ({
@@ -192,6 +204,7 @@ export default function PatientProfile() {
         });
 
         // normalize employment data using API field names
+        console.log("rawWork array:", rawWork);
         const employment =
           rawWork.length > 0
             ? {
@@ -212,6 +225,8 @@ export default function PatientProfile() {
                 startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
               }
             : null;
+
+        console.log("Processed employment:", employment);
 
         // Set data from API response
         const merged = {
@@ -399,22 +414,6 @@ export default function PatientProfile() {
                       }}
                     >
                       <div style={{ flex: 1 }}>
-                        <div className="media" aria-hidden="true">
-                          {programImg ? (
-                            <img
-                              src={programImg}
-                              alt={p.name}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          ) : (
-                            <div className="media-placeholder">Image</div>
-                          )}
-                        </div>
-
                         <h4 className="h4" style={{ marginTop: 8 }}>
                           {p.name}
                         </h4>

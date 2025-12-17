@@ -2,7 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { setAuthState } from "../context/AuthState";
 
-export default function Sidebar({ userType = "patient" }) {
+export default function Sidebar({
+  userType = "patient",
+  hideHomeIcon = false,
+}) {
   const navigate = useNavigate();
 
   // Determine profile route based on user type
@@ -14,6 +17,8 @@ export default function Sidebar({ userType = "patient" }) {
         return "/organization-profile";
       case "therapyCenter":
         return "/center-profile";
+      case "caretaker":
+        return "/caregiver-profile";
       case "patient":
       default:
         return "/patient-profile";
@@ -51,13 +56,15 @@ export default function Sidebar({ userType = "patient" }) {
   return (
     <div className="side-rect" aria-hidden="true">
       <div className="side-icons">
-        <button
-          className="side-btn"
-          aria-label="home"
-          onClick={() => navigate("/Home")}
-        >
-          <i className="fa-solid fa-house" aria-hidden="true"></i>
-        </button>
+        {!hideHomeIcon && userType !== "caretaker" && (
+          <button
+            className="side-btn"
+            aria-label="home"
+            onClick={() => navigate("/Home")}
+          >
+            <i className="fa-solid fa-house" aria-hidden="true"></i>
+          </button>
+        )}
 
         <button
           className="side-btn"
@@ -82,6 +89,16 @@ export default function Sidebar({ userType = "patient" }) {
             onClick={() => navigate("/patient-reports")}
           >
             <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+          </button>
+        )}
+
+        {userType === "organization" && (
+          <button
+            className="side-btn"
+            aria-label="assessments"
+            onClick={() => navigate("/organization-assessments")}
+          >
+            <i className="fa-solid fa-clipboard-check" aria-hidden="true"></i>
           </button>
         )}
 

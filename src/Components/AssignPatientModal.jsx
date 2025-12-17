@@ -22,7 +22,7 @@ export default function AssignPatientModal({ isOpen, onClose, caregiver }) {
   // TODO: Replace these with your API URLs
   const fetchPatientsUrl = useMemo(() => {
     // Example placeholder – provide final URL
-    return `${baseApiUrl}/patients/getallpatientsusernames`;
+    return `${baseApiUrl}/patients/organization/${auth.orgSsn}/with-usernames`;
   }, []);
 
   const assignPatientUrl = (cg) => {

@@ -9,6 +9,7 @@ import Messages from "./Messages";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setAuthState } from "../context/AuthState";
 import { useEffect, useState } from "react";
+import OrgAssesments from "../Pages/OrgAssesments";
 
 export default function Organizationpage() {
   const location = useLocation();
@@ -80,9 +81,12 @@ export default function Organizationpage() {
 
         const orgData = await response.json();
         setData(orgData);
-        // const token = JSON.parse(localStorage.getItem("organizationToken"));
-        // const fetchedData = await getUserInfo(token);
-        // setData(fetchedData);
+
+        // Save organization data to localStorage for Messages component
+        localStorage.setItem("organizationData", JSON.stringify(orgData));
+        if (orgData.name) {
+          localStorage.setItem("organizationName", orgData.name);
+        }
       } catch (error) {
         console.error("Error fetching organization data:", error);
         setIsError(true);
@@ -104,7 +108,7 @@ export default function Organizationpage() {
 
   return (
     <div className="with-sidebar">
-      <div className="side-rect" aria-hidden="true">
+      <div className="side-rect">
         <div className="side-icons">
           <button
             className="side-btn"
@@ -126,6 +130,13 @@ export default function Organizationpage() {
             onClick={() => setAppear(1)}
           >
             <i className="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+          </button>
+          <button
+            className="side-btn"
+            aria-label="assessments"
+            onClick={() => setAppear(4)}
+          >
+            <i className="fa-solid fa-clipboard-check" aria-hidden="true"></i>
           </button>
           <button
             className="side-btn"
@@ -157,9 +168,11 @@ export default function Organizationpage() {
         {appear === 2 && <AvailableLocationsBox />}
         {appear === 1 && <CareGiverBox />}
         {appear === 3 && <Messages showSidebar={false} showHeader={false} />}
+        {appear === 4 && <OrgAssesments />}
         {appear === 0 && (
           <>
             <AvailablePrograms />
+
             <FinancialAid />
             <JobApplications />
           </>

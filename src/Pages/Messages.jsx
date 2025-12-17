@@ -156,18 +156,57 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
     // Check if relative data exists
     const relativeDataStr = localStorage.getItem("relativeData");
     const patientDataStr = localStorage.getItem("patientData");
+    const organizationDataStr = localStorage.getItem("organizationData");
+    const centerDataStr = localStorage.getItem("centerData");
+    const caregiverDataStr = localStorage.getItem("caregiverData");
 
     let data = null;
     let userType = "patient"; // default
 
-    // Try to load relative data first
+    // Try to load organization data first
     try {
-      if (relativeDataStr) {
-        data = JSON.parse(relativeDataStr);
-        userType = "relative";
+      if (organizationDataStr) {
+        data = JSON.parse(organizationDataStr);
+        userType = "organization";
       }
     } catch (e) {
-      console.error("Failed to parse relative data", e);
+      console.error("Failed to parse organization data", e);
+    }
+
+    // Try to load therapy center data
+    if (!data) {
+      try {
+        if (centerDataStr) {
+          data = JSON.parse(centerDataStr);
+          userType = "therapyCenter";
+        }
+      } catch (e) {
+        console.error("Failed to parse center data", e);
+      }
+    }
+
+    // Try to load caregiver data
+    if (!data) {
+      try {
+        if (caregiverDataStr) {
+          data = JSON.parse(caregiverDataStr);
+          userType = "caretaker";
+        }
+      } catch (e) {
+        console.error("Failed to parse caregiver data", e);
+      }
+    }
+
+    // Try to load relative data
+    if (!data) {
+      try {
+        if (relativeDataStr) {
+          data = JSON.parse(relativeDataStr);
+          userType = "relative";
+        }
+      } catch (e) {
+        console.error("Failed to parse relative data", e);
+      }
     }
 
     // If no relative data, try patient data
@@ -186,8 +225,28 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
     if (!data) {
       const relativeName = localStorage.getItem("relativeName");
       const patientName = localStorage.getItem("patientName");
+      const organizationName = localStorage.getItem("organizationName");
+      const centerName = localStorage.getItem("centerName");
 
-      if (relativeName) {
+      if (organizationName) {
+        userType = "organization";
+        data = {
+          fullName: organizationName || "Organization Name",
+          name: organizationName,
+          email: localStorage.getItem("organizationEmail") || "",
+          phone: localStorage.getItem("organizationPhone") || "",
+          ssn: storedSSN,
+        };
+      } else if (centerName) {
+        userType = "therapyCenter";
+        data = {
+          fullName: centerName || "Center Name",
+          name: centerName,
+          email: localStorage.getItem("centerEmail") || "",
+          phone: localStorage.getItem("centerPhone") || "",
+          ssn: storedSSN,
+        };
+      } else if (relativeName) {
         userType = "relative";
         data = {
           fullName: relativeName || "Relative Name",
@@ -209,6 +268,19 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
     if (data && !data.ssn) {
       data.ssn = storedSSN;
     }
+
+    console.log("=== Messages Component User Detection ===");
+    console.log("Detected userType:", userType);
+    console.log("User data:", data);
+    console.log("User SSN:", data?.ssn || storedSSN);
+    console.log(
+      "centerData in localStorage:",
+      localStorage.getItem("centerData")
+    );
+    console.log(
+      "organizationData in localStorage:",
+      localStorage.getItem("organizationData")
+    );
 
     return { ...data, userType };
   });

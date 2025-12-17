@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./profile.css";
 
-export function CenterCard({ title, data, onEdit, disableFetch = false }) {
+export function CenterCard({ title, data, disableFetch = false }) {
   const [form, setForm] = useState({
     name: "",
     contactInfo: "",
@@ -10,6 +10,7 @@ export function CenterCard({ title, data, onEdit, disableFetch = false }) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -21,33 +22,60 @@ export function CenterCard({ title, data, onEdit, disableFetch = false }) {
     }
   }, [data]);
 
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit();
-    } else {
-      setIsEditing(true);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    // Reset to original data
-    if (data) {
-      setForm({
-        name: data.name || "",
-        contactInfo: data.contactInfo || "",
-        address: data.address || "",
-      });
-    }
-  };
-
   const handleSave = async () => {
-    // Handle save logic here or call parent callback
-    setIsEditing(false);
+    // make sure that the data changed
+    if (
+      form.name === data.name &&
+      form.contactInfo === data.contactInfo &&
+      form.address === (data.location || data.address)
+    ) {
+      setIsEditing(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const orgSSN = localStorage.getItem("ssn");
+
+      // Create FormData for multipart/form-data request
+      const formData = new FormData();
+      formData.append("Name", form.name);
+      formData.append("Location", form.address);
+      formData.append("ContactInfo", form.contactInfo);
+      // Image can be added later if needed: formData.append("Image", imageFile);
+
+      const response = await fetch(
+        `https://localhost:7040/api/center/updatecenter/${orgSSN}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      alert("Center data updated successfully.");
+    } catch (error) {
+      console.error("Error updating center:", error);
+      setIsError(true);
+      alert("Failed to save changes. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsEditing(false);
+    }
   };
 
   if (loading) {
     return <div className="relative-card">Loading...</div>;
+  }
+
+  if (isError) {
+    return <div className="relative-card">Error loading data.</div>;
   }
 
   return (
@@ -65,20 +93,11 @@ export function CenterCard({ title, data, onEdit, disableFetch = false }) {
 
           <div>
             {isEditing ? (
-              <>
-                <button onClick={handleSave} className="save-btn">
-                  Save
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="edit-btn"
-                  style={{ marginLeft: "8px" }}
-                >
-                  Cancel
-                </button>
-              </>
+              <button onClick={handleSave} className="save-btn">
+                Save
+              </button>
             ) : (
-              <button onClick={handleEdit} className="edit-btn">
+              <button onClick={() => setIsEditing(true)} className="edit-btn">
                 Edit
               </button>
             )}

@@ -21,7 +21,7 @@ export default function RelativeSignUp() {
     const fetchPatients = async () => {
       setLoadingPatients(true);
       try {
-        const url = `${baseApiUrl}/patients/getallpatientsusernames`;
+        const url = `${baseApiUrl}/patients/GetAllPatientsUsernamesRealtive`;
         const res = await fetch(url, { method: "GET" });
         if (!res.ok) throw new Error(`Failed to load patients: ${res.status}`);
         const json = await res.json();

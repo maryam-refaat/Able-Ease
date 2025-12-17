@@ -3,8 +3,9 @@ import { CenterCard } from "../profilepagecomponents/centerbox";
 import Availabletherapiess from "./availabletherapies.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Sidebar from "./Sidebar";
 import { setAuthState } from "../context/AuthState";
+import AvailabletherapiessJoined from "../Components/AvailabletherapiessJoined.jsx";
+import Messages from "../Pages/Messages";
 
 export default function Physiocenterpage() {
   const location = useLocation();
@@ -14,11 +15,26 @@ export default function Physiocenterpage() {
   const [data, setData] = useState(organizationData || {});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [appear, setAppear] = useState(0);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
   };
 
   useEffect(() => {
@@ -43,9 +59,12 @@ export default function Physiocenterpage() {
 
         const orgData = await response.json();
         setData(orgData);
-        // const token = JSON.parse(localStorage.getItem("organizationToken"));
-        // const fetchedData = await getUserInfo(token);
-        // setData(fetchedData);
+
+        // Save center data to localStorage for Messages component
+        localStorage.setItem("centerData", JSON.stringify(orgData));
+        if (orgData.name) {
+          localStorage.setItem("centerName", orgData.name);
+        }
       } catch (error) {
         console.error("Error fetching organization data:", error);
         setIsError(true);
@@ -67,7 +86,34 @@ export default function Physiocenterpage() {
 
   return (
     <div className="with-sidebar">
-      <Sidebar userType="therapyCenter" />
+      <div className="side-rect">
+        <div className="side-icons">
+          <button
+            className="side-btn"
+            aria-label="profile"
+            onClick={() => setAppear(0)}
+          >
+            <i className="fa-solid fa-user" aria-hidden="true"></i>
+          </button>
+          <button
+            className="side-btn"
+            aria-label="messages"
+            onClick={() => setAppear(1)}
+          >
+            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
+          </button>
+          <button
+            className="side-btn"
+            aria-label="logout"
+            onClick={handleLogout}
+          >
+            <i
+              className="fa-solid fa-right-from-bracket"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </div>
+      </div>
 
       <div className="page-container">
         <header className="welcome-box">
@@ -76,8 +122,16 @@ export default function Physiocenterpage() {
           </h1>
           <p>Tue, 07 June 2022</p>
         </header>
-        <CenterCard title="Physiotherapy Center" data={data} />
-        <Availabletherapiess />
+        {appear !== 1 && (
+          <CenterCard title="Physiotherapy Center" data={data} />
+        )}
+        {appear === 1 && <Messages showSidebar={false} showHeader={false} />}
+        {appear === 0 && (
+          <>
+            <Availabletherapiess />
+            <AvailabletherapiessJoined />
+          </>
+        )}
       </div>
     </div>
   );

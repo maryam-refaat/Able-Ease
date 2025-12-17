@@ -177,7 +177,7 @@ export const getPrograms = async () => {
 
 // Fetch physi centers
 export const getPhysicenters = async () => {
-  const response = await fetch(`${BASE_URL}/physi-centers${API_KEY}`);
+  const response = await fetch(`${BASE_URL}/center/getallcenters`);
   const data = await response.json();
   return data.results;
 };

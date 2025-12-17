@@ -22,15 +22,30 @@ export default function AvailableTherapyModal({
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const centerId = localStorage.getItem("ssn") || "";
+
     if (program) {
+      // Convert date to YYYY-MM-DD format for date input
+      let dateValue = "";
+      if (program.Date || program.date) {
+        const dateStr = program.Date || program.date;
+        try {
+          const dateObj = new Date(dateStr);
+          dateValue = dateObj.toISOString().split("T")[0];
+        } catch {
+          dateValue = "";
+        }
+      }
+
       setFormData({
         name: program.Name || program.name || "",
         duration: program.duration || "",
-        pricePerHour: program.PricePerHour || program.price || "",
-        doctorName: program.Doctorname || "",
+        pricePerHour:
+          program.PricePerHour || program.pricePerHour || program.price || "",
+        doctorName: program.Doctorname || program.doctorName || "",
         therapyDetails: program.therapyDetails || "",
-        date: program.Date || "",
-        centerId: program.CenterID || program.CenterID || "",
+        date: dateValue,
+        centerId: program.CenterID || program.centerID || centerId,
         image: null,
       });
     } else {
@@ -41,7 +56,7 @@ export default function AvailableTherapyModal({
         doctorName: "",
         therapyDetails: "",
         date: "",
-        centerId: "",
+        centerId: centerId,
         image: null,
       });
     }
@@ -174,26 +189,20 @@ export default function AvailableTherapyModal({
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="date">Date / Status</label>
+              <label htmlFor="date">Date *</label>
               <input
-                type="text"
+                type="date"
                 id="date"
                 name="date"
                 value={formData.date}
                 onChange={handleChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="centerId">Center ID</label>
-              <input
-                type="text"
-                id="centerId"
-                name="centerId"
-                value={formData.centerId}
-                onChange={handleChange}
+                required
               />
             </div>
           </div>
+
+          {/* Hidden fields */}
+          <input type="hidden" name="centerId" value={formData.centerId} />
 
           <div className="form-row">
             <div className="form-group">

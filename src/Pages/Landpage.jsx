@@ -157,31 +157,47 @@ export default function Landpage() {
     <div className="landpage-container">
       <div className="paragraph-container">
         <p className="paragraph arched-text">
-          Schedule your next program or physiotherapy session. Discover local organizations and physiotherapy centers near you.
+          Schedule your next program or physiotherapy session. Discover local
+          organizations and physiotherapy centers near you.
         </p>
       </div>
 
-      <div className="block" style={{ marginBottom: "16px", paddingTop: "80px" }}>
+      <div
+        className="block"
+        style={{ marginBottom: "16px", paddingTop: "80px" }}
+      >
         <p className="dark-glow-title">Top Searches</p>
 
         <div className="search-grid">
           <Link to="/all-programs" className="search-item">
-            <FontAwesomeIcon icon={faSitemap} className="pictures icon-purple" />
+            <FontAwesomeIcon
+              icon={faSitemap}
+              className="pictures icon-purple"
+            />
             <p className="label">Programs</p>
           </Link>
 
           <Link to="/all-therapies" className="search-item">
-            <FontAwesomeIcon icon={faHandsHoldingChild} className="pictures icon-pink" />
+            <FontAwesomeIcon
+              icon={faHandsHoldingChild}
+              className="pictures icon-pink"
+            />
             <p className="label">Therapies</p>
           </Link>
 
           <Link to="/all-employments" className="search-item">
-            <FontAwesomeIcon icon={faClipboardUser} className="pictures icon-blue" />
+            <FontAwesomeIcon
+              icon={faClipboardUser}
+              className="pictures icon-blue"
+            />
             <p className="label">Employment</p>
           </Link>
 
           <Link to="/organizations" className="search-item">
-            <FontAwesomeIcon icon={faBuilding} className="pictures icon-green" />
+            <FontAwesomeIcon
+              icon={faBuilding}
+              className="pictures icon-green"
+            />
             <p className="label">Organizations</p>
           </Link>
         </div>

@@ -1,0 +1,203 @@
+.org-assessments-section {
+    margin: 40px auto;
+    max-width: 1000px;
+    padding: 32px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(25, 135, 81, 0.12);
+}
+
+.assessment-program-block {
+    margin-bottom: 40px;
+    padding: 24px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-left: 5px solid #198751;
+}
+
+.assessment-program-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #198751;
+    margin-bottom: 20px;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.assessment-patients-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.assessment-patient-block {
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    border-radius: 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.assessment-patient-block:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(25, 135, 81, 0.15);
+    border-color: #198751;
+}
+
+.assessment-patient-name {
+    font-weight: 700;
+    color: #2d3748;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.assessment-patient-text {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-style: italic;
+    padding: 6px 10px;
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+/* Button layout beside program title */
+.assessment-program-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Button group */
+.assessment-program-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Add Assessment (blue) */
+.btn-add {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Update Program (smaller, modern) */
+.btn-update {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+    align-self: flex-start;
+}
+
+.btn-update:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+/* Delete button under patient assessment */
+.btn-delete {
+    margin-top: 12px;
+    align-self: flex-end;
+    background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(201, 42, 42, 0.3);
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(201, 42, 42, 0.4);
+}
+
+.assessment-patient-grade {
+    margin-top: 4px;
+    color: #0f5132;
+    font-weight: 700;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    padding: 8px 12px;
+    border-radius: 8px;
+    width: fit-content;
+    font-size: 0.95rem;
+    border: 1px solid #b7dfbb;
+}
+
+.assessment-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f5132;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    padding: 12px 16px;
+    border-radius: 10px;
+    width: fit-content;
+    box-shadow: 0 2px 8px rgba(15, 81, 50, 0.1);
+    border: 1px solid #b7dfbb;
+}
+
+.assessment-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Add Patient button (blue) */
+.btn-add-patient {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.btn-add-patient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(79, 172, 254, 0.4);
+}
+
+.empty-card {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-style: italic;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+}

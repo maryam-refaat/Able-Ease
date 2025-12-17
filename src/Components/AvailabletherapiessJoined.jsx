@@ -1,21 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState, useRef } from "react";
-import {
-  fetchAvailabletherapies,
-  addtherapy,
-  updatetherapy,
-  deleteTherapy,
-} from "../assets/apis.js";
-import AvailableTherapyModal from "./AvailableTherapyModal";
+import React, { useEffect, useState, useRef } from "react";
+import { fetchAvailabletherapiesJoined } from "../assets/apis";
 import "../profilepagecomponents/organization.css";
 
-export default function Availabletherapiess() {
+export default function AvailabletherapiessJoined() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProgramForEdit, setSelectedProgramForEdit] = useState(null);
-  const [deleteLoading, setDeleteLoading] = useState(null);
   const progTrackRef = useRef(null);
 
   const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
@@ -25,8 +16,17 @@ export default function Availabletherapiess() {
       try {
         setLoading(true);
         const ID = localStorage.getItem("ssn");
-        const resProg = await fetchAvailabletherapies(ID);
-        console.log("Fetched therapies response:", resProg);
+
+        if (!ID) {
+          console.error("No SSN found in localStorage");
+          setPrograms([]);
+          setError(true);
+          setLoading(false);
+          return;
+        }
+
+        const resProg = await fetchAvailabletherapiesJoined(ID);
+        console.log("Fetched joined therapies response:", resProg);
 
         // Ensure we always set an array
         const therapiesData = resProg?.data || resProg || [];
@@ -34,7 +34,7 @@ export default function Availabletherapiess() {
           ? therapiesData
           : [];
 
-        console.log("Therapies array:", therapiesArray);
+        console.log("Joined therapies array:", therapiesArray);
         setPrograms(therapiesArray);
         setError(false);
       } catch (err) {
@@ -48,79 +48,6 @@ export default function Availabletherapiess() {
     loadPrograms();
   }, []);
 
-  const handleAddProgram = () => {
-    setSelectedProgramForEdit(null);
-    setIsModalOpen(true);
-  };
-
-  const handleUpdateProgram = (program) => {
-    setSelectedProgramForEdit(program);
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteProgram = async (program) => {
-    const therapyName = program.Name || program.name || "this therapy";
-    if (!window.confirm(`Are you sure you want to delete "${therapyName}"?`))
-      return;
-
-    const therapyId = program.id || program.Id;
-    if (!therapyId) {
-      alert("Cannot delete therapy: ID not found");
-      return;
-    }
-
-    setDeleteLoading(therapyId);
-    try {
-      await deleteTherapy(therapyId);
-      // Remove from local state
-      setPrograms(programs.filter((p) => (p.id || p.Id) !== therapyId));
-      alert("Therapy deleted successfully");
-    } catch (error) {
-      console.error("Delete therapy error:", error);
-      alert("Failed to delete therapy. Please try again.");
-    } finally {
-      setDeleteLoading(null);
-    }
-  };
-
-  const handleSubmitProgram = async (formData) => {
-    const centerId = localStorage.getItem("ssn");
-
-    try {
-      if (selectedProgramForEdit) {
-        // Update - add the therapy ID to FormData
-        formData.append(
-          "Id",
-          selectedProgramForEdit.id || selectedProgramForEdit.Id
-        );
-
-        const response = await updatetherapy(formData);
-        console.log("Update response:", response);
-
-        alert("Therapy updated successfully");
-      } else {
-        // Add - set CenterID from localStorage
-        formData.set("CenterID", centerId);
-
-        const response = await addtherapy(formData);
-        console.log("Add response:", response);
-
-        alert("Therapy added successfully");
-      }
-
-      // Refresh the therapies list
-      const resProg = await fetchAvailabletherapies(centerId);
-      const therapiesData = resProg?.data || resProg || [];
-      const therapiesArray = Array.isArray(therapiesData) ? therapiesData : [];
-      setPrograms(therapiesArray);
-
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error saving therapy:", error);
-      alert("Failed to save therapy. Please try again.");
-    }
-  };
-
   return (
     <section className="section-box" style={{ marginTop: "40px" }}>
       <div
@@ -130,10 +57,7 @@ export default function Availabletherapiess() {
           alignItems: "center",
         }}
       >
-        <h3>Available therapies</h3>
-        <button className="action-btn add-btn" onClick={handleAddProgram}>
-          <i className="fa-solid fa-plus"></i> Add therapy
-        </button>
+        <h3>Available therapies Joined</h3>
       </div>
 
       {loading ? (
@@ -179,7 +103,7 @@ export default function Availabletherapiess() {
                     <div className="program-card-header">
                       <h4>{p.Name || p.name || "Therapy"}</h4>
                       <span className="program-status">
-                        {p.Date || p.date || "Available"}
+                        {p.Date || p.date || "Joined"}
                       </span>
                     </div>
                     <div className="program-meta">
@@ -209,21 +133,6 @@ export default function Availabletherapiess() {
                         {p.therapyDetails}
                       </div>
                     )}
-                    <div className="program-actions">
-                      <button
-                        className="program-action-btn update-btn-small"
-                        onClick={() => handleUpdateProgram(p)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="program-action-btn delete-btn-small"
-                        disabled={deleteLoading === (p.id || p.Id)}
-                        onClick={() => handleDeleteProgram(p)}
-                      >
-                        {deleteLoading === (p.id || p.Id) ? "..." : "Delete"}
-                      </button>
-                    </div>
                   </div>
                 ))
               )}
@@ -242,13 +151,6 @@ export default function Availabletherapiess() {
           </div>
         </div>
       )}
-
-      <AvailableTherapyModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmitProgram}
-        program={selectedProgramForEdit}
-      />
     </section>
   );
 }

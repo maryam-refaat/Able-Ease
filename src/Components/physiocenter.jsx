@@ -75,7 +75,11 @@ export default function Physicenterfind() {
 
           <div className="centers-row" ref={scrollRef} aria-live="polite">
             {centers.map((c) => (
-              <div key={`center-${c.id}`} className="org-card" style={{ minWidth: "280px", maxWidth: "280px" }}>
+              <div
+                key={`center-${c.id}`}
+                className="org-card"
+                style={{ minWidth: "280px", maxWidth: "280px" }}
+              >
                 <div
                   style={{
                     height: "130px",
@@ -107,7 +111,10 @@ export default function Physicenterfind() {
 
                 <h4 className="h4">{c.name}</h4>
 
-                <p className="small" style={{ marginTop: "6px", color: "#666" }}>
+                <p
+                  className="small"
+                  style={{ marginTop: "6px", color: "#666" }}
+                >
                   📍 {c.location}
                 </p>
 
