@@ -58,9 +58,8 @@ export default function Physicenterfind() {
     >
       <div className="Program_finds">
         <div className="section-title">
-          <h2 style={{ color: "white", margin: 0, marginLeft: "120px" }}>
-            connect to nearby <br />
-            physiotherapy centers
+          <h2 style={{ color: "white", margin: 0, marginLeft: "50px" }}>
+            Connect to nearby physiotherapy centers
           </h2>
         </div>
 
@@ -75,47 +74,42 @@ export default function Physicenterfind() {
 
           <div className="centers-row" ref={scrollRef} aria-live="polite">
             {centers.map((c) => (
-              <div key={`center-${c.id}`} className="org-card" style={{ minWidth: "280px", maxWidth: "280px" }}>
-                <div
-                  style={{
-                    height: "130px",
-                    background: "#e5e7eb",
-                    borderRadius: "8px",
-                    marginBottom: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "14px",
-                    color: "#777",
-                  }}
-                >
-                  {c.image || c.imageUrl ? (
-                    <img
-                      src={c.image || c.imageUrl}
-                      alt={c.name}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                      }}
-                    />
-                  ) : (
-                    "Image"
-                  )}
-                </div>
+              <div key={`center-${c.id}`} className="center-card">
+                {c.image || c.imageUrl ? (
+                  <img
+                    src={c.image || c.imageUrl}
+                    alt={c.name}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "99%",
+                      height: "150px",
+                      background: "#e5e7eb",
+                      borderRadius: "20px 20px 20px 20px",
+                      display: "block",
+                      margin: "12px auto 18px auto",
+                      boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
+                      textAlign: "center",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      color: "#777",
+                      position: "relative",
+                    }}
+                  >
+                    <div style={{position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"}}>Image</div>
+                  </div>
+                )}
 
-                <h4 className="h4">{c.name}</h4>
+                <h3>{c.name}</h3>
 
-                <p className="small" style={{ marginTop: "6px", color: "#666" }}>
+                <p style={{ marginTop: "6px" }}>
                   📍 {c.location}
                 </p>
 
                 {c.contactInfo && (
-                  <p
-                    className="small"
-                    style={{ marginTop: "4px", color: "#888" }}
-                  >
+                  <p style={{ marginTop: "4px", fontSize: "14px" }}>
                     📞 {c.contactInfo}
                   </p>
                 )}

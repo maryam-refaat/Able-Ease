@@ -1,70 +1,56 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getPrograms } from "../assets/apis";
-import "../index.css";
+import "./program_find.css";
 import programimg from "../assets/unsplash_VOUicg8Ejus.png";
-import ProgramFindCard from "./ProgramFindCard";
-import "./ProgramFindCard.css";
 export default function Programfind() {
   const dummyPrograms = [
     {
       id: 1,
-      name: "Physical Therapy Program",
-      organizationName: "Able Care Center",
-      location: "Cairo, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 150,
+      Price: "100$",
       S_date: "2025-12-04",
       E_date: "2025-01-04",
     },
     {
       id: 2,
-      name: "Rehabilitation Program",
-      organizationName: "Wellness Hub",
-      location: "Giza, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 180,
-      S_date: "2026-01-05",
-      E_date: "2026-04-05",
+      Price: "100$",
+      S_date: "2025-12-04",
+      E_date: "2025-01-04",
     },
     {
       id: 3,
-      name: "Mobility Enhancement",
-      organizationName: "Care Plus",
-      location: "Alexandria, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 200,
-      S_date: "2026-01-15",
-      E_date: "2026-05-15",
+      Price: "100$",
+      S_date: "2025-12-04",
+      E_date: "2025-01-04",
     },
     {
       id: 4,
-      name: "Sports Injury Recovery",
-      organizationName: "Hope Centre",
-      location: "Mansoura, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 220,
-      S_date: "2026-01-10",
-      E_date: "2026-04-10",
+      Price: "100$",
+      S_date: "2025-12-04",
+      E_date: "2025-01-04",
     },
     {
       id: 5,
-      name: "Senior Fitness Program",
-      organizationName: "Golden Care",
-      location: "Tanta, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 120,
-      S_date: "2025-12-25",
-      E_date: "2026-03-25",
+      Price: "100$",
+      S_date: "2025-12-04",
+      E_date: "2025-01-04",
     },
     {
       id: 6,
-      name: "Pediatric Therapy",
-      organizationName: "Kids First Center",
-      location: "Ismailia, Egypt",
+      name: "Physio Care Center",
       image: programimg,
-      price: 160,
-      S_date: "2026-02-01",
-      E_date: "2026-05-01",
+      Price: "100$",
+      S_date: "2025-12-04",
+      E_date: "2025-01-04",
     },
   ];
 
@@ -79,6 +65,13 @@ export default function Programfind() {
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
+    }
+  };
+
+  const handleCardClick = () => {
+    const authSection = document.getElementById("auth-form");
+    if (authSection) {
+      authSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -99,35 +92,43 @@ export default function Programfind() {
   }, []);
 
   return (
-    <section className="centers-strip">
-      <div className="Program_finds">
-        <div className="section-title">
-          <h2 className="glowing-title" style={{ color: "white", margin: 0, paddingLeft: "50px" }}>
-            Find Programs &gt; &gt; &gt;
+    <section className="program-section">
+      <div className="program-container">
+        <div className="program-header">
+          <h2 className="program-title">
+            Discover Our Programs
           </h2>
+          <button className="program-view-btn">
+            View All
+            <i className="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
 
-        <div className="slider-container" style={{ marginTop: 18 }}>
+        <div className="program-slider">
           <button
-            className="slider-arrow left"
+            className="program-arrow left"
             onClick={() => scroll("left")}
             aria-label="Scroll left"
           >
             <i className="fa-solid fa-chevron-left"></i>
           </button>
 
-          <div className="centers-row" ref={scrollRef} aria-live="polite">
+          <div className="program-cards" ref={scrollRef} aria-live="polite">
             {programs.map((c) => (
-              <ProgramFindCard 
-                key={c.id} 
-                program={c}
-                onBook={() => console.log('Book:', c.name)}
-              />
+              <div key={c.id} className="program-card" onClick={handleCardClick}>
+                <img
+                  src={c.imageUrl || c.image || programimg}
+                  alt={c.name}
+                />
+                <div className="program-badge">Featured</div>
+                <h3>{c.name}</h3>
+                <p>${c.price || c.Price}</p>
+              </div>
             ))}
           </div>
 
           <button
-            className="slider-arrow right"
+            className="program-arrow right"
             onClick={() => scroll("right")}
             aria-label="Scroll right"
           >

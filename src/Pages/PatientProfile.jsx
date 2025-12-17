@@ -191,6 +191,23 @@ export default function PatientProfile() {
           };
         });
 
+        // Add dummy therapy session for review
+        sessions.push({
+          id: "dummy-1",
+          title: "Physical Therapy - Lower Back",
+          centerName: "HealthCare Rehabilitation Center",
+          location: "123 Medical Plaza, City Center",
+          pricePerHour: 75,
+          duration: 60,
+          doctorname: "Dr. Sarah Johnson",
+          therapyDetails: "Focused rehabilitation for lower back pain with exercise therapy",
+          date: "2025-12-20",
+          imageUrl: "",
+          imgUrl: "",
+          centerID: "center-001",
+          state: "scheduled",
+        });
+
         // normalize employment data using API field names
         const employment =
           rawWork.length > 0
@@ -523,22 +540,6 @@ export default function PatientProfile() {
                       }}
                     >
                       <div style={{ flex: 1 }}>
-                        <div className="media" aria-hidden="true">
-                          {sessionImg ? (
-                            <img
-                              src={sessionImg}
-                              alt={s.title}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          ) : (
-                            <div className="media-placeholder">Image</div>
-                          )}
-                        </div>
-
                         <h4 className="h4" style={{ marginTop: 8 }}>
                           {s.title}
                         </h4>

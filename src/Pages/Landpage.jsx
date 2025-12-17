@@ -17,10 +17,8 @@ import Physicenterfind from "../Components/physiocenter";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSitemap,
-  faCoins,
   faHandsHoldingChild,
   faClipboardUser,
-  faHandshakeAngle,
   faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
 import AuthForm from "../Components/Login";
@@ -105,6 +103,7 @@ function SimpleCarousel({ images = [], autoDelay = 3000 }) {
 
   return (
     <div
+     
       className="simple-carousel"
       ref={containerRef}
       onMouseEnter={stopAuto}
@@ -153,15 +152,44 @@ export default function Landpage() {
     window.addEventListener("auth-changed", handler);
     return () => window.removeEventListener("auth-changed", handler);
   }, []);
+
+
   return (
     <div className="landpage-container">
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Welcome to Able Ease
+          </h1>
+          <p className="hero-subtitle">
+            Connecting you with the best healthcare programs,
+            <br />
+            physiotherapy centers, and professional care services.
+          </p>
+          <div className="hero-buttons">
+            <Link to="/all-programs" className="hero-btn primary">
+              Explore Programs
+            </Link>
+            <Link to="/all-therapies" className="hero-btn secondary">
+              Find Therapy
+            </Link>
+          </div>
+        </div>
+        <div className="hero-wave">
+          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0 C150,100 350,0 600,50 C850,100 1050,0 1200,50 L1200,120 L0,120 Z" fill="#f8fffe" />
+          </svg>
+        </div>
+      </section>
+
       <div className="paragraph-container">
         <p className="paragraph arched-text">
           Schedule your next program or physiotherapy session. Discover local organizations and physiotherapy centers near you.
         </p>
       </div>
 
-      <div className="block" style={{ marginBottom: "16px", paddingTop: "80px" }}>
+      <div className="block" style={{ marginBottom: "16px" }}>
         <p className="dark-glow-title">Top Searches</p>
 
         <div className="search-grid">

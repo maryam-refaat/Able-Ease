@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getAuthState } from "../context/AuthState";
 import "../index.css";
+import HomePage from "../assets/HomePage.png";
 
 export default function Header({ onJoin }) {
   const navigate = useNavigate();
@@ -73,7 +74,12 @@ export default function Header({ onJoin }) {
                 paddingTop: "10px",
               }}
             >
-              <Link to="/Home">Home</Link>
+              <div className="nav-item-with-image">
+                <Link to="/Home">Home</Link>
+                <div className="hover-image-preview">
+                  <img src={HomePage} alt="Home Preview" />
+                </div>
+              </div>
               <Link to="/about">About us</Link>
               <Link to="/organizations">Organizations</Link>
               <Link to="/therapy-centers">Therapy-Centers</Link>

@@ -1,0 +1,384 @@
+/* Program Find Component Styles */
+.program-section {
+  background: white;
+  padding: 60px 20px;
+  margin: 60px auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.program-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: white;
+  border-radius: 50%;
+}
+
+.program-section::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 400px;
+  height: 400px;
+  background:white;
+  border-radius: 50%;
+}
+
+.program-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+@media (max-width: 1024px) {
+  .program-container {
+    max-width: 900px;
+  }
+  .program-cards{ max-width: 900px;}
+}
+
+@media (max-width: 1024px) {
+  .program-container {
+    max-width: 800px;
+  }
+  .program-cards{ max-width: 800px;}
+}
+
+.program-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.program-title {
+  margin-left: 64px !important;
+  font-size: 38px !important;
+  font-weight: 800;
+  background: linear-gradient(135deg, #198751 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.program-view-btn {
+  background: linear-gradient(135deg, #198751 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(25, 135, 81, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.program-view-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(25, 135, 81, 0.35);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+
+.program-view-btn i {
+  transition: transform 0.3s ease;
+}
+
+.program-view-btn:hover i {
+  transform: translateX(4px);
+}
+
+.program-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 2;
+}
+
+.program-arrow {
+  background: linear-gradient(135deg, #198751 0%, #16a34a 100%);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(25, 135, 81, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.program-arrow:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 28px rgba(25, 135, 81, 0.4);
+}
+
+.program-arrow:active {
+  transform: scale(1.05);
+}
+
+.program-arrow i {
+  color: white;
+  font-size: 20px;
+}
+
+.program-cards {
+  display: flex;
+  gap: 24px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 20px 0;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex: 1;
+}
+
+.program-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.program-card {
+  min-width: 280px;
+  background:white;
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: 0 8px 32px rgba(25, 135, 81, 0.08);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.program-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+.program-card:hover::before {
+  opacity: 1;
+}
+
+.program-card:hover {
+  transform: translateY(-16px) scale(1.03);
+  box-shadow: 0 20px 60px rgba(25, 135, 81, 0.2);
+  border-color: rgba(25, 135, 81, 0.3);
+}
+
+.program-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 20px 20px 0 0;
+  transition: transform 0.5s ease;
+  position: relative;
+  z-index: 0;
+}
+
+.program-card:hover img {
+  transform: scale(1.1);
+}
+
+.program-card h3 {
+  margin: 16px 16px 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  position: relative;
+  z-index: 2;
+  transition: color 0.3s ease;
+}
+
+.program-card:hover h3 {
+  color: #198751;
+}
+
+.program-card p {
+  margin: 0 16px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #198751;
+  position: relative;
+  z-index: 2;
+}
+
+.program-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background:white;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 3;
+  box-shadow: 0 4px 12px rgba(25, 135, 81, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .program-section {
+    padding: 50px 15px;
+    margin: 50px auto;
+  }
+
+  .program-container {
+    padding: 0 15px;
+    max-width: 900px;
+  }
+
+  .program-title {
+    font-size: 28px;
+  }
+
+  .program-card {
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .program-section {
+    padding: 40px 10px;
+    margin: 40px auto;
+  }
+
+  .program-container {
+    padding: 0 10px;
+  }
+
+  .program-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .program-title {
+    font-size: 24px;
+  }
+
+  .program-view-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .program-arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .program-arrow i {
+    font-size: 18px;
+  }
+
+  .program-card {
+    min-width: 240px;
+  }
+
+  .program-card img {
+    height: 160px;
+  }
+
+  .program-slider {
+    gap: 12px;
+  }
+
+  .program-section::before,
+  .program-section::after {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .program-section {
+    padding: 30px 8px;
+    margin: 30px auto;
+  }
+
+  .program-container {
+    padding: 0 5px;
+  }
+
+  .program-title {
+    font-size: 20px;
+  }
+
+  .program-view-btn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+
+  .program-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .program-arrow i {
+    font-size: 16px;
+  }
+
+  .program-card {
+    min-width: 200px;
+  }
+
+  .program-card img {
+    height: 140px;
+  }
+
+  .program-card h3 {
+    font-size: 16px;
+    margin: 12px 12px 6px;
+  }
+
+  .program-card p {
+    font-size: 18px;
+    margin: 0 12px 12px;
+  }
+
+  .program-badge {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+
+  .program-cards {
+    gap: 16px;
+    padding: 15px 0;
+  }
+
+  .program-slider {
+    gap: 8px;
+  }
+}
+
