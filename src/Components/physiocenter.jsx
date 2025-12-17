@@ -86,15 +86,50 @@ export default function Physicenterfind() {
 
           <div className="centers-row" ref={scrollRef} aria-live="polite">
             {centers.map((c) => (
-              <div key={`center-${c.id}`} className="center-card">
-                {c.image ? (
-                  <img src={c.image} alt={c.name} className="center-img" />
-                ) : null}
-                <h3>{c.name}</h3>
-                <p className="center-location">
-                  {c.location}
-                  <i className="fa-solid fa-location-dot"></i>
+              <div key={`center-${c.id}`} className="org-card" style={{ minWidth: "280px", maxWidth: "280px" }}>
+                <div
+                  style={{
+                    height: "130px",
+                    background: "#e5e7eb",
+                    borderRadius: "8px",
+                    marginBottom: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "14px",
+                    color: "#777",
+                  }}
+                >
+                  {c.image || c.imageUrl ? (
+                    <img
+                      src={c.image || c.imageUrl}
+                      alt={c.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  ) : (
+                    "Image"
+                  )}
+                </div>
+
+                <h4 className="h4">{c.name}</h4>
+
+                <p className="small" style={{ marginTop: "6px", color: "#666" }}>
+                  📍 {c.location}
                 </p>
+
+                {c.contactInfo && (
+                  <p
+                    className="small"
+                    style={{ marginTop: "4px", color: "#888" }}
+                  >
+                    📞 {c.contactInfo}
+                  </p>
+                )}
               </div>
             ))}
           </div>

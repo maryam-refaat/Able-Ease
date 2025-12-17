@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { getPrograms } from "../assets/apis";
 import "../index.css";
 import programimg from "../assets/unsplash_VOUicg8Ejus.png";
+import ProgramFindCard from "./ProgramFindCard";
+import "./ProgramFindCard.css";
 export default function Programfind() {
   const dummyPrograms = [
     {
@@ -115,20 +117,11 @@ export default function Programfind() {
 
           <div className="centers-row" ref={scrollRef} aria-live="polite">
             {programs.map((c) => (
-              <div key={c.id} className="center-card">
-                <img
-                  src={c.imageUrl || ""}
-                  alt={c.name}
-                  style={{
-                    width: "100%",
-                    height: 120,
-                    objectFit: "cover",
-                    borderRadius: 8,
-                  }}
-                />
-                <h3 style={{ marginTop: 10 }}>{c.name}</h3>
-                <p style={{ color: "#6b7280" }}>${c.price}</p>
-              </div>
+              <ProgramFindCard 
+                key={c.id} 
+                program={c}
+                onBook={() => console.log('Book:', c.name)}
+              />
             ))}
           </div>
 

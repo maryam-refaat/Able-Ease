@@ -240,6 +240,11 @@
   padding:20px;
    padding-left: 60px;
 }
+.program-content-small {
+  flex: 1;
+  padding:20px;
+   padding-left: 10px;
+}
 
 .program-header {
   display: flex;
