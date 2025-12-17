@@ -12,6 +12,8 @@ export default function Sidebar({ userType = "patient" }) {
         return "/relative-profile";
       case "organization":
         return "/organization-profile";
+      case "admin":
+        return "/admin-profile";
       case "therapyCenter":
         return "/center-profile";
       case "patient":

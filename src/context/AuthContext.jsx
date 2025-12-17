@@ -14,13 +14,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Load user from localStorage on mount
+  // Load user and auth flags from localStorage on mount
   useEffect(() => {
     const storedSSN = localStorage.getItem("ssn");
-    if (storedSSN) {
-      // SSN is stored as a plain string, not JSON
-      setUser({ ssn: storedSSN });
-      setIsLoggedIn(true);
+    const storedLoggedIn = localStorage.getItem("auth.isLoggedIn") === "true";
+    const storedUserType = localStorage.getItem("auth.userType") || null;
+    const storedUsername = localStorage.getItem("auth.username") || null;
+    const storedEmail = localStorage.getItem("auth.email") || null;
+    const storedName = localStorage.getItem("auth.name") || null;
+    if (storedSSN || storedUsername || storedEmail) {
+      // include role/type if present
+      setUser({ ssn: storedSSN, role: storedUserType, username: storedUsername, email: storedEmail, name: storedName });
+      setIsLoggedIn(storedLoggedIn);
     }
   }, []);
 
@@ -45,6 +50,22 @@ export const AuthProvider = ({ children }) => {
     logout,
     userType: user?.role || user?.type || null, // patient, relative, organization, therapyCenter
   };
+
+  // Keep AuthContext in sync with manual auth changes (setAuthState)
+  useEffect(() => {
+    const handler = () => {
+      const storedSSN = localStorage.getItem("ssn");
+      const storedLoggedIn = localStorage.getItem("auth.isLoggedIn") === "true";
+      const storedUserType = localStorage.getItem("auth.userType") || null;
+      const storedUsername = localStorage.getItem("auth.username") || null;
+      const storedEmail = localStorage.getItem("auth.email") || null;
+      const storedName = localStorage.getItem("auth.name") || null;
+      setIsLoggedIn(storedLoggedIn);
+      setUser(storedSSN || storedUsername || storedEmail ? { ssn: storedSSN, role: storedUserType, username: storedUsername, email: storedEmail, name: storedName } : null);
+    };
+    window.addEventListener('auth-changed', handler);
+    return () => window.removeEventListener('auth-changed', handler);
+  }, []);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
