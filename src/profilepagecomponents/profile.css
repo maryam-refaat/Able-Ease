@@ -10,8 +10,11 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  max-width: 1400px;
 }
-
+@media (min-width: 1024px) and (max-width: 1399px) {
+    .slider-container {max-width: 1000px;}
+}
 .slider-arrow {
   background: white;
   border: none;

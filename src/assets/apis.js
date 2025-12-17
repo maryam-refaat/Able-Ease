@@ -932,12 +932,7 @@ export const sendMssg = async (body) => {
   return data;
 };
 
-export const getAllUsernames = async () => {
-  const response = await fetch(`${BASE_URL}/Account/GetUsernames`);
-  const data = await response.json();
-  const users = data.results || data || [];
-  return { data: users };
-};
+
 
 export const markMessageAsRead = async (receiverSSN, messageId) => {
   const response = await fetch(
@@ -1018,4 +1013,189 @@ export const resetPassword = async (email, token, newPassword) => {
   return await response.text();
 };
 
+// Change password for current authenticated user
+export const changePassword = async (body) => {
+  const payload = {
+    CurrentPassword: body?.CurrentPassword || body?.currentPassword || '',
+    NewPassword: body?.NewPassword || body?.newPassword || '',
+    ConfirmPassword: body?.ConfirmPassword || body?.confirmPassword || body?.NewPassword || body?.newPassword || ''
+  };
+
+  console.log('changePassword called');
+
+  const response = await fetch(`${BASE_URL}/Account/ChangePassword`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${localStorage.getItem('authToken')}` 
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Change password failed');
+  }
+
+  const text = await response.text();
+  return text || 'Password changed successfully';
+};
+export const getAllUsernames = async () => {
+  const response = await fetch(`${BASE_URL}/Account/GetUsernames`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch usernames');
+  }
+  
+  const data = await response.json();
+  console.log('getAllUsernames response:', data);
+  
+  const users = Array.isArray(data) ? data : (data.results || data.data || []);
+  return { data: users };
+};
+
+// Register a new user (generic). Backend Register expects a RegisterDTO with Role
+export const registerUser = async (body) => {
+  // Ensure the payload matches backend RegisterDTO
+  const payload = {
+    Name: body?.Name || body?.name || '',
+    Role: body?.Role || body?.role || 0, // Use numeric role value
+    Username: body?.Username || body?.username || '',
+    Email: body?.Email || body?.email || '',
+    Password: body?.Password || body?.password || '',
+    ConfirmPassword: body?.ConfirmPassword || body?.confirmPassword || body?.Password || body?.password || '',
+    PhoneNumber: body?.PhoneNumber || body?.phoneNumber || ''
+  };
+
+  console.log('registerUser payload:', payload);
+
+  const response = await fetch(`${BASE_URL}/Account/Register`, {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${localStorage.getItem('authToken')}` 
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type') || '';
+    const errText = contentType.includes('application/json') 
+      ? await response.json() 
+      : await response.text();
+    throw new Error(typeof errText === 'string' ? errText : JSON.stringify(errText));
+  }
+
+  const text = await response.text();
+  
+  // Backend returns user ID as plain text on success
+  try { 
+    return JSON.parse(text); 
+  } catch { 
+    return { id: text, success: true }; 
+  }
+};
+
+// Update an existing user (backend now expects PUT /Account/Update/{ssn})
+// Accepts a payload object that must include `ssn` (or call as updateUser(ssn, body)).
+// The request body will contain { name, email, role, phoneNumber } to match the server DTO.
+export const getUsers = async (role = null, page = 1, pageSize = 50) => {
+  try {
+    const params = new URLSearchParams();
+    if (role) params.append("role", role);
+    params.append("page", page.toString());
+    params.append("pageSize", pageSize.toString());
+
+    const response = await fetch(`${BASE_URL}/Account/Users?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch users: ${response.status}`);
+    }
+
+    const data = await response.json();
+    // Your backend returns IEnumerable<ReturnUsersDto> directly
+    const users = Array.isArray(data) ? data : (data.results || data.data || []);
+    
+    return { data: users };
+  } catch (error) {
+    console.error("getUsers error:", error.message);
+    return { data: [] };
+  }
+};
+
+/**
+ * Get a specific user profile by SSN (Admin View)
+ * Backend: [HttpGet("User/{ssn}")]
+ */
+export const getUserBySsn = async (ssn) => {
+  if (!ssn) return { data: null };
+  
+  try {
+    const response = await fetch(`${BASE_URL}/Account/User/${ssn}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    if (!response.ok) {
+      console.warn('getUserBySsn failed:', response.status);
+      return { data: null };
+    }
+    
+    const data = await response.json();
+    return { data };
+  } catch (error) {
+    console.error("getUserBySsn error:", error.message);
+    return { data: null };
+  }
+};
+
+/**
+ * Update an existing user's basic info
+ * Backend: [HttpPut("Update/{ssn}")]
+ */
+export const updateUser = async (ssn, body) => {
+  if (!ssn) throw new Error('updateUser requires ssn');
+
+  // Map incoming camelCase frontend keys to Backend PascalCase DTO keys
+  const payload = {
+    Name: body?.name || body?.Name || '',
+    Email: body?.email || body?.Email || '',
+    Role: body?.role !== undefined ? body.role : (body?.Role || '')
+  };
+
+  const response = await fetch(`${BASE_URL}/Account/Update/${ssn}`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${localStorage.getItem('authToken')}` 
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const contentType = response.headers.get('content-type') || '';
+  
+  if (!response.ok) {
+    const errText = contentType.includes('application/json') 
+      ? await response.json() 
+      : await response.text();
+    throw new Error(typeof errText === "string" ? errText : JSON.stringify(errText));
+  }
+
+  // Handle both JSON and plain text ("User updated") responses
+  if (contentType.includes('application/json')) {
+    return await response.json();
+  }
+  return await response.text();
+};
 export default api;

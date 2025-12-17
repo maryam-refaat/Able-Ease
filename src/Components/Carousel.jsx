@@ -117,7 +117,7 @@ export default function Carousel() {
   }, []);
 
   const handleBook = (program) => {
-    if (!isLoggedIn || userType !== "patient") {
+   if (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
       navigate("/Able-Ease#auth-form");
       setTimeout(() => {
         const authElement = document.getElementById("auth-form");
@@ -132,7 +132,7 @@ export default function Carousel() {
   };
 
   const handleApplyFA = (program) => {
-    if (!isLoggedIn || userType !== "patient") {
+    if  (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
       navigate("/Able-Ease#auth-form");
       setTimeout(() => {
         const authElement = document.getElementById("auth-form");

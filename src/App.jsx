@@ -20,6 +20,7 @@ import ResetPassword from "./Pages/ResetPassword";
 
 import Physiocenterpage from "./Components/PhysioTherapyProfile";
 import WebsiteReports from "./Pages/WebsiteRepotrs";
+import AdminProfile from "./Pages/AdminProfile";
 
 const router = createBrowserRouter([
   {
@@ -99,6 +100,9 @@ const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPassword />,
+  },{
+    path: "/admin-profile",
+    element: <AdminProfile />,
   },
 ]);
 

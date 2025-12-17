@@ -55,13 +55,103 @@
 .centers-row::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
 }
-.center-card { 
-    min-width:230px;
-     background:white; 
-     border-radius:12px; 
-     padding:12px; 
-     box-shadow:0 12px 30px rgba(3,15,10,0.06);
-     }
+
+.center-card {
+  min-width: 280px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.center-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(6, 95, 70, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+.center-card:hover::before {
+  opacity: 1;
+}
+
+.center-card:hover {
+  transform: translateY(-16px) scale(1.03);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 1);
+}
+
+.center-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: transform 0.5s ease;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.center-card:hover img {
+  transform: scale(1.08);
+}
+
+
+.center-card img {
+  width: 88%;
+  height: 180px;
+  object-fit: contain;
+  border-radius: 20px;
+  margin: 28px auto 18px auto;
+  display: block;
+  background: #fff;
+  transition: transform 0.5s ease;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+}
+
+@media (max-width: 1024px) {
+  .center-card img {
+    height: 120px;
+    margin: 18px auto 10px auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .center-card img {
+    height: 90px;
+    margin: 12px auto 8px auto;
+  }
+}
+.center-card p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
 
 .section-title { display:flex; 
     align-items:center; 
@@ -273,6 +363,75 @@ header {
   
 }
 
+/* Navigation Item with Image Preview */
+.nav-item-with-image {
+  position: relative;
+}
+
+.nav-item-with-image > a {
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  display: block;
+}
+
+.nav-item-with-image > a:hover {
+  color: #198751;
+}
+
+/* Hover Image Preview */
+.hover-image-preview {
+  position: absolute;
+  top: 105%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px) scale(0.95);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 320px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  border: 1px solid rgba(25, 135, 81, 0.1);
+  overflow: hidden;
+}
+
+.hover-image-preview::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-left: 1px solid rgba(25, 135, 81, 0.1);
+  border-top: 1px solid rgba(25, 135, 81, 0.1);
+}
+
+.nav-item-with-image:hover .hover-image-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.hover-image-preview img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.nav-item-with-image:hover .hover-image-preview img {
+  transform: scale(1.02);
+}
+
 header h1 {
   font-size: 32px;
   font-weight: 700;
@@ -300,19 +459,46 @@ header nav a:hover {
 
 header .auth-buttons {
   margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .auth-buttons button {
-  padding: 6px 12px;
-  margin: 0 4px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: white;
+  padding: 6px 16px;
+  margin: 0;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #89CFF0 0%, #B19CD9 50%, #FFB6D9 100%);
+  color: white;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(137, 207, 240, 0.3);
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.auth-buttons button:hover {
-  background: #f1f1f1;
+.auth-buttons button:first-child {
+  background: white;
+  color: #89CFF0;
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white), linear-gradient(135deg, #89CFF0 0%, #B19CD9 50%, #FFB6D9 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.auth-buttons button:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(137, 207, 240, 0.25);
+  background-image: linear-gradient(rgba(137, 207, 240, 0.05), rgba(137, 207, 240, 0.05)), linear-gradient(135deg, #89CFF0 0%, #B19CD9 50%, #FFB6D9 100%);
+}
+
+.auth-buttons button:last-child:hover {
+  background: linear-gradient(135deg, #75C5E8 0%, #A88FD1 50%, #FF9FCC 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(137, 207, 240, 0.4);
 }
 
 .auth-buttons .profile-btn {
@@ -566,12 +752,7 @@ footer a:hover {
       border-top:4px solid rgba(0,0,0,0.03); 
       overflow-x: hidden;
 }
-.slider-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
+
 
 .slider-arrow {
     background: white;
@@ -626,14 +807,21 @@ footer a:hover {
     position: relative;
     top: 20px;
 }
+ .program-slider{max-width: 1200px;}
+ .slider-container {max-width: 1200px;}
+  .Program_finds { max-width: 1400px; }
 
 @media (min-width: 1400px) {
-    .Program_finds { padding: 20px 8% !important; }
+    .Program_finds { padding: 20px 8% !important;}
     .center-card { min-width: 260px !important; max-width: 300px !important; }
+    .slider-container {max-width: 1200px;}
+   
 }
 
 @media (min-width: 1024px) and (max-width: 1399px) {
-    .Program_finds { padding: 20px 6% !important; }
+    .Program_finds { padding: 20px 6% !important;max-width: 1000px; }
+    .program-slider{max-width: 1000px;}
+    .slider-container {max-width: 1000px;}
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {

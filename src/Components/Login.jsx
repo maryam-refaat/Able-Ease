@@ -72,35 +72,48 @@ const AuthForm = () => {
 
       // TODO: Replace with actual login API call
       const response = await loginAPI(data);
-      localStorage.setItem("authToken", response.token);
-      localStorage.setItem("ssn", response.ssn);
+      // Support payload shape variations: sometimes server returns { data: {...} }
+      const payload = response?.data ?? response ?? {};
+      console.debug('Login response payload:', payload);
+      const token = payload.token ?? payload.Token ?? payload.accessToken ?? response.token ?? response.Token ?? null;
+      const ssn = payload.ssn ?? payload.SSN ?? payload.Ssn ?? response.ssn ?? null;
+      const roleRaw = ((payload.role ?? payload.Role ?? response.role ?? response.Role ?? "") + "").toLowerCase();
+
+      if (token) localStorage.setItem("authToken", token);
+      if (ssn) localStorage.setItem("ssn", ssn);
+
+      // also extract username / email if provided by backend
+      const username = payload.username ?? payload.Username ?? payload.userName ?? payload.UserName ?? payload.Email ?? payload.Email ?? null;
+      const email = payload.email ?? payload.Email ?? null;
+      const name = payload.name ?? payload.Name ?? null;
+
       // Normalize role to a consistent userType
-      const role = (response.role || "").toLowerCase();
       const userTypeMap = {
         organization: "organization",
         relative: "relative",
+        caregiver: "caregiver",
         caretaker: "caretaker",
         physiotherapycenter: "therapyCenter",
         patient: "patient",
+        admin: "admin",
       };
-      const userType = userTypeMap[role] || null;
+      const userType = userTypeMap[roleRaw] || null;
 
       // Persist unified auth state and notify listeners
-      setAuthState({ isLoggedIn: true, userType, ssn: response.ssn });
+      setAuthState({ isLoggedIn: true, userType, ssn, username, email, name });
+      // ensure storage flags exist and notify listeners
+      localStorage.setItem('auth.isLoggedIn', 'true');
+      if (userType) localStorage.setItem('auth.userType', userType);
+      window.dispatchEvent(new CustomEvent('auth-changed'));
+      console.log('Login successful - userType:', userType, 'username:', username, 'email:', email);
 
-      let url = "";
-
-      if (response.role == "Organization") {
-        url = "/organization-profile";
-      } else if (response.role == "Relative") {
-        url = "/relative-profile";
-      } else if (response.role == "Caregiver") {
-        url = "/caregiver-profile";
-      } else if (response.role == "Center") {
-        url = "/center-profile";
-      } else if (response.role == "Patient") {
-        url = "/patient-profile";
-      }
+      let url = "/";
+      if (roleRaw === 'organization') url = "/organization-profile";
+      else if (roleRaw === 'relative') url = "/relative-profile";
+      else if (roleRaw === 'caregiver') url = "/caregiver-profile";
+      else if (roleRaw === 'center' || roleRaw === 'physiotherapycenter') url = "/center-profile";
+      else if (roleRaw === 'patient') url = "/patient-profile";
+      else if (roleRaw === 'admin') url = "/admin-profile";
 
       navigate(url);
     } catch (error) {

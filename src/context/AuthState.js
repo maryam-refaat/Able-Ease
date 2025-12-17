@@ -9,7 +9,7 @@ export function getAuthState() {
   }
 }
 
-export function setAuthState({ isLoggedIn, userType, ssn }) {
+export function setAuthState({ isLoggedIn, userType, ssn, username, email, name }) {
   if (typeof isLoggedIn !== "undefined") {
     localStorage.setItem("auth.isLoggedIn", isLoggedIn ? "true" : "false");
   }
@@ -18,6 +18,15 @@ export function setAuthState({ isLoggedIn, userType, ssn }) {
   }
   if (typeof ssn !== "undefined" && ssn !== null) {
     localStorage.setItem("ssn", ssn);
+  }
+  if (typeof username !== "undefined" && username !== null) {
+    localStorage.setItem("auth.username", username);
+  }
+  if (typeof email !== "undefined" && email !== null) {
+    localStorage.setItem("auth.email", email);
+  }
+  if (typeof name !== "undefined" && name !== null) {
+    localStorage.setItem("auth.name", name);
   }
   window.dispatchEvent(new CustomEvent("auth-changed"));
 }

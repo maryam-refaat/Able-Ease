@@ -15,6 +15,8 @@ export default function Sidebar({
         return "/relative-profile";
       case "organization":
         return "/organization-profile";
+      case "admin":
+        return "/admin-profile";
       case "therapyCenter":
         return "/center-profile";
       case "caretaker":
