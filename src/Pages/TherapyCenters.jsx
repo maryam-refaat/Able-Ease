@@ -5,7 +5,11 @@ import "../Org.css";
 import TherapyCenterCarousel from "../Components/TherapyCenterCarousel";
 import ProgramCard from "../Components/ProgramCard";
 import SessionConfirmationModal from "../Components/SessionConfirmationModal";
-import { getCenters, getcenter_Therapies } from "../assets/apis";
+import {
+  getCenters,
+  getPagedCenters,
+  getcenter_Therapies,
+} from "../assets/apis";
 
 /* Dummy fallback data */
 const DUMMY_Centers = [
@@ -38,6 +42,9 @@ export default function TherapyCenters() {
   const [showBookModal, setShowBookModal] = useState(false);
   const [selectedTherapy, setSelectedTherapy] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
   const navigate = useNavigate();
   const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
   useEffect(() => {
@@ -62,7 +69,7 @@ export default function TherapyCenters() {
       setLoadingCenters(true);
 
       try {
-        const res = await getCenters();
+        const res = await getPagedCenters(currentPage, pageSize);
         const centers = res?.data;
 
         if (mounted && Array.isArray(centers) && centers.length) {
@@ -72,13 +79,13 @@ export default function TherapyCenters() {
           const firstSSN = getCenterSSN(centers[0]);
           if (firstSSN) setSelectedCenter(firstSSN);
         } else {
-          setTherapyCenters(DUMMY_Centers);
-          setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
+          setTherapyCenters([]);
+          setSelectedCenter(null);
         }
       } catch (err) {
-        console.error("getCenters failed", err);
-        setTherapyCenters(DUMMY_Centers);
-        setSelectedCenter(getCenterSSN(DUMMY_Centers[0]));
+        console.error("getPagedCenters failed", err);
+        setTherapyCenters([]);
+        setSelectedCenter(null);
       } finally {
         if (mounted) setLoadingCenters(false);
       }
@@ -86,7 +93,7 @@ export default function TherapyCenters() {
 
     loadCenters();
     return () => (mounted = false);
-  }, []);
+  }, [currentPage]);
 
   /* =========================
      Load Therapies
@@ -119,7 +126,7 @@ export default function TherapyCenters() {
         }
       } catch (err) {
         console.error("getcenter_Therapies failed", err);
-        setPrograms(DUMMY_Therapies);
+        setPrograms([]);
       } finally {
         if (mounted) setLoadingPrograms(false);
       }
@@ -182,6 +189,108 @@ export default function TherapyCenters() {
           selectedSSN={selectedCenter}
         />
       </section>
+
+      {/* Pagination Controls */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "15px",
+          margin: "30px 0",
+        }}
+      >
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          style={{
+            padding: "10px 24px",
+            fontSize: "14px",
+            fontWeight: "600",
+            color: currentPage === 1 ? "#999" : "white",
+            background:
+              currentPage === 1
+                ? "#e0e0e0"
+                : "linear-gradient(135deg, #27865d 0%, #1e6b4a 100%)",
+            border: "none",
+            borderRadius: "8px",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              currentPage === 1 ? "none" : "0 4px 12px rgba(39, 134, 93, 0.3)",
+          }}
+          onMouseEnter={(e) => {
+            if (currentPage !== 1) {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(39, 134, 93, 0.4)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (currentPage !== 1) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(39, 134, 93, 0.3)";
+            }
+          }}
+        >
+          ← Previous
+        </button>
+
+        <span
+          style={{
+            fontSize: "16px",
+            fontWeight: "700",
+            color: "#27865d",
+            padding: "10px 20px",
+            background: "#f0f7f4",
+            borderRadius: "8px",
+            border: "2px solid #27865d",
+          }}
+        >
+          Page {currentPage}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          disabled={therapyCenters.length < pageSize}
+          style={{
+            padding: "10px 24px",
+            fontSize: "14px",
+            fontWeight: "600",
+            color: therapyCenters.length < pageSize ? "#999" : "white",
+            background:
+              therapyCenters.length < pageSize
+                ? "#e0e0e0"
+                : "linear-gradient(135deg, #27865d 0%, #1e6b4a 100%)",
+            border: "none",
+            borderRadius: "8px",
+            cursor:
+              therapyCenters.length < pageSize ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              therapyCenters.length < pageSize
+                ? "none"
+                : "0 4px 12px rgba(39, 134, 93, 0.3)",
+          }}
+          onMouseEnter={(e) => {
+            if (therapyCenters.length >= pageSize) {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(39, 134, 93, 0.4)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (therapyCenters.length >= pageSize) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(39, 134, 93, 0.3)";
+            }
+          }}
+        >
+          Next →
+        </button>
+      </div>
 
       <div className="container" style={{ padding: 22 }}>
         <section style={{ marginTop: 30 }}>

@@ -7,9 +7,11 @@ import ProgramCard from "../Components/ProgramCard";
 import PositionCard from "../Components/PositionsCard";
 import CaregiverCarousel from "../Components/CaregiverCarousel";
 import ConfirmationModal from "../Components/ConfirmationModal";
+import ContactModal from "../Components/ContactModal";
 
 import {
   getOrganizations,
+  getPagedOrganizations,
   getOrg_Programs,
   getOrg_CareGivers,
   getOrg_Proposals,
@@ -73,8 +75,13 @@ export default function OrganizationsPage() {
 
   const [showBookModal, setShowBookModal] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const [selectedCaregiver, setSelectedCaregiver] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
 
   const navigate = useNavigate();
   const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
@@ -98,7 +105,7 @@ export default function OrganizationsPage() {
       setLoadingOrgs(true);
 
       try {
-        const res = await getOrganizations();
+        const res = await getPagedOrganizations(currentPage, pageSize);
         const orgs = res?.data;
 
         if (mounted && Array.isArray(orgs) && orgs.length) {
@@ -108,13 +115,13 @@ export default function OrganizationsPage() {
           const firstSSN = readSSN(orgs[0]);
           if (firstSSN) setSelectedOrg(firstSSN);
         } else {
-          setOrganizations(DUMMY_ORGANIZATIONS);
-          setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
+          setOrganizations([]);
+          setSelectedOrg(null);
         }
       } catch (err) {
-        console.error("getOrganizations failed", err);
-        setOrganizations(DUMMY_ORGANIZATIONS);
-        setSelectedOrg(readSSN(DUMMY_ORGANIZATIONS[0]));
+        console.error("getPagedOrganizations failed", err);
+        setOrganizations([]);
+        setSelectedOrg(null);
       } finally {
         if (mounted) setLoadingOrgs(false);
       }
@@ -122,7 +129,7 @@ export default function OrganizationsPage() {
 
     loadOrganizations();
     return () => (mounted = false);
-  }, []);
+  }, [currentPage]);
 
   /* =========================
      Load Programs / Caregivers / Positions
@@ -147,40 +154,40 @@ export default function OrganizationsPage() {
           getOrg_Proposals(selectedOrg),
         ]);
 
-        // Programs - only show dummy on API failure, not on empty array
+        // Programs
         if (
           progRes.status === "fulfilled" &&
           Array.isArray(progRes.value?.data)
         ) {
           setPrograms(progRes.value.data);
         } else {
-          setPrograms(DUMMY_PROGRAMS);
+          setPrograms([]);
         }
 
-        // Positions - use API data if available
+        // Positions
         if (
           posRes.status === "fulfilled" &&
           Array.isArray(posRes.value?.data)
         ) {
           setPositions(posRes.value.data);
         } else {
-          setPositions(DUMMY_POSITIONS);
+          setPositions([]);
         }
 
-        // Caregivers - only show dummy on API failure, not on empty array
+        // Caregivers
         if (
           carRes.status === "fulfilled" &&
           Array.isArray(carRes.value?.data)
         ) {
           setCaregivers(carRes.value.data);
         } else {
-          setCaregivers(DUMMY_CAREGIVERS);
+          setCaregivers([]);
         }
       } catch (err) {
         console.error("Error loading data", err);
-        setPrograms(DUMMY_PROGRAMS);
-        setPositions(DUMMY_POSITIONS);
-        setCaregivers(DUMMY_CAREGIVERS);
+        setPrograms([]);
+        setPositions([]);
+        setCaregivers([]);
       } finally {
         if (mounted) setLoadingData(false);
       }
@@ -259,6 +266,64 @@ export default function OrganizationsPage() {
     setSelectedPosition(null);
   };
 
+  const handleContact = (caregiver) => {
+    if (!isLoggedIn) {
+      navigate("/Able-Ease#auth-form");
+      setTimeout(() => {
+        const authElement = document.getElementById("auth-form");
+        if (authElement) {
+          authElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+    } else {
+      setSelectedCaregiver(caregiver);
+      setShowContactModal(true);
+    }
+  };
+
+  const handleContactConfirm = async (formData) => {
+    try {
+      const senderSSN = localStorage.getItem("ssn");
+      const receiverSSN =
+        selectedCaregiver?.id ||
+        selectedCaregiver?.ID ||
+        selectedCaregiver?.ssn;
+
+      const response = await fetch(
+        "https://localhost:7040/api/Message/send/contact",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          body: JSON.stringify({
+            senderSSN: senderSSN,
+            receiverSSN: receiverSSN,
+            subject: formData.subject,
+            body: formData.body,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      alert("Message sent successfully!");
+      setShowContactModal(false);
+      setSelectedCaregiver(null);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Failed to send message. Please try again.");
+    }
+  };
+
+  const handleContactCancel = () => {
+    setShowContactModal(false);
+    setSelectedCaregiver(null);
+  };
+
   /* =========================
      Render
      ========================= */
@@ -273,6 +338,107 @@ export default function OrganizationsPage() {
           selectedSSN={selectedOrg}
         />
       </section>
+
+      {/* Pagination Controls */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "15px",
+          margin: "30px 0",
+        }}
+      >
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          disabled={currentPage === 1}
+          style={{
+            padding: "10px 24px",
+            fontSize: "14px",
+            fontWeight: "600",
+            color: currentPage === 1 ? "#999" : "white",
+            background:
+              currentPage === 1
+                ? "#e0e0e0"
+                : "linear-gradient(135deg, #27865d 0%, #1e6b4a 100%)",
+            border: "none",
+            borderRadius: "8px",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              currentPage === 1 ? "none" : "0 4px 12px rgba(39, 134, 93, 0.3)",
+          }}
+          onMouseEnter={(e) => {
+            if (currentPage !== 1) {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(39, 134, 93, 0.4)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (currentPage !== 1) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(39, 134, 93, 0.3)";
+            }
+          }}
+        >
+          ← Previous
+        </button>
+
+        <span
+          style={{
+            fontSize: "16px",
+            fontWeight: "700",
+            color: "#27865d",
+            padding: "10px 20px",
+            background: "#f0f7f4",
+            borderRadius: "8px",
+            border: "2px solid #27865d",
+          }}
+        >
+          Page {currentPage}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          disabled={organizations.length < pageSize}
+          style={{
+            padding: "10px 24px",
+            fontSize: "14px",
+            fontWeight: "600",
+            color: organizations.length < pageSize ? "#999" : "white",
+            background:
+              organizations.length < pageSize
+                ? "#e0e0e0"
+                : "linear-gradient(135deg, #27865d 0%, #1e6b4a 100%)",
+            border: "none",
+            borderRadius: "8px",
+            cursor: organizations.length < pageSize ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              organizations.length < pageSize
+                ? "none"
+                : "0 4px 12px rgba(39, 134, 93, 0.3)",
+          }}
+          onMouseEnter={(e) => {
+            if (organizations.length >= pageSize) {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(39, 134, 93, 0.4)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (organizations.length >= pageSize) {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(39, 134, 93, 0.3)";
+            }
+          }}
+        >
+          Next →
+        </button>
+      </div>
 
       <div className="container-oragnizations">
         <section style={{ marginTop: 30 }}>
@@ -318,7 +484,11 @@ export default function OrganizationsPage() {
           {loadingData ? (
             <div>Loading caregivers...</div>
           ) : caregivers.length ? (
-            <CaregiverCarousel caregivers={caregivers} showCount={1} />
+            <CaregiverCarousel
+              caregivers={caregivers}
+              showCount={1}
+              onContact={handleContact}
+            />
           ) : (
             <div>No caregivers for this organization.</div>
           )}
@@ -345,6 +515,13 @@ export default function OrganizationsPage() {
         message="Confirm to Apply for this position and wait for the reply!!"
         program={selectedPosition}
         isApply={true}
+      />
+
+      <ContactModal
+        isOpen={showContactModal}
+        onConfirm={handleContactConfirm}
+        onCancel={handleContactCancel}
+        receiverName={selectedCaregiver?.name || selectedCaregiver?.Name || ""}
       />
     </div>
   );
