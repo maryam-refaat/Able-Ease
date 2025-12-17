@@ -641,4 +641,34 @@ export const sendMssg = async (body) => {
   return data;
 };
 
+export const deletePatientSession = async (therapyId) => {
+  const response = await fetch(
+    `${BASE_URL}/Therapy/delete/${therapyId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  const data = await response.text();
+  return data;
+};
+
+export const deletePatientWork = async (patientssn,ossn) => {
+  const response = await fetch(
+    `${BASE_URL}/patientwork/delete/${patientssn}/${ossn}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  const data = await response.text();
+  return data;
+};
+
 export default api;

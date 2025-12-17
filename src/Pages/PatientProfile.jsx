@@ -4,12 +4,16 @@ import "./PatientProf.css";
 import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
+import PatientProfileModal from "../Components/PatientProfileModal";
 import {
   getPatientBySSN,
   getProgramByPatient,
   getTherapyByPatient,
   getWorkByPatient,
   getPatient_Reports,
+  deletePatientFromProgram,
+  deletePatientSession,
+  deletePatientWork,
 } from "../assets/apis";
 import Footer from "../Components/Footer";
 
@@ -26,6 +30,12 @@ export default function PatientProfile() {
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
+
+  // Modal states for confirmations
+  const [withdrawModal, setWithdrawModal] = useState({ isOpen: false, program: null });
+  const [cancelModal, setCancelModal] = useState({ isOpen: false, session: null });
+  const [resignModal, setResignModal] = useState({ isOpen: false });
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -318,19 +328,8 @@ export default function PatientProfile() {
                   title: "Initial Assessment Report",
                   date: "2025-11-01",
                   type: "Assessment",
-                },
-                {
-                  id: 2,
-                  title: "Progress Report - Month 1",
-                  date: "2025-12-01",
-                  type: "Progress",
-                },
-                {
-                  id: 3,
-                  title: "Mid-Program Evaluation",
-                  date: "2025-12-15",
-                  type: "Evaluation",
-                },
+                }
+                
               ],
               employment: {
                 patientSSN: "demo-patient-123",
@@ -524,6 +523,95 @@ export default function PatientProfile() {
     }
   };
 
+  // Handler functions for action buttons
+  const handleWithdrawClick = (program) => {
+    setWithdrawModal({ isOpen: true, program });
+  };
+
+  const handleWithdrawConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const program = withdrawModal.program;
+      const userSSN = localStorage.getItem("ssn");
+      
+      // Call deletePatientFromProgram(programId, ssn, organizationSSN)
+      await deletePatientFromProgram(
+        program.id,
+        userSSN,
+        program.organizationSSN
+      );
+      
+      console.log(`Successfully withdrew from program ${program?.id}`);
+      // Remove program from state
+      setData(prev => ({
+        ...prev,
+        programs: prev.programs?.filter(p => p.id !== program?.id) || []
+      }));
+      setWithdrawModal({ isOpen: false, program: null });
+    } catch (err) {
+      console.error("Withdraw failed", err);
+      alert("Failed to withdraw from program. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancelSessionClick = (session) => {
+    setCancelModal({ isOpen: true, session });
+  };
+
+  const handleCancelSessionConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const session = cancelModal.session;
+      
+      // Call deletePatientSession(therapyId)
+      await deletePatientSession(session.id);
+      
+      console.log(`Successfully cancelled session ${session?.id}`);
+      // Remove session from state
+      setData(prev => ({
+        ...prev,
+        sessions: prev.sessions?.filter(s => s.id !== session?.id) || []
+      }));
+      setCancelModal({ isOpen: false, session: null });
+    } catch (err) {
+      console.error("Cancel session failed", err);
+      alert("Failed to cancel session. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleResignClick = () => {
+    setResignModal({ isOpen: true });
+  };
+
+  const handleResignConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const userSSN = localStorage.getItem("ssn");
+      const organizationSSN = data.employment?.organizationSSN;
+      
+      if (!organizationSSN) {
+        throw new Error("Organization SSN not found");
+      }
+      
+      // Call deletePatientWork(ssn, organizationSSN)
+      await deletePatientWork(userSSN, organizationSSN);
+      
+      console.log("Successfully resigned from employment");
+      // Remove employment from state
+      setData(prev => ({ ...prev, employment: null }));
+      setResignModal({ isOpen: false });
+    } catch (err) {
+      console.error("Resign failed", err);
+      alert("Failed to resign from employment. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (isLoading) return <div className="page-container">Loading...</div>;
   if (isError) return <div className="page-container">Error loading data.</div>;
 
@@ -636,9 +724,7 @@ export default function PatientProfile() {
 
                       <button
                         className="withdraw-btn"
-                        onClick={() =>
-                          console.log(`Withdraw from program ${programKey}`)
-                        }
+                        onClick={() => handleWithdrawClick(p)}
                         style={{
                           position: "absolute",
                           bottom: "16px",
@@ -758,9 +844,7 @@ export default function PatientProfile() {
 
                       <button
                         className="cancel-session-btn"
-                        onClick={() =>
-                          console.log(`Cancel session ${sessionKey}`)
-                        }
+                        onClick={() => handleCancelSessionClick(s)}
                         style={{
                           position: "absolute",
                           bottom: "16px",
@@ -825,7 +909,7 @@ export default function PatientProfile() {
                 </div>
                 <button
                   className="resign-btn"
-                  onClick={() => console.log(`Resign from employment`)}
+                  onClick={handleResignClick}
                   style={{
                     position: "absolute",
                     bottom: "16px",
@@ -931,6 +1015,37 @@ export default function PatientProfile() {
         </div>
       </div>
       <Footer />
+
+      {/* Confirmation Modals */}
+      <PatientProfileModal
+        isOpen={withdrawModal.isOpen}
+        onConfirm={handleWithdrawConfirm}
+        onCancel={() => setWithdrawModal({ isOpen: false, program: null })}
+        title="Withdraw from Program"
+        message={`Are you sure you want to withdraw from "${withdrawModal.program?.name || 'this program'}"? This action cannot be undone.`}
+        confirmText="Withdraw"
+        isLoading={actionLoading}
+      />
+
+      <PatientProfileModal
+        isOpen={cancelModal.isOpen}
+        onConfirm={handleCancelSessionConfirm}
+        onCancel={() => setCancelModal({ isOpen: false, session: null })}
+        title="Cancel Session"
+        message={`Are you sure you want to cancel "${cancelModal.session?.title || 'this session'}"? This action cannot be undone.`}
+        confirmText="Cancel Session"
+        isLoading={actionLoading}
+      />
+
+      <PatientProfileModal
+        isOpen={resignModal.isOpen}
+        onConfirm={handleResignConfirm}
+        onCancel={() => setResignModal({ isOpen: false })}
+        title="Resign from Employment"
+        message={`Are you sure you want to resign from your position as ${data.employment?.jobTitle || 'employee'} at ${data.employment?.organizationName || 'this organization'}? This action cannot be undone.`}
+        confirmText="Resign"
+        isLoading={actionLoading}
+      />
     </>
   );
 }
