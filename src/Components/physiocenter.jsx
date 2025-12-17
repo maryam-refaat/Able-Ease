@@ -62,17 +62,6 @@ export default function Physicenterfind() {
             connect to nearby <br />
             physiotherapy centers
           </h2>
-          <button
-            style={{
-              background: "#fff",
-              borderRadius: 20,
-              padding: "8px 12px",
-              marginRight: "110px",
-            }}
-          >
-            View More
-            <i className="arrow fa-solid fa-arrow-right"></i>
-          </button>
         </div>
 
         <div className="slider-container">

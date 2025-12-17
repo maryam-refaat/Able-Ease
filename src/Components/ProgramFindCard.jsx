@@ -30,7 +30,7 @@ export default function ProgramFindCard({ program, onBook = () => {} }) {
 
       <div style={{ padding: "16px" }}>
         <h3 style={{ 
-          margin: "0 0 8px 0",
+          margin: "0 0 10px 0",
           fontSize: "1.1rem",
           fontWeight: "600",
           color: "#1f2937",
@@ -41,57 +41,44 @@ export default function ProgramFindCard({ program, onBook = () => {} }) {
 
         {orgName && (
           <p style={{ 
-            margin: "0 0 12px 0",
+            margin: "0 0 8px 0",
             fontSize: "0.875rem",
             color: "#6b7280",
             fontWeight: "500"
           }}>
-            📍 {orgName}
+            🏢 {orgName}
           </p>
         )}
 
-        {(start || end) && (
+        {program.location && (
           <p style={{ 
-            margin: "0 0 12px 0",
-            fontSize: "0.85rem",
-            color: "#9ca3af"
+            margin: "0 0 8px 0",
+            fontSize: "0.875rem",
+            color: "#6b7280",
+            fontWeight: "500"
           }}>
-            {start || ""} {start && end && "→"} {end || ""}
+            📍 {program.location}
           </p>
         )}
 
         <div style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
-          marginTop: "16px"
+          marginTop: "12px",
+          marginLeft: "-16px",
+          marginRight: "-16px",
+          marginBottom: "-16px",
+          padding: "12px 16px",
+          background: "rgba(39, 134, 93, 0.1)"
         }}>
           <span style={{ 
-            fontSize: "1.25rem",
+            fontSize: "1rem",
             fontWeight: "700",
             color: "#27865d"
           }}>
-            {price != null ? `$${price}` : "Price N/A"}
+            Price: {price != null ? `$${price}` : "N/A"}
           </span>
-          
-          <button 
-            onClick={() => onBook(program)}
-            style={{
-              background: "#27865d",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              padding: "8px 20px",
-              fontSize: "0.9rem",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => e.target.style.background = "#1f6b4a"}
-            onMouseLeave={(e) => e.target.style.background = "#27865d"}
-          >
-            Book
-          </button>
         </div>
       </div>
     </div>

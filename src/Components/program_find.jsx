@@ -8,51 +8,63 @@ export default function Programfind() {
   const dummyPrograms = [
     {
       id: 1,
-      name: "Physio Care Center",
+      name: "Physical Therapy Program",
+      organizationName: "Able Care Center",
+      location: "Cairo, Egypt",
       image: programimg,
-      Price: "100$",
+      price: 150,
       S_date: "2025-12-04",
       E_date: "2025-01-04",
     },
     {
       id: 2,
-      name: "Physio Care Center",
+      name: "Rehabilitation Program",
+      organizationName: "Wellness Hub",
+      location: "Giza, Egypt",
       image: programimg,
-      Price: "100$",
-      S_date: "2025-12-04",
-      E_date: "2025-01-04",
+      price: 180,
+      S_date: "2026-01-05",
+      E_date: "2026-04-05",
     },
     {
       id: 3,
-      name: "Physio Care Center",
+      name: "Mobility Enhancement",
+      organizationName: "Care Plus",
+      location: "Alexandria, Egypt",
       image: programimg,
-      Price: "100$",
-      S_date: "2025-12-04",
-      E_date: "2025-01-04",
+      price: 200,
+      S_date: "2026-01-15",
+      E_date: "2026-05-15",
     },
     {
       id: 4,
-      name: "Physio Care Center",
+      name: "Sports Injury Recovery",
+      organizationName: "Hope Centre",
+      location: "Mansoura, Egypt",
       image: programimg,
-      Price: "100$",
-      S_date: "2025-12-04",
-      E_date: "2025-01-04",
+      price: 220,
+      S_date: "2026-01-10",
+      E_date: "2026-04-10",
     },
     {
       id: 5,
-      name: "Physio Care Center",
+      name: "Senior Fitness Program",
+      organizationName: "Golden Care",
+      location: "Tanta, Egypt",
       image: programimg,
-      Price: "100$",
-      S_date: "2025-12-04",
-      E_date: "2025-01-04",
+      price: 120,
+      S_date: "2025-12-25",
+      E_date: "2026-03-25",
     },
     {
       id: 6,
-      name: "Physio Care Center",
+      name: "Pediatric Therapy",
+      organizationName: "Kids First Center",
+      location: "Ismailia, Egypt",
       image: programimg,
-      Price: "100$",
-      S_date: "2025-12-04",
-      E_date: "2025-01-04",
+      price: 160,
+      S_date: "2026-02-01",
+      E_date: "2026-05-01",
     },
   ];
 
@@ -90,20 +102,9 @@ export default function Programfind() {
     <section className="centers-strip">
       <div className="Program_finds">
         <div className="section-title">
-          <h2 style={{ color: "#198751", margin: 0, marginLeft: "120px" }}>
+          <h2 className="glowing-title" style={{ color: "white", margin: 0, paddingLeft: "50px" }}>
             Find Programs &gt; &gt; &gt;
           </h2>
-          <button
-            style={{
-              background: "#fff",
-              borderRadius: 20,
-              padding: "8px 12px",
-              marginRight: "110px",
-            }}
-          >
-            View More
-            <i className=" arrow fa-solid fa-arrow-right"></i>
-          </button>
         </div>
 
         <div className="slider-container" style={{ marginTop: 18 }}>
