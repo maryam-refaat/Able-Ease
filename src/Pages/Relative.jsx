@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Footer from "../Components/Footer";
 import Sidebar from "../Components/Sidebar";
 import { setAuthState } from "../context/AuthState";
+import { getRelativeBySSN } from "../assets/apis";
 
 export default function Relative() {
   const location = useLocation();
@@ -30,12 +31,16 @@ export default function Relative() {
     async function fetchData() {
       try {
         setIsLoading(true);
-        // const token = JSON.parse(localStorage.getItem("relativeToken"));
-        // const fetchedData = await getUserInfo(token);
-        // setData(fetchedData);
 
-        // Load from localStorage if no data
-        if (!relativeData || Object.keys(relativeData).length === 0) {
+        // Get SSN from localStorage
+        const relativeSSN = localStorage.getItem("ssn");
+
+        if (relativeSSN) {
+          // Fetch data from API
+          const relativeData = await getRelativeBySSN(relativeSSN);
+          setData(relativeData);
+        } else {
+          // Fallback to stored data if no SSN
           const storedDataStr = localStorage.getItem("relativeData");
           try {
             const storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
@@ -122,7 +127,10 @@ export default function Relative() {
         </header>
 
         <RelativeCard title="Relative" data={data} onEdit={openEdit} />
-        <MedicalBox />
+        <MedicalBox
+          relativeSSN={data?.ssn || localStorage.getItem("ssn")}
+          patientSSN={data?.patientSSN || ""}
+        />
         <Footer />
       </div>
 

@@ -13,7 +13,7 @@ export default function Sidebar({ userType = "patient" }) {
       case "organization":
         return "/organization-profile";
       case "therapyCenter":
-        return "/therapy-center-profile";
+        return "/center-profile";
       case "patient":
       default:
         return "/patient-profile";

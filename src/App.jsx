@@ -16,6 +16,7 @@ import AllProgram from "./Pages/AllProgram";
 import AllTherapies from "./Pages/AllTherapies";
 import AllEmployments from "./Pages/AllEmployments";
 import CaregiverProfile from "./Components/CareGiverProfile";
+import Physiocenterpage from "./Components/PhysioTherapyProfile";
 
 const router = createBrowserRouter([
   {
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
   {
     path: "/caregiver-profile",
     element: <CaregiverProfile />,
+  },
+  {
+    path: "/center-profile",
+    element: <Physiocenterpage />,
   },
 ]);
 

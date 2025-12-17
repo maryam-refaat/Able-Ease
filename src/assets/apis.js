@@ -18,7 +18,7 @@ export const getUserInfo = async (token) => {
 
 // signup relative
 export const signupRelative = async (body) => {
-  const response = await fetch(`${BASE_URL}/relatives`, {
+  const response = await fetch(`${BASE_URL}/relative/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -380,6 +380,58 @@ export const getrelativebyid = async (ssn) => {
   return data;
 };
 
+export const getRelativeBySSN = async (ssn) => {
+  const response = await fetch(`${BASE_URL}/Relative/GetRelative/${ssn}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const addMedicalInfo = async (body) => {
+  console.log("addMedicalInfo called with body:", body);
+
+  const response = await fetch(`${BASE_URL}/MedicalInfo/AddMedicalInfo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  console.log("Response status:", response.status);
+  console.log("Response headers:", response.headers);
+
+  // If server returns text/plain, parsing JSON will throw.
+  // Treat any 2xx as success and return text or empty.
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok) {
+    const errText = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+
+    console.error("Server error response:", errText);
+
+    throw new Error(
+      typeof errText === "string" ? errText : JSON.stringify(errText)
+    );
+  }
+
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+  // text/plain or empty body
+  try {
+    return await response.text();
+  } catch {
+    return "";
+  }
+};
+
 export const fetchAvailablePrograms = async (ssn) => {
   const response = await fetch(
     `${BASE_URL}/program/organizationprograms/${ssn}`,
@@ -480,9 +532,45 @@ export const getProgramPatients = async (programId, ssn) => {
       },
     }
   );
+  return response.json();
+};
 
+// Therapy APIs
+export const fetchAvailabletherapies = async (centerSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Therapy/center/${centerSSN}/unjoined`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
   const data = await response.json();
-  return data;
+  return { data: data || [] };
+};
+
+export const addtherapy = async (formData) => {
+  const response = await fetch(`${BASE_URL}/therapy/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  });
+  return await response.json();
+};
+
+export const updatetherapy = async (formData) => {
+  const therapyId = formData.get("Id") || formData.get("id");
+  const response = await fetch(`${BASE_URL}/therapy/update/${therapyId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  });
+  return await response.json();
 };
 
 export default api;
