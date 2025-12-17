@@ -5,6 +5,7 @@ import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
 import {
+  getPatientBySSN,
   getProgramByPatient,
   getTherapyByPatient,
   getWorkByPatient,
@@ -62,13 +63,65 @@ export default function PatientProfile() {
         const patientId = candidateId || storedSSN || storedToken || null;
 
         if (patientId) {
-          // fetch related patient resources in parallel
-          const [progRes, therapiesRes, reportsRes, workRes] = await Promise.all([
-            getProgramByPatient(storedSSN).catch(() => ({ data: [] })),
-            getTherapyByPatient(storedSSN).catch(() => ({ data: [] })),
-            getPatient_Reports(storedSSN).catch(() => ({ data: [] })),
-            getWorkByPatient(storedSSN).catch(() => ({ data: [] })),
-          ]);
+          console.log(`Fetching patient data for SSN: ${patientId}`);
+          // fetch patient core data + related resources in parallel
+          const [patientRes, progRes, therapiesRes, reportsRes, workRes] =
+            await Promise.all([
+              getPatientBySSN(patientId).catch((err) => {
+                console.error("getPatientBySSN error:", err);
+                return { data: null };
+              }),
+              getProgramByPatient(patientId).catch((err) => {
+                console.error("getProgramByPatient error:", err);
+                return { data: [] };
+              }),
+              getTherapyByPatient(patientId).catch((err) => {
+                console.error("getTherapyByPatient error:", err);
+                return { data: [] };
+              }),
+              getPatient_Reports(patientId).catch((err) => {
+                console.error("getPatient_Reports error:", err);
+                return { data: [] };
+              }),
+              getWorkByPatient(patientId).catch((err) => {
+                console.error("getWorkByPatient error:", err);
+                return { data: [] };
+              }),
+            ]);
+
+          console.log("ALL RESPONSES:", {
+            patientRes,
+            progRes,
+            therapiesRes,
+            reportsRes,
+            workRes,
+          });
+
+          const patientEntity = patientRes?.data ?? null;
+          const patientBase = patientEntity
+            ? {
+                fullName:
+                  patientEntity.name || patientEntity.fullName || base.fullName,
+                phone:
+                  patientEntity.contactInfo ||
+                  patientEntity.phone ||
+                  base.phone,
+                email: patientEntity.email || base.email,
+                gender: patientEntity.gender || base.gender,
+                address: patientEntity.address || base.address,
+                birthDate:
+                  patientEntity.birthDate ||
+                  patientEntity.birthdate ||
+                  base.birthDate,
+                ssn: patientEntity.ssn || patientId,
+                relativeName: patientEntity.relativeName,
+                caregiverName: patientEntity.caregiverName,
+                programId: patientEntity.programId,
+                programName: patientEntity.programName,
+                programOrganizationSSN: patientEntity.programOrganizationSSN,
+                avatar: patientEntity.avatar || base.avatar,
+              }
+            : {};
 
           const rawPrograms = Array.isArray(progRes?.data) ? progRes.data : [];
           const therapies = Array.isArray(therapiesRes?.data)
@@ -91,46 +144,81 @@ export default function PatientProfile() {
             price: p.price ?? 0,
             imageUrl: p.imageUrl ?? "",
             imgUrl: p.imageUrl ?? "",
-            location: p.location ?? ""
+            location: p.location ?? "",
           }));
 
           // normalize therapies -> sessions using API field names
-          const sessions = therapies.map((t, i) => ({
-            id: t.id ?? `t-${i}`,
-            title: t.name ?? "Therapy",
-            centerName: t.center?.name ?? "",
-            location: t.center?.location ?? "",
-            pricePerHour: t.pricePerHour ?? 0,
-            duration: t.duration ?? 0,
-            doctorname: t.doctorname ?? "",
-            therapyDetails: t.therapyDetails ?? "",
-            date: t.date ?? "",
-            imageUrl: t.imageUrl ?? "",
-            imgUrl: t.imageUrl ?? "",
-            centerID: t.centerID ?? "",
-            state: t.date ? "scheduled" : "pending",
-          }));
+          const sessions = therapies.map((t, i) => {
+            const rawImg =
+              t?.imageUrl ??
+              t?.imgUrl ??
+              t?.image ??
+              t?.img ??
+              t?.photoUrl ??
+              t?.pictureUrl ??
+              t?.ImageUrl ??
+              t?.Image ??
+              t?.imagePath ??
+              t?.fileUrl ??
+              t?.filePath ??
+              "";
+
+            const safeImg =
+              typeof rawImg === "string" && rawImg.trim().length > 0
+                ? rawImg.trim()
+                : "";
+
+            return {
+              id: t.id ?? `t-${i}`,
+              title: t.name ?? "Therapy",
+              centerName: t.center?.name ?? "",
+              location: t.center?.location ?? "",
+              pricePerHour: t.pricePerHour ?? 0,
+              duration: t.duration ?? 0,
+              doctorname: t.doctorname ?? "",
+              therapyDetails: t.therapyDetails ?? "",
+              date: t.date ?? "",
+              imageUrl: safeImg,
+              imgUrl: safeImg,
+              centerID: t.centerID ?? "",
+              state: t.date ? "scheduled" : "pending",
+            };
+          });
 
           // normalize employment data using API field names
-          const employment = rawWork.length > 0 ? {
-            patientSSN: rawWork[0].PatientSSN ?? rawWork[0].patientSSN ?? "",
-            organizationSSN: rawWork[0].OrganizationSSN ?? rawWork[0].organizationSSN ?? "",
-            patientName: rawWork[0].PatientName ?? rawWork[0].patientName ?? "",
-            organizationName: rawWork[0].OrganizationName ?? rawWork[0].organizationName ?? "",
-            jobTitle: rawWork[0].JobTitle ?? rawWork[0].jobTitle ?? "",
-            salary: rawWork[0].Salary ?? rawWork[0].salary ?? 0,
-            startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
-          } : null;
+          const employment =
+            rawWork.length > 0
+              ? {
+                  patientSSN:
+                    rawWork[0].PatientSSN ?? rawWork[0].patientSSN ?? "",
+                  organizationSSN:
+                    rawWork[0].OrganizationSSN ??
+                    rawWork[0].organizationSSN ??
+                    "",
+                  patientName:
+                    rawWork[0].PatientName ?? rawWork[0].patientName ?? "",
+                  organizationName:
+                    rawWork[0].OrganizationName ??
+                    rawWork[0].organizationName ??
+                    "",
+                  jobTitle: rawWork[0].JobTitle ?? rawWork[0].jobTitle ?? "",
+                  salary: rawWork[0].Salary ?? rawWork[0].salary ?? 0,
+                  startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
+                }
+              : null;
 
+          // Use API data if available, otherwise use base/demo data
           const merged = {
             ...base,
-            programs,
-            sessions,
-            reports,
-            employment,
+            ...patientBase,
+            programs: programs.length > 0 ? programs : base.programs || [],
+            sessions: sessions.length > 0 ? sessions : base.sessions || [],
+            reports: reports.length > 0 ? reports : base.reports || [],
+            employment: employment || base.employment || null,
           };
 
           setData(merged);
+          console.log("Patient data loaded:", merged);
         } else {
           // no identifier found — keep state data if any, otherwise use stored localStorage data
           if (Object.keys(base).length) {
@@ -171,7 +259,10 @@ export default function PatientProfile() {
                 localStorage.getItem("patientBirthDate") ||
                 storedData?.birthDate ||
                 "1990-05-15",
-              ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "demo-patient-123",
+              ssn:
+                localStorage.getItem("patientSSN") ||
+                storedData?.ssn ||
+                "demo-patient-123",
               programs: [
                 {
                   id: 1,
@@ -180,9 +271,8 @@ export default function PatientProfile() {
                   startDate: "2025-12-20",
                   endDate: "2026-03-20",
                   status: "Active",
-                  price: 150
-                }
-                
+                  price: 150,
+                },
               ],
               sessions: [
                 {
@@ -192,7 +282,7 @@ export default function PatientProfile() {
                   location: "Cairo",
                   pricePerHour: 50,
                   duration: 60,
-                  state: "completed"
+                  state: "completed",
                 },
                 {
                   id: 2,
@@ -201,7 +291,7 @@ export default function PatientProfile() {
                   location: "Cairo",
                   pricePerHour: 50,
                   duration: 60,
-                  state: "scheduled"
+                  state: "scheduled",
                 },
                 {
                   id: 3,
@@ -210,7 +300,7 @@ export default function PatientProfile() {
                   location: "Giza",
                   pricePerHour: 40,
                   duration: 90,
-                  state: "scheduled"
+                  state: "scheduled",
                 },
                 {
                   id: 4,
@@ -219,28 +309,28 @@ export default function PatientProfile() {
                   location: "Alexandria",
                   pricePerHour: 60,
                   duration: 45,
-                  state: "completed"
-                }
+                  state: "completed",
+                },
               ],
               reports: [
                 {
                   id: 1,
                   title: "Initial Assessment Report",
                   date: "2025-11-01",
-                  type: "Assessment"
+                  type: "Assessment",
                 },
                 {
                   id: 2,
                   title: "Progress Report - Month 1",
                   date: "2025-12-01",
-                  type: "Progress"
+                  type: "Progress",
                 },
                 {
                   id: 3,
                   title: "Mid-Program Evaluation",
                   date: "2025-12-15",
-                  type: "Evaluation"
-                }
+                  type: "Evaluation",
+                },
               ],
               employment: {
                 patientSSN: "demo-patient-123",
@@ -249,7 +339,7 @@ export default function PatientProfile() {
                 organizationName: "Able Care Center",
                 jobTitle: "Physical Therapist Assistant",
                 salary: 3500,
-                startDate: "2024-06-01"
+                startDate: "2024-06-01",
               },
             };
             setData(patientInfo);
@@ -292,7 +382,10 @@ export default function PatientProfile() {
             localStorage.getItem("patientBirthDate") ||
             storedData?.birthDate ||
             "1990-05-15",
-          ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "demo-patient-123",
+          ssn:
+            localStorage.getItem("patientSSN") ||
+            storedData?.ssn ||
+            "demo-patient-123",
           programs: [
             {
               id: 1,
@@ -301,7 +394,7 @@ export default function PatientProfile() {
               startDate: "2025-12-20",
               endDate: "2026-03-20",
               status: "Active",
-              price: 150
+              price: 150,
             },
             {
               id: 2,
@@ -310,7 +403,7 @@ export default function PatientProfile() {
               startDate: "2026-01-05",
               endDate: "2026-04-05",
               status: "Active",
-              price: 180
+              price: 180,
             },
             {
               id: 3,
@@ -319,8 +412,8 @@ export default function PatientProfile() {
               startDate: "2025-11-01",
               endDate: "2025-12-15",
               status: "Completed",
-              price: 200
-            }
+              price: 200,
+            },
           ],
           sessions: [
             {
@@ -330,7 +423,7 @@ export default function PatientProfile() {
               location: "Cairo",
               pricePerHour: 50,
               duration: 60,
-              state: "completed"
+              state: "completed",
             },
             {
               id: 2,
@@ -339,7 +432,7 @@ export default function PatientProfile() {
               location: "Cairo",
               pricePerHour: 50,
               duration: 60,
-              state: "scheduled"
+              state: "scheduled",
             },
             {
               id: 3,
@@ -348,7 +441,7 @@ export default function PatientProfile() {
               location: "Giza",
               pricePerHour: 40,
               duration: 90,
-              state: "scheduled"
+              state: "scheduled",
             },
             {
               id: 4,
@@ -357,28 +450,28 @@ export default function PatientProfile() {
               location: "Alexandria",
               pricePerHour: 60,
               duration: 45,
-              state: "completed"
-            }
+              state: "completed",
+            },
           ],
           reports: [
             {
               id: 1,
               title: "Initial Assessment Report",
               date: "2025-11-01",
-              type: "Assessment"
+              type: "Assessment",
             },
             {
               id: 2,
               title: "Progress Report - Month 1",
               date: "2025-12-01",
-              type: "Progress"
+              type: "Progress",
             },
             {
               id: 3,
               title: "Mid-Program Evaluation",
               date: "2025-12-15",
-              type: "Evaluation"
-            }
+              type: "Evaluation",
+            },
           ],
           employment: {
             patientSSN: "demo-patient-123",
@@ -387,7 +480,7 @@ export default function PatientProfile() {
             organizationName: "Able Care Center",
             jobTitle: "Physical Therapist Assistant",
             salary: 3500,
-            startDate: "2024-06-01"
+            startDate: "2024-06-01",
           },
         };
         setData(patientInfo);
@@ -455,93 +548,123 @@ export default function PatientProfile() {
             <h3>Patient Programs</h3>
             <div className="profile-cards-grid">
               {data.programs?.length ? (
-                data.programs.map((p) => (
-                  <div key={p.id} className="profile-program-card" style={{ display: "flex", gap: "16px", position: "relative" }}>
-                    <div style={{ flex: 1 }}>
-                      <div className="media" aria-hidden="true">
-                        {p.imgUrl || p.imageUrl ? (
-                          <img
-                            src={p.imgUrl || p.imageUrl}
-                            alt={p.name}
+                data.programs.map((p, index) => {
+                  const programKey = `${
+                    p.id || p.programId || `program-${index}`
+                  }-${index}`;
+                  const programImg =
+                    (typeof p.imgUrl === "string" && p.imgUrl?.trim?.()) ||
+                    (typeof p.imageUrl === "string" && p.imageUrl?.trim?.()) ||
+                    null;
+
+                  return (
+                    <div
+                      key={`${programKey}-${index}`}
+                      className="profile-program-card"
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div className="media" aria-hidden="true">
+                          {programImg ? (
+                            <img
+                              src={programImg}
+                              alt={p.name}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <div className="media-placeholder">Image</div>
+                          )}
+                        </div>
+
+                        <h4 className="h4" style={{ marginTop: 8 }}>
+                          {p.name}
+                        </h4>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 6, color: "#666" }}
+                        >
+                          {p.organizationName && `📍 ${p.organizationName}`}
+                        </p>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 4, color: "#888" }}
+                        >
+                          {p.startDate && p.endDate && (
+                            <>
+                              📅 {p.startDate} to {p.endDate}
+                            </>
+                          )}
+                        </p>
+
+                        {p.price && (
+                          <p
+                            className="small"
                             style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
+                              marginTop: 6,
+                              fontWeight: 700,
+                              color: "#27865d",
+                              fontSize: "1.05rem",
                             }}
-                          />
-                        ) : (
-                          <div className="media-placeholder">Image</div>
+                          >
+                            💰 ${p.price}
+                          </p>
+                        )}
+
+                        {p.status && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 600,
+                              color: "#555",
+                            }}
+                          >
+                            Status: {p.status}
+                          </p>
                         )}
                       </div>
 
-                      <h4 className="h4" style={{ marginTop: 8 }}>
-                        {p.name}
-                      </h4>
-
-                      <p className="small" style={{ marginTop: 6, color: "#666" }}>
-                        {p.organizationName && `📍 ${p.organizationName}`}
-                      </p>
-
-                      <p className="small" style={{ marginTop: 4, color: "#888" }}>
-                        {p.startDate && p.endDate && (
-                          <>
-                            📅 {p.startDate} to {p.endDate}
-                          </>
-                        )}
-                      </p>
-
-                      {p.price && (
-                        <p
-                          className="small"
-                          style={{
-                            marginTop: 6,
-                            fontWeight: 700,
-                            color: "#27865d",
-                            fontSize: "1.05rem",
-                          }}
-                        >
-                          💰 ${p.price}
-                        </p>
-                      )}
-
-                      {p.status && (
-                        <p
-                          className="small"
-                          style={{
-                            marginTop: 6,
-                            fontWeight: 600,
-                            color: "#555",
-                          }}
-                        >
-                          Status: {p.status}
-                        </p>
-                      )}
+                      <button
+                        className="withdraw-btn"
+                        onClick={() =>
+                          console.log(`Withdraw from program ${programKey}`)
+                        }
+                        style={{
+                          position: "absolute",
+                          bottom: "16px",
+                          right: "16px",
+                          padding: "8px 12px",
+                          background: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.background = "#c82333")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.background = "#dc3545")
+                        }
+                      >
+                        Withdraw
+                      </button>
                     </div>
-
-                    <button
-                      className="withdraw-btn"
-                      onClick={() => console.log(`Withdraw from program ${p.id}`)}
-                      style={{
-                        position: "absolute",
-                        bottom: "16px",
-                        right: "16px",
-                        padding: "8px 12px",
-                        background: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = "#c82333"}
-                      onMouseLeave={(e) => e.target.style.background = "#dc3545"}
-                    >
-                      Withdraw
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="empty-card">No enrolled program</div>
               )}
@@ -553,89 +676,117 @@ export default function PatientProfile() {
             <h3>Therapy Sessions</h3>
             <div className="profile-cards-grid">
               {data.sessions?.length ? (
-                data.sessions.map((s) => (
-                  <div key={s.id} className="profile-session-card" style={{ display: "flex", gap: "16px", position: "relative" }}>
-                    <div style={{ flex: 1 }}>
-                      <div className="media" aria-hidden="true">
-                        {s.imgUrl || s.imageUrl ? (
-                          <img
-                            src={s.imgUrl || s.imageUrl}
-                            alt={s.title}
+                data.sessions.map((s, index) => {
+                  const sessionKey = `${s.id || `session-${index}`}-${index}`;
+                  const sessionImg =
+                    (typeof s.imgUrl === "string" && s.imgUrl?.trim?.()) ||
+                    (typeof s.imageUrl === "string" && s.imageUrl?.trim?.()) ||
+                    null;
+
+                  return (
+                    <div
+                      key={`${sessionKey}-${index}`}
+                      className="profile-session-card"
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div className="media" aria-hidden="true">
+                          {sessionImg ? (
+                            <img
+                              src={sessionImg}
+                              alt={s.title}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <div className="media-placeholder">Image</div>
+                          )}
+                        </div>
+
+                        <h4 className="h4" style={{ marginTop: 8 }}>
+                          {s.title}
+                        </h4>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 6, color: "#666" }}
+                        >
+                          {s.centerName && `🏥 ${s.centerName}`}
+                        </p>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 4, color: "#888" }}
+                        >
+                          {s.location && `📍 ${s.location}`}
+                        </p>
+
+                        {s.pricePerHour && s.duration && (
+                          <p
+                            className="small"
                             style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
+                              marginTop: 6,
+                              fontWeight: 700,
+                              color: "#2e65f3",
+                              fontSize: "1.05rem",
                             }}
-                          />
-                        ) : (
-                          <div className="media-placeholder">Image</div>
+                          >
+                            💰 ${s.pricePerHour}/hr • ⏱️ {s.duration} min
+                          </p>
+                        )}
+
+                        {s.state && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 600,
+                              color: "#555",
+                            }}
+                          >
+                            Status: {s.state}
+                          </p>
                         )}
                       </div>
 
-                      <h4 className="h4" style={{ marginTop: 8 }}>
-                        {s.title}
-                      </h4>
-
-                      <p className="small" style={{ marginTop: 6, color: "#666" }}>
-                        {s.centerName && `🏥 ${s.centerName}`}
-                      </p>
-
-                      <p className="small" style={{ marginTop: 4, color: "#888" }}>
-                        {s.location && `📍 ${s.location}`}
-                      </p>
-
-                      {s.pricePerHour && s.duration && (
-                        <p
-                          className="small"
-                          style={{
-                            marginTop: 6,
-                            fontWeight: 700,
-                            color: "#2e65f3",
-                            fontSize: "1.05rem",
-                          }}
-                        >
-                          💰 ${s.pricePerHour}/hr • ⏱️ {s.duration} min
-                        </p>
-                      )}
-
-                      {s.state && (
-                        <p
-                          className="small"
-                          style={{
-                            marginTop: 6,
-                            fontWeight: 600,
-                            color: "#555",
-                          }}
-                        >
-                          Status: {s.state}
-                        </p>
-                      )}
+                      <button
+                        className="cancel-session-btn"
+                        onClick={() =>
+                          console.log(`Cancel session ${sessionKey}`)
+                        }
+                        style={{
+                          position: "absolute",
+                          bottom: "16px",
+                          right: "16px",
+                          padding: "8px 12px",
+                          background: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.background = "#c82333")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.background = "#dc3545")
+                        }
+                      >
+                        Cancel
+                      </button>
                     </div>
-
-                    <button
-                      className="cancel-session-btn"
-                      onClick={() => console.log(`Cancel session ${s.id}`)}
-                      style={{
-                        position: "absolute",
-                        bottom: "16px",
-                        right: "16px",
-                        padding: "8px 12px",
-                        background: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = "#c82333"}
-                      onMouseLeave={(e) => e.target.style.background = "#dc3545"}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="empty-card">No upcoming sessions</div>
               )}
@@ -650,13 +801,24 @@ export default function PatientProfile() {
                 <div className="avatar-circle">�</div>
                 <div style={{ flex: 1 }}>
                   <div className="employment-title">
-                    {data.employment.jobTitle} at {data.employment.organizationName}
+                    {data.employment.jobTitle} at{" "}
+                    {data.employment.organizationName}
                   </div>
                   <div className="employment-sub">
-                    Since {data.employment.startDate ? new Date(data.employment.startDate).toLocaleDateString() : "N/A"}
+                    Since{" "}
+                    {data.employment.startDate
+                      ? new Date(data.employment.startDate).toLocaleDateString()
+                      : "N/A"}
                   </div>
                   {data.employment.salary > 0 && (
-                    <div className="employment-sub" style={{ marginTop: 4, color: "#27865d", fontWeight: 600 }}>
+                    <div
+                      className="employment-sub"
+                      style={{
+                        marginTop: 4,
+                        color: "#27865d",
+                        fontWeight: 600,
+                      }}
+                    >
                       💰 ${data.employment.salary}/month
                     </div>
                   )}
@@ -678,8 +840,8 @@ export default function PatientProfile() {
                     cursor: "pointer",
                     transition: "all 0.3s ease",
                   }}
-                  onMouseEnter={(e) => e.target.style.background = "#c82333"}
-                  onMouseLeave={(e) => e.target.style.background = "#dc3545"}
+                  onMouseEnter={(e) => (e.target.style.background = "#c82333")}
+                  onMouseLeave={(e) => (e.target.style.background = "#dc3545")}
                 >
                   Resign
                 </button>

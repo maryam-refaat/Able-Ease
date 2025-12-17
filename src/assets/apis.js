@@ -3,6 +3,34 @@ import axios from "axios";
 const API_KEY = "";
 const BASE_URL = "https://localhost:7040/api"; // example: https://myserver.com/api
 
+// Fetch a single patient by SSN
+export const getPatientBySSN = async (ssn) => {
+  if (!ssn) return { data: null };
+
+  try {
+    const response = await fetch(`${BASE_URL}/Patients/GetPatientBySSN/${ssn}`);
+
+    if (!response.ok) {
+      console.warn(
+        `getPatientBySSN returned ${response.status}, falling back to demo data`
+      );
+      return { data: null }; // Fall back, don't throw
+    }
+
+    const data = await response.json();
+    console.log("getPatientBySSN raw response:", data); // Log full response
+
+    // Check different possible response structures
+    const patient = data?.data || data?.results || data || null;
+    console.log("getPatientBySSN extracted patient:", patient);
+
+    return { data: patient };
+  } catch (error) {
+    console.warn("getPatientBySSN failed:", error.message);
+    return { data: null }; // Return null to use fallback demo data
+  }
+};
+
 // get relative by id
 export const getUserInfo = async (token) => {
   const response = await fetch(`${BASE_URL}/relatives`, {
@@ -147,12 +175,30 @@ export const getOrg_Proposals = async (Oid) => {
   return { data: therapies };
 };
 export const getPatient_Reports = async (PSSN) => {
-  const response = await fetch(
-    `${BASE_URL}/Report/GetReportsByPatient/${PSSN}`
-  );
-  const data = await response.json();
-  const reports = data.results || data || [];
-  return { data: reports };
+  try {
+    const response = await fetch(
+      `${BASE_URL}/Report/GetReportsByPatient/${PSSN}`
+    );
+
+    if (!response.ok) {
+      console.warn(`getPatient_Reports returned ${response.status}`);
+      return { data: [] };
+    }
+
+    const text = await response.text();
+    if (!text) {
+      console.warn("getPatient_Reports returned empty response");
+      return { data: [] };
+    }
+
+    const data = JSON.parse(text);
+    console.log("getPatient_Reports data:", data);
+    const reports = data.data || data.results || data || [];
+    return { data: reports };
+  } catch (error) {
+    console.error("getPatient_Reports error:", error.message);
+    return { data: [] };
+  }
 };
 
 export const getPatient_Medicalinfo = async (PSSN) => {
@@ -236,7 +282,7 @@ export const AddPatientToProgram = async (PSSN, ProID, OSSN) => {
 
 export const AddPatientToTherapy = async (body) => {
   const formData = new FormData();
-  
+
   // Add all fields to FormData
   formData.append("Name", body.Name || "");
   formData.append("duration", body.duration || 0);
@@ -440,58 +486,147 @@ export const getProgramPatients = async (programId, ssn) => {
   return data;
 };
 
-
-
 export const getReportByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/report/getReportsByPatient/${Pssn}`);
+  const response = await fetch(
+    `${BASE_URL}/report/getReportsByPatient/${Pssn}`
+  );
   const data = await response.json();
   const Patient_reports = data.results || data || [];
   return { data: Patient_reports };
 };
 
-
 export const getTherapyByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/therapy/Patient/${Pssn}`);
-  const data = await response.json();
-  const Patient_therapies = data.results || data || [];
-  return { data: Patient_therapies };
+  try {
+    const response = await fetch(`${BASE_URL}/therapy/Patient/${Pssn}`);
+
+    if (!response.ok) {
+      console.warn(`getTherapyByPatient returned ${response.status}`);
+      return { data: [] };
+    }
+
+    const text = await response.text();
+    if (!text) {
+      console.warn("getTherapyByPatient returned empty response");
+      return { data: [] };
+    }
+
+    const data = JSON.parse(text);
+    console.log("getTherapyByPatient data:", data);
+    const Patient_therapies = data.data || data.results || data || [];
+    return { data: Patient_therapies };
+  } catch (error) {
+    console.error("getTherapyByPatient error:", error.message);
+    return { data: [] };
+  }
 };
 
 export const getWorkByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/PatientWork/getby-patient/${Pssn}`);
-  const data = await response.json();
-  const Patient_work = data.results || data || [];
-  return { data: Patient_work };
+  try {
+    const response = await fetch(
+      `${BASE_URL}/PatientWork/getby-patient/${Pssn}`
+    );
+
+    if (!response.ok) {
+      console.warn(`getWorkByPatient returned ${response.status}`);
+      return { data: [] };
+    }
+
+    const text = await response.text();
+    if (!text) {
+      console.warn("getWorkByPatient returned empty response");
+      return { data: [] };
+    }
+
+    const data = JSON.parse(text);
+    console.log("getWorkByPatient data:", data);
+    const Patient_work = data.data || data.results || data || [];
+    return { data: Patient_work };
+  } catch (error) {
+    console.error("getWorkByPatient error:", error.message);
+    return { data: [] };
+  }
 };
 
 export const getPatientDisability = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/Patientdisability/getpatientBisabilities/${Pssn}`);
+  const response = await fetch(
+    `${BASE_URL}/Patientdisability/getpatientBisabilities/${Pssn}`
+  );
   const data = await response.json();
   const Patient_disability = data.results || data || [];
   return { data: Patient_disability };
 };
 
 export const getFAByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/FinancialAid/getFinancialAidsByPatient/${Pssn}`);
+  const response = await fetch(
+    `${BASE_URL}/FinancialAid/getFinancialAidsByPatient/${Pssn}`
+  );
   const data = await response.json();
   const Patient_work = data.results || data || [];
   return { data: Patient_work };
 };
 
 export const getProgramByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/getProgramByPatientSSN/${Pssn}`);
-  const data = await response.json();
-  const patient_prog = data.results || data || [];
-  return { data: patient_prog };
+  try {
+    const response = await fetch(
+      `${BASE_URL}/patients/getProgramByPatientSSN/${Pssn}`
+    );
+
+    if (!response.ok) {
+      console.warn(`getProgramByPatient returned ${response.status}`);
+      return { data: [] };
+    }
+
+    const text = await response.text();
+    if (!text) {
+      console.warn("getProgramByPatient returned empty response");
+      return { data: [] };
+    }
+
+    const data = JSON.parse(text);
+    console.log("getProgramByPatient raw data:", data);
+
+    // The API returns a SINGLE PROGRAM OBJECT directly
+    // Check if it's a program object (has id and name fields)
+    if (data?.id && data?.name) {
+      const program = {
+        id: data.id,
+        name: data.name,
+        organizationSSN: data.organizationSSN || "",
+        organizationName: data.organizationName || "",
+        startDate: data.startDate || "",
+        endDate: data.endDate || "",
+        status: data.status || "Active",
+        price: data.price || 0,
+        imageUrl: data.imageUrl || "",
+        imgUrl: data.imageUrl || "", // Add both for compatibility
+        location: data.location || "",
+      };
+      console.log("getProgramByPatient extracted program:", program);
+      return { data: [program] }; // Wrap in array since code expects array
+    }
+
+    // If it's already an array, return as is
+    if (Array.isArray(data)) {
+      return { data };
+    }
+
+    // Otherwise try standard extraction
+    const patient_prog = data?.data || data?.results || [];
+    return { data: patient_prog };
+  } catch (error) {
+    console.error("getProgramByPatient error:", error.message);
+    return { data: [] };
+  }
 };
 
 export const getMedicalInfoByPatient = async (Pssn) => {
-  const response = await fetch(`${BASE_URL}/MedicalInfo/GetMedicalInfoByPatient/${Pssn}`);
+  const response = await fetch(
+    `${BASE_URL}/MedicalInfo/GetMedicalInfoByPatient/${Pssn}`
+  );
   const data = await response.json();
   const patient_prog = data.results || data || [];
   return { data: patient_prog };
 };
-
 
 export const sendMssg = async (body) => {
   const response = await fetch(`${BASE_URL}/Message/send/contact`, {
