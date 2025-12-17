@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../profilepagecomponents/profile.css";
 import "./messages.css";
 import Footer from "../Components/Footer";
-import{getReceived_msgs, getSent_msgs,getUser_data} from "../assets/apis";
+import{getReceived_msgs, getSent_msgs,sendMssg} from "../assets/apis";
 import Sidebar from "../Components/Sidebar";
 
 
@@ -208,7 +208,7 @@ export default function Messages() {
     return { ...data, userType };
   });
   
-  const userSSN = userData.ssn || localStorage.getItem("userSSN") || "current-user-ssn";
+  const userSSN = userData.ssn || localStorage.getItem("ssn") || "current-user-ssn";
 
   // Fetch user name by SSN with caching
   const fetchUserName = async (ssn) => {
@@ -229,34 +229,43 @@ export default function Messages() {
 
   // Transform API message to conversation format
   const transformMessage = async (msg, type) => {
-    const senderSSN = msg.SenderSSN || msg.senderSSN || msg.sender_SSN;
-    const receiverSSN = msg.ReceivedSSN || msg.receivedSSN || msg.receiver_SSN || msg.ReceiverSSN;
-    const subject = msg.Subject || msg.subject || "(no subject)";
-    const body = msg.Body || msg.body || msg.message || "";
-    const sentDate = msg.SentDate || msg.sentDate || msg.datetime || new Date().toISOString();
+    const messageId = msg.MessageId ?? msg.messageId ?? `msg-${Date.now()}`;
+    const senderSSN = msg.SenderSSN ?? msg.senderSSN ?? "";
+    const senderName = msg.SenderName ?? msg.senderName ?? "";
+    const receiverSSN = msg.ReceiverSSN ?? msg.receiverSSN ?? "";
+    const receiverName = msg.ReceiverName ?? msg.receiverName ?? "";
+    const subject = msg.Subject ?? msg.subject ?? "(no subject)";
+    const body = msg.Body ?? msg.body ?? "";
+    const sentDate = msg.SentDate ?? msg.sentDate ?? new Date().toISOString();
+    const messageStatus = msg.MessageStatus ?? msg.messageStatus ?? 0;
+    const messageType = msg.MessageType ?? msg.messageType ?? "";
     
-    const senderName = await fetchUserName(senderSSN);
-    const receiverName = await fetchUserName(receiverSSN);
+    // Use provided names or fetch if not available
+    const displaySenderName = senderName || await fetchUserName(senderSSN);
+    const displayReceiverName = receiverName || await fetchUserName(receiverSSN);
     
     return {
-      id: msg.Id || msg.id || `msg-${senderSSN}-${Date.now()}`,
+      id: messageId,
       subject,
       participants: {
-        from: type === "sent" ? "You" : senderName,
-        to: type === "sent" ? receiverName : "You",
+        from: type === "sent" ? "You" : displaySenderName,
+        to: type === "sent" ? displayReceiverName : "You",
         fromSSN: senderSSN,
         toSSN: receiverSSN
       },
       snippet: body.slice(0, 120),
-      unread: msg.messageStatus === 0 || msg.MessageStatus === 0 || false,
+      unread: messageStatus === 0,
+      messageType,
       messages: [{
-        from: type === "sent" ? "You" : senderName,
-        to: type === "sent" ? receiverName : "You",
+        from: type === "sent" ? "You" : displaySenderName,
+        to: type === "sent" ? displayReceiverName : "You",
         subject,
         body,
         datetime: sentDate,
         senderSSN,
-        receiverSSN
+        receiverSSN,
+        messageStatus,
+        messageType
       }]
     };
   };

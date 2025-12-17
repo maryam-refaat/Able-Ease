@@ -6,10 +6,16 @@ import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
 import { setAuthState } from "../context/AuthState";
 
+import PatientProfileModal from "../Components/PatientProfileModal";
 import {
-  getPatient_Program,
-  getPatient_Therapies,
+  getPatientBySSN,
+  getProgramByPatient,
+  getTherapyByPatient,
+  getWorkByPatient,
   getPatient_Reports,
+  deletePatientFromProgram,
+  deletePatientSession,
+  deletePatientWork,
 } from "../assets/apis";
 import Footer from "../Components/Footer";
 
@@ -35,6 +41,18 @@ export default function PatientProfile() {
     // Navigate to home
     navigate("/");
   };
+
+  // Modal states for confirmations
+  const [withdrawModal, setWithdrawModal] = useState({
+    isOpen: false,
+    program: null,
+  });
+  const [cancelModal, setCancelModal] = useState({
+    isOpen: false,
+    session: null,
+  });
+  const [resignModal, setResignModal] = useState({ isOpen: false });
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     // Scroll to top when component mounts
@@ -72,38 +90,162 @@ export default function PatientProfile() {
         const patientId = candidateId || storedSSN || storedToken || null;
 
         if (patientId) {
-          // fetch related patient resources in parallel
-          const [progRes, therapiesRes, reportsRes] = await Promise.all([
-            getPatient_Program(patientId).catch(() => ({ data: [] })),
-            getPatient_Therapies(patientId).catch(() => ({ data: [] })),
-            getPatient_Reports(patientId).catch(() => ({ data: [] })),
-          ]);
+          console.log(`Fetching patient data for SSN: ${patientId}`);
+          // fetch patient core data + related resources in parallel
+          const [patientRes, progRes, therapiesRes, reportsRes, workRes] =
+            await Promise.all([
+              getPatientBySSN(patientId).catch((err) => {
+                console.error("getPatientBySSN error:", err);
+                return { data: null };
+              }),
+              getProgramByPatient(patientId).catch((err) => {
+                console.error("getProgramByPatient error:", err);
+                return { data: [] };
+              }),
+              getTherapyByPatient(patientId).catch((err) => {
+                console.error("getTherapyByPatient error:", err);
+                return { data: [] };
+              }),
+              getPatient_Reports(patientId).catch((err) => {
+                console.error("getPatient_Reports error:", err);
+                return { data: [] };
+              }),
+              getWorkByPatient(patientId).catch((err) => {
+                console.error("getWorkByPatient error:", err);
+                return { data: [] };
+              }),
+            ]);
 
-          const programs = Array.isArray(progRes?.data) ? progRes.data : [];
+          console.log("ALL RESPONSES:", {
+            patientRes,
+            progRes,
+            therapiesRes,
+            reportsRes,
+            workRes,
+          });
+
+          const patientEntity = patientRes?.data ?? null;
+          const patientBase = patientEntity
+            ? {
+                fullName:
+                  patientEntity.name || patientEntity.fullName || base.fullName,
+                phone:
+                  patientEntity.contactInfo ||
+                  patientEntity.phone ||
+                  base.phone,
+                email: patientEntity.email || base.email,
+                gender: patientEntity.gender || base.gender,
+                address: patientEntity.address || base.address,
+                birthDate:
+                  patientEntity.birthDate ||
+                  patientEntity.birthdate ||
+                  base.birthDate,
+                ssn: patientEntity.ssn || patientId,
+                relativeName: patientEntity.relativeName,
+                caregiverName: patientEntity.caregiverName,
+                programId: patientEntity.programId,
+                programName: patientEntity.programName,
+                programOrganizationSSN: patientEntity.programOrganizationSSN,
+                avatar: patientEntity.avatar || base.avatar,
+              }
+            : {};
+
+          const rawPrograms = Array.isArray(progRes?.data) ? progRes.data : [];
           const therapies = Array.isArray(therapiesRes?.data)
             ? therapiesRes.data
             : [];
           const reports = Array.isArray(reportsRes?.data)
             ? reportsRes.data
             : [];
+          const rawWork = Array.isArray(workRes?.data) ? workRes.data : [];
 
-          // normalize therapies -> sessions (best-effort mapping)
-          const sessions = therapies.map((t, i) => ({
-            id: t.id ?? t.therapyId ?? `t-${i}`,
-            title: t.name ?? t.title ?? t.therapyName ?? "Therapy",
-            location:
-              t.location ?? t.centerLocation ?? t.center?.location ?? "",
-            state: t.state ?? t.status ?? "scheduled",
+          // normalize programs mapping with API field names
+          const programs = rawPrograms.map((p, i) => ({
+            id: p.id ?? p.programId ?? `p-${i}`,
+            organizationSSN: p.organizationSSN ?? "",
+            name: p.name ?? "Program",
+            organizationName: p.organizationName ?? "",
+            startDate: p.startDate ?? "",
+            endDate: p.endDate ?? "",
+            status: p.status ?? "Unknown",
+            price: p.price ?? 0,
+            imageUrl: p.imageUrl ?? "",
+            imgUrl: p.imageUrl ?? "",
+            location: p.location ?? "",
           }));
 
+          // normalize therapies -> sessions using API field names
+          const sessions = therapies.map((t, i) => {
+            const rawImg =
+              t?.imageUrl ??
+              t?.imgUrl ??
+              t?.image ??
+              t?.img ??
+              t?.photoUrl ??
+              t?.pictureUrl ??
+              t?.ImageUrl ??
+              t?.Image ??
+              t?.imagePath ??
+              t?.fileUrl ??
+              t?.filePath ??
+              "";
+
+            const safeImg =
+              typeof rawImg === "string" && rawImg.trim().length > 0
+                ? rawImg.trim()
+                : "";
+
+            return {
+              id: t.id ?? `t-${i}`,
+              title: t.name ?? "Therapy",
+              centerName: t.center?.name ?? "",
+              location: t.center?.location ?? "",
+              pricePerHour: t.pricePerHour ?? 0,
+              duration: t.duration ?? 0,
+              doctorname: t.doctorname ?? "",
+              therapyDetails: t.therapyDetails ?? "",
+              date: t.date ?? "",
+              imageUrl: safeImg,
+              imgUrl: safeImg,
+              centerID: t.centerID ?? "",
+              state: t.date ? "scheduled" : "pending",
+            };
+          });
+
+          // normalize employment data using API field names
+          const employment =
+            rawWork.length > 0
+              ? {
+                  patientSSN:
+                    rawWork[0].PatientSSN ?? rawWork[0].patientSSN ?? "",
+                  organizationSSN:
+                    rawWork[0].OrganizationSSN ??
+                    rawWork[0].organizationSSN ??
+                    "",
+                  patientName:
+                    rawWork[0].PatientName ?? rawWork[0].patientName ?? "",
+                  organizationName:
+                    rawWork[0].OrganizationName ??
+                    rawWork[0].organizationName ??
+                    "",
+                  jobTitle: rawWork[0].JobTitle ?? rawWork[0].jobTitle ?? "",
+                  salary: rawWork[0].Salary ?? rawWork[0].salary ?? 0,
+                  startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
+                }
+              : null;
+
+          // Use API data if available, otherwise use base/demo data
           const merged = {
             ...base,
-            programs,
-            sessions,
-            reports,
+            ...patientBase,
+            programs: programs.length > 0 ? programs : base.programs || [],
+            sessions: sessions.length > 0 ? sessions : base.sessions || [],
+            reports: reports.length > 0 ? reports : base.reports || [],
+            employment: employment || base.employment || null,
           };
 
           setData(merged);
+          console.log("Patient data loaded:", merged);
         } else {
           // no identifier found — keep state data if any, otherwise use stored localStorage data
           if (Object.keys(base).length) {
@@ -123,31 +265,97 @@ export default function PatientProfile() {
               fullName:
                 localStorage.getItem("patientName") ||
                 storedData?.fullName ||
-                "Patient Name",
+                "John Smith",
               email:
                 localStorage.getItem("patientEmail") ||
                 storedData?.email ||
-                "patient@example.com",
+                "john.smith@example.com",
               phone:
                 localStorage.getItem("patientPhone") ||
                 storedData?.phone ||
-                "+1 234 567 8900",
+                "+1 555 123 4567",
               gender:
                 localStorage.getItem("patientGender") ||
                 storedData?.gender ||
-                "Not specified",
+                "Male",
               address:
                 localStorage.getItem("patientAddress") ||
                 storedData?.address ||
-                "Address not available",
+                "123 Main Street, Cairo, Egypt",
               birthDate:
                 localStorage.getItem("patientBirthDate") ||
                 storedData?.birthDate ||
-                "",
-              ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
-              programs: [],
-              sessions: [],
-              reports: [],
+                "1990-05-15",
+              ssn:
+                localStorage.getItem("patientSSN") ||
+                storedData?.ssn ||
+                "demo-patient-123",
+              programs: [
+                {
+                  id: 1,
+                  name: "Physical Therapy Program",
+                  organizationName: "Able Care Center",
+                  startDate: "2025-12-20",
+                  endDate: "2026-03-20",
+                  status: "Active",
+                  price: 150,
+                },
+              ],
+              sessions: [
+                {
+                  id: 1,
+                  title: "Physiotherapy Session - Week 1",
+                  centerName: "Able Care Center",
+                  location: "Cairo",
+                  pricePerHour: 50,
+                  duration: 60,
+                  state: "completed",
+                },
+                {
+                  id: 2,
+                  title: "Physiotherapy Session - Week 2",
+                  centerName: "Able Care Center",
+                  location: "Cairo",
+                  pricePerHour: 50,
+                  duration: 60,
+                  state: "scheduled",
+                },
+                {
+                  id: 3,
+                  title: "Aquatic Therapy",
+                  centerName: "Wellness Hub",
+                  location: "Giza",
+                  pricePerHour: 40,
+                  duration: 90,
+                  state: "scheduled",
+                },
+                {
+                  id: 4,
+                  title: "Occupational Therapy",
+                  centerName: "Care Plus",
+                  location: "Alexandria",
+                  pricePerHour: 60,
+                  duration: 45,
+                  state: "completed",
+                },
+              ],
+              reports: [
+                {
+                  id: 1,
+                  title: "Initial Assessment Report",
+                  date: "2025-11-01",
+                  type: "Assessment",
+                },
+              ],
+              employment: {
+                patientSSN: "demo-patient-123",
+                organizationSSN: "ORG-001",
+                patientName: "John Smith",
+                organizationName: "Able Care Center",
+                jobTitle: "Physical Therapist Assistant",
+                salary: 3500,
+                startDate: "2024-06-01",
+              },
             };
             setData(patientInfo);
           }
@@ -168,31 +376,127 @@ export default function PatientProfile() {
           fullName:
             localStorage.getItem("patientName") ||
             storedData?.fullName ||
-            "Patient Name",
+            "John Smith",
           email:
             localStorage.getItem("patientEmail") ||
             storedData?.email ||
-            "patient@example.com",
+            "john.smith@example.com",
           phone:
             localStorage.getItem("patientPhone") ||
             storedData?.phone ||
-            "+1 234 567 8900",
+            "+1 555 123 4567",
           gender:
             localStorage.getItem("patientGender") ||
             storedData?.gender ||
-            "Not specified",
+            "Male",
           address:
             localStorage.getItem("patientAddress") ||
             storedData?.address ||
-            "Address not available",
+            "123 Main Street, Cairo, Egypt",
           birthDate:
             localStorage.getItem("patientBirthDate") ||
             storedData?.birthDate ||
-            "",
-          ssn: localStorage.getItem("patientSSN") || storedData?.ssn || "",
-          programs: [],
-          sessions: [],
-          reports: [],
+            "1990-05-15",
+          ssn:
+            localStorage.getItem("patientSSN") ||
+            storedData?.ssn ||
+            "demo-patient-123",
+          programs: [
+            {
+              id: 1,
+              name: "Physical Therapy Program",
+              organizationName: "Able Care Center",
+              startDate: "2025-12-20",
+              endDate: "2026-03-20",
+              status: "Active",
+              price: 150,
+            },
+            {
+              id: 2,
+              name: "Rehabilitation Program",
+              organizationName: "Wellness Hub",
+              startDate: "2026-01-05",
+              endDate: "2026-04-05",
+              status: "Active",
+              price: 180,
+            },
+            {
+              id: 3,
+              name: "Mobility Enhancement",
+              organizationName: "Care Plus",
+              startDate: "2025-11-01",
+              endDate: "2025-12-15",
+              status: "Completed",
+              price: 200,
+            },
+          ],
+          sessions: [
+            {
+              id: 1,
+              title: "Physiotherapy Session - Week 1",
+              centerName: "Able Care Center",
+              location: "Cairo",
+              pricePerHour: 50,
+              duration: 60,
+              state: "completed",
+            },
+            {
+              id: 2,
+              title: "Physiotherapy Session - Week 2",
+              centerName: "Able Care Center",
+              location: "Cairo",
+              pricePerHour: 50,
+              duration: 60,
+              state: "scheduled",
+            },
+            {
+              id: 3,
+              title: "Aquatic Therapy",
+              centerName: "Wellness Hub",
+              location: "Giza",
+              pricePerHour: 40,
+              duration: 90,
+              state: "scheduled",
+            },
+            {
+              id: 4,
+              title: "Occupational Therapy",
+              centerName: "Care Plus",
+              location: "Alexandria",
+              pricePerHour: 60,
+              duration: 45,
+              state: "completed",
+            },
+          ],
+          reports: [
+            {
+              id: 1,
+              title: "Initial Assessment Report",
+              date: "2025-11-01",
+              type: "Assessment",
+            },
+            {
+              id: 2,
+              title: "Progress Report - Month 1",
+              date: "2025-12-01",
+              type: "Progress",
+            },
+            {
+              id: 3,
+              title: "Mid-Program Evaluation",
+              date: "2025-12-15",
+              type: "Evaluation",
+            },
+          ],
+          employment: {
+            patientSSN: "demo-patient-123",
+            organizationSSN: "ORG-001",
+            patientName: "John Smith",
+            organizationName: "Able Care Center",
+            jobTitle: "Physical Therapist Assistant",
+            salary: 3500,
+            startDate: "2024-06-01",
+          },
         };
         setData(patientInfo);
       } finally {
@@ -235,6 +539,95 @@ export default function PatientProfile() {
     }
   };
 
+  // Handler functions for action buttons
+  const handleWithdrawClick = (program) => {
+    setWithdrawModal({ isOpen: true, program });
+  };
+
+  const handleWithdrawConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const program = withdrawModal.program;
+      const userSSN = localStorage.getItem("ssn");
+
+      // Call deletePatientFromProgram(programId, ssn, organizationSSN)
+      await deletePatientFromProgram(
+        program.id,
+        userSSN,
+        program.organizationSSN
+      );
+
+      console.log(`Successfully withdrew from program ${program?.id}`);
+      // Remove program from state
+      setData((prev) => ({
+        ...prev,
+        programs: prev.programs?.filter((p) => p.id !== program?.id) || [],
+      }));
+      setWithdrawModal({ isOpen: false, program: null });
+    } catch (err) {
+      console.error("Withdraw failed", err);
+      alert("Failed to withdraw from program. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancelSessionClick = (session) => {
+    setCancelModal({ isOpen: true, session });
+  };
+
+  const handleCancelSessionConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const session = cancelModal.session;
+
+      // Call deletePatientSession(therapyId)
+      await deletePatientSession(session.id);
+
+      console.log(`Successfully cancelled session ${session?.id}`);
+      // Remove session from state
+      setData((prev) => ({
+        ...prev,
+        sessions: prev.sessions?.filter((s) => s.id !== session?.id) || [],
+      }));
+      setCancelModal({ isOpen: false, session: null });
+    } catch (err) {
+      console.error("Cancel session failed", err);
+      alert("Failed to cancel session. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleResignClick = () => {
+    setResignModal({ isOpen: true });
+  };
+
+  const handleResignConfirm = async () => {
+    setActionLoading(true);
+    try {
+      const userSSN = localStorage.getItem("ssn");
+      const organizationSSN = data.employment?.organizationSSN;
+
+      if (!organizationSSN) {
+        throw new Error("Organization SSN not found");
+      }
+
+      // Call deletePatientWork(ssn, organizationSSN)
+      await deletePatientWork(userSSN, organizationSSN);
+
+      console.log("Successfully resigned from employment");
+      // Remove employment from state
+      setData((prev) => ({ ...prev, employment: null }));
+      setResignModal({ isOpen: false });
+    } catch (err) {
+      console.error("Resign failed", err);
+      alert("Failed to resign from employment. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (isLoading) return <div className="page-container">Loading...</div>;
   if (isError) return <div className="page-container">Error loading data.</div>;
 
@@ -256,15 +649,124 @@ export default function PatientProfile() {
 
           {/* Program section */}
           <section className="card-section">
-            <h3>Patient Program if enrolled</h3>
-            <div className="card-content">
+            <h3>Patient Programs</h3>
+            <div className="profile-cards-grid">
               {data.programs?.length ? (
-                data.programs.map((p) => (
-                  <div key={p.id} className="program-card big">
-                    <div className="program-title">{p.name}</div>
-                    <div className="program-state">State: {p.state}</div>
-                  </div>
-                ))
+                data.programs.map((p, index) => {
+                  const programKey = `${
+                    p.id || p.programId || `program-${index}`
+                  }-${index}`;
+                  const programImg =
+                    (typeof p.imgUrl === "string" && p.imgUrl?.trim?.()) ||
+                    (typeof p.imageUrl === "string" && p.imageUrl?.trim?.()) ||
+                    null;
+
+                  return (
+                    <div
+                      key={`${programKey}-${index}`}
+                      className="profile-program-card"
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div className="media" aria-hidden="true">
+                          {programImg ? (
+                            <img
+                              src={programImg}
+                              alt={p.name}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <div className="media-placeholder">Image</div>
+                          )}
+                        </div>
+
+                        <h4 className="h4" style={{ marginTop: 8 }}>
+                          {p.name}
+                        </h4>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 6, color: "#666" }}
+                        >
+                          {p.organizationName && `📍 ${p.organizationName}`}
+                        </p>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 4, color: "#888" }}
+                        >
+                          {p.startDate && p.endDate && (
+                            <>
+                              📅 {p.startDate} to {p.endDate}
+                            </>
+                          )}
+                        </p>
+
+                        {p.price && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 700,
+                              color: "#27865d",
+                              fontSize: "1.05rem",
+                            }}
+                          >
+                            💰 ${p.price}
+                          </p>
+                        )}
+
+                        {p.status && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 600,
+                              color: "#555",
+                            }}
+                          >
+                            Status: {p.status}
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        className="withdraw-btn"
+                        onClick={() => handleWithdrawClick(p)}
+                        style={{
+                          position: "absolute",
+                          bottom: "16px",
+                          right: "16px",
+                          padding: "8px 12px",
+                          background: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.background = "#c82333")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.background = "#dc3545")
+                        }
+                      >
+                        Withdraw
+                      </button>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="empty-card">No enrolled program</div>
               )}
@@ -273,16 +775,118 @@ export default function PatientProfile() {
 
           {/* sessions */}
           <section className="card-section">
-            <h3>Coming sessions</h3>
-            <div className="card-content horizontal">
+            <h3>Therapy Sessions</h3>
+            <div className="profile-cards-grid">
               {data.sessions?.length ? (
-                data.sessions.map((s) => (
-                  <div key={s.id} className="session-card">
-                    <div className="session-title">{s.title}</div>
-                    <div className="session-loc">{s.location}</div>
-                    <div className="session-state">{s.state}</div>
-                  </div>
-                ))
+                data.sessions.map((s, index) => {
+                  const sessionKey = `${s.id || `session-${index}`}-${index}`;
+                  const sessionImg =
+                    (typeof s.imgUrl === "string" && s.imgUrl?.trim?.()) ||
+                    (typeof s.imageUrl === "string" && s.imageUrl?.trim?.()) ||
+                    null;
+
+                  return (
+                    <div
+                      key={`${sessionKey}-${index}`}
+                      className="profile-session-card"
+                      style={{
+                        display: "flex",
+                        gap: "16px",
+                        position: "relative",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div className="media" aria-hidden="true">
+                          {sessionImg ? (
+                            <img
+                              src={sessionImg}
+                              alt={s.title}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <div className="media-placeholder">Image</div>
+                          )}
+                        </div>
+
+                        <h4 className="h4" style={{ marginTop: 8 }}>
+                          {s.title}
+                        </h4>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 6, color: "#666" }}
+                        >
+                          {s.centerName && `🏥 ${s.centerName}`}
+                        </p>
+
+                        <p
+                          className="small"
+                          style={{ marginTop: 4, color: "#888" }}
+                        >
+                          {s.location && `📍 ${s.location}`}
+                        </p>
+
+                        {s.pricePerHour && s.duration && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 700,
+                              color: "#2e65f3",
+                              fontSize: "1.05rem",
+                            }}
+                          >
+                            💰 ${s.pricePerHour}/hr • ⏱️ {s.duration} min
+                          </p>
+                        )}
+
+                        {s.state && (
+                          <p
+                            className="small"
+                            style={{
+                              marginTop: 6,
+                              fontWeight: 600,
+                              color: "#555",
+                            }}
+                          >
+                            Status: {s.state}
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        className="cancel-session-btn"
+                        onClick={() => handleCancelSessionClick(s)}
+                        style={{
+                          position: "absolute",
+                          bottom: "16px",
+                          right: "16px",
+                          padding: "8px 12px",
+                          background: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.background = "#c82333")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.background = "#dc3545")
+                        }
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="empty-card">No upcoming sessions</div>
               )}
@@ -291,19 +895,60 @@ export default function PatientProfile() {
 
           {/* employment */}
           <section className="card-section">
-            <h3>Employment (position and organization)</h3>
-            <div className="employment-card">
-              <div className="avatar-circle">👤</div>
-              <div>
-                <div className="employment-title">
-                  {data?.employment?.position || "Job description"}{" "}
-                  {data?.employment?.since && `since ${data.employment.since}`}
+            <h3>Employment</h3>
+            {data?.employment ? (
+              <div className="employment-card" style={{ position: "relative" }}>
+                <div className="avatar-circle">�</div>
+                <div style={{ flex: 1 }}>
+                  <div className="employment-title">
+                    {data.employment.jobTitle} at{" "}
+                    {data.employment.organizationName}
+                  </div>
+                  <div className="employment-sub">
+                    Since{" "}
+                    {data.employment.startDate
+                      ? new Date(data.employment.startDate).toLocaleDateString()
+                      : "N/A"}
+                  </div>
+                  {data.employment.salary > 0 && (
+                    <div
+                      className="employment-sub"
+                      style={{
+                        marginTop: 4,
+                        color: "#27865d",
+                        fontWeight: 600,
+                      }}
+                    >
+                      💰 ${data.employment.salary}/month
+                    </div>
+                  )}
                 </div>
-                <div className="employment-sub">
-                  {data?.employment?.organization || "manager details"}
-                </div>
+                <button
+                  className="resign-btn"
+                  onClick={handleResignClick}
+                  style={{
+                    position: "absolute",
+                    bottom: "16px",
+                    right: "16px",
+                    padding: "8px 12px",
+                    background: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => (e.target.style.background = "#c82333")}
+                  onMouseLeave={(e) => (e.target.style.background = "#dc3545")}
+                >
+                  Resign
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="empty-card">No employment information</div>
+            )}
           </section>
 
           {/* edit modal */}
@@ -386,6 +1031,45 @@ export default function PatientProfile() {
         </div>
       </div>
       <Footer />
+
+      {/* Confirmation Modals */}
+      <PatientProfileModal
+        isOpen={withdrawModal.isOpen}
+        onConfirm={handleWithdrawConfirm}
+        onCancel={() => setWithdrawModal({ isOpen: false, program: null })}
+        title="Withdraw from Program"
+        message={`Are you sure you want to withdraw from "${
+          withdrawModal.program?.name || "this program"
+        }"? This action cannot be undone.`}
+        confirmText="Withdraw"
+        isLoading={actionLoading}
+      />
+
+      <PatientProfileModal
+        isOpen={cancelModal.isOpen}
+        onConfirm={handleCancelSessionConfirm}
+        onCancel={() => setCancelModal({ isOpen: false, session: null })}
+        title="Cancel Session"
+        message={`Are you sure you want to cancel "${
+          cancelModal.session?.title || "this session"
+        }"? This action cannot be undone.`}
+        confirmText="Cancel Session"
+        isLoading={actionLoading}
+      />
+
+      <PatientProfileModal
+        isOpen={resignModal.isOpen}
+        onConfirm={handleResignConfirm}
+        onCancel={() => setResignModal({ isOpen: false })}
+        title="Resign from Employment"
+        message={`Are you sure you want to resign from your position as ${
+          data.employment?.jobTitle || "employee"
+        } at ${
+          data.employment?.organizationName || "this organization"
+        }? This action cannot be undone.`}
+        confirmText="Resign"
+        isLoading={actionLoading}
+      />
     </>
   );
 }

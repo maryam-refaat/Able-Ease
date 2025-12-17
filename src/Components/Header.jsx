@@ -77,6 +77,7 @@ export default function Header({ onJoin }) {
               <Link to="/about">About us</Link>
               <Link to="/organizations">Organizations</Link>
               <Link to="/therapy-centers">Therapy-Centers</Link>
+              <Link to="/insights">Insights</Link>
             </nav>
           </div>
 

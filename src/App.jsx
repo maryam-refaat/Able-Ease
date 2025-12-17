@@ -16,7 +16,9 @@ import AllProgram from "./Pages/AllProgram";
 import AllTherapies from "./Pages/AllTherapies";
 import AllEmployments from "./Pages/AllEmployments";
 import CaregiverProfile from "./Components/CareGiverProfile";
+
 import Physiocenterpage from "./Components/PhysioTherapyProfile";
+import WebsiteReports from "./Pages/WebsiteRepotrs";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/therapy-centers",
         element: <TherapyCenters />,
+      },
+      {
+        path: "/insights",
+        element: <WebsiteReports />,
       },
       {
         path: "/all-programs",
