@@ -110,7 +110,7 @@ export default function OrgEmploySection() {
   return (
     <section id="org">
       <div className="container">
-        <h3 className="section-title">
+        <h3 className="section-title2">
           Find Organizations Ready to Employ &gt;
         </h3>
 

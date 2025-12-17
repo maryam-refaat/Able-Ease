@@ -197,7 +197,7 @@ export default function Carousel() {
           marginBottom: 8,
         }}
       >
-        <h3 className="section-title" style={{ margin: 0 }}>
+        <h3 className="section-title2" style={{ margin: 0 }}>
           Don't miss coming programs &gt;&gt;
         </h3>
       </div>

@@ -233,7 +233,7 @@ export default function Landpage() {
       <br />
 
       <h2
-        className="program-title"
+        className="program-title2"
         style={{ paddingLeft: "160px", paddingBottom: "20px" }}
       >
         Meet Our Care Givers

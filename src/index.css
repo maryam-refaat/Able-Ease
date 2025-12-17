@@ -326,27 +326,19 @@ body, html, #root {
 }
 
 /* ---------- CONTAINER ---------- */
+
+.container_Programs,
+.container_employ,
 .container_Phy {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-}
-.container_employ {
-  max-width: 1200px;
-  margin: 0 ;
-  padding: 10px 20px;
-}
-.container_finan {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 20px;
-}
-
-
-.container_Programs {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 10px 20px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 30px auto 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+  padding-bottom: 40px;
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
 }
 /* ---------- HEADER ---------- */
 header {
@@ -569,24 +561,19 @@ header .auth-buttons {
   text-align:left;
   padding-left: 20px;
   padding-right: 20px;
-  padding-top: 60px;
+  padding-top: 20px;
   padding-bottom: 20px;
 }
 
-.hero h2 {
-  font-size: 55px;
-  margin: 0;
-  color: #243b4a;
-  font-weight: 800;
-  text-align: left;
-}
 
-.hero p {
-  margin-top: 12px;
+.hero-inner{
+  background: linear-gradient(135deg, #89CFF0 0%, #B19CD9 50%, #FFB6D9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+   margin-top: 0px;
   font-size: 42px;
-  color: #243b4a;
-  text-align: left;
-
+  text-align: left!important;
 }
 
 /* ---------- CAROUSEL ---------- */
@@ -594,9 +581,10 @@ header .auth-buttons {
  { margin: 18px 0; }
 
 .carousel {
-  max-width: 1000px;
+  max-width: 1400px;
   overflow: hidden;
 }
+
 
 .carousel-list {
   display: flex;
@@ -650,7 +638,7 @@ header .auth-buttons {
 }
 
 .btn:hover {
-  background: linear-gradient(135deg, #1e6b49 0%, #27865d 100%);
+  background: linear-gradient(135deg, #89CFF0 0%, #B19CD9 50%, #FFB6D9 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(22, 138, 72, 0.35);
 }
@@ -676,15 +664,45 @@ header .auth-buttons {
 @media (max-width: 720px) {
   .carousel-item { flex: 0 0 92%; }
 }
-/* ---------- SECTION TITLES ---------- */
-.section-title {
-  text-align: left;
-  margin-bottom:  40px;
-  margin-top: 0px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #243b4a;
+@media(max-width:1024){
+  .carousel{max-width: 1000px;}
 }
+/* ---------- SECTION TITLES ---------- */
+.section-title2 {
+  text-align: left;
+  margin-bottom: 40px;
+  margin-top: 0px;
+  font-size: 30px;
+  font-weight: 700;
+  color: #b49ddf;
+  font-family: 'Chewy';
+  padding-left: 20px !important;
+  /* Subtle shadow */
+  text-shadow: 
+    0 1px 2px rgba(0,0,0,0.08),
+    0 2px 6px rgba(21, 37, 47, 0.12);
+
+  /* Soft movement animation */
+  animation: title-float 3.2s ease-in-out infinite;
+}
+
+@keyframes title-float {
+  0%, 100% {
+    transform: translateY(0);
+    text-shadow: 
+      0 1px 2px rgba(0,0,0,0.08),
+      0 2px 6px rgba(38, 72, 94, 0.12);
+  }
+  50% {
+    transform: translateY(-4px);
+    text-shadow: 
+      0 2px 4px rgba(0,0,0,0.10),
+      0 4px 12px rgba(38,72,94,0.18);
+  }
+}
+
+
+
 
 /* ---------- ORG / EMPLOY SECTION ---------- */
 .org-grid {
@@ -720,9 +738,7 @@ header .auth-buttons {
 .org-card button:hover {
   background: #0d5939;
 }
-.container_employ{
-  max-width: 1000px;
-}
+
 
 /* ---------- FOOTER ---------- */
 footer {
@@ -793,7 +809,8 @@ footer a:hover {
      box-shadow:0 12px 30px rgba(3,15,10,0.06);
      }
 
-.section-title { display:flex; 
+.section-title
+ { display:flex; 
     align-items:center; 
     justify-content:space-between;
      margin-top:18px; 
@@ -815,7 +832,12 @@ footer a:hover {
     .Program_finds { padding: 20px 8% !important;}
     .center-card { min-width: 260px !important; max-width: 300px !important; }
     .slider-container {max-width: 1200px;}
+    .carousel{max-width: 1400px;}
    
+}
+@media (min-width: 1600px){
+    .carousel{max-width: 1500px;}
+
 }
 
 @media (min-width: 1024px) and (max-width: 1399px) {
