@@ -16,23 +16,19 @@ export const AuthProvider = ({ children }) => {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("ssn");
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.error("Failed to parse stored user data:", error);
-        localStorage.removeItem("ssn");
-      }
+    const storedSSN = localStorage.getItem("ssn");
+    if (storedSSN) {
+      // SSN is stored as a plain string, not JSON
+      setUser({ ssn: storedSSN });
+      setIsLoggedIn(true);
     }
   }, []);
 
   const login = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
-    localStorage.setItem("ssn", JSON.stringify(userData.ssn));
+    // Store SSN as a plain string, not JSON
+    localStorage.setItem("ssn", userData.ssn);
   };
 
   const logout = () => {

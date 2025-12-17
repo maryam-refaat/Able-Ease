@@ -226,17 +226,97 @@ export const getPatient_Program = async (PSSN) => {
 };
 
 export const getReceived_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}`);
-  const data = await response.json();
-  const Recieved = data.results || data || [];
+  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}/contact`);
+  const result = await response.json();
+  const Recieved = result.data || result.results || result || [];
   return { data: Recieved };
 };
 
 export const getSent_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`);
-  const data = await response.json();
-  const Sent = data.results || data || [];
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}/contact`);
+  const result = await response.json();
+  const Sent = result.data || result.results || result || [];
   return { data: Sent };
+};
+
+export const getReceivedJobApplications = async (receiverSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/received/${receiverSSN}/job-applications`
+  );
+  const result = await response.json();
+  const applications = result.data || result.results || result || [];
+  return { data: applications };
+};
+
+export const addPatientWork = async (body) => {
+  const response = await fetch(`${BASE_URL}/PatientWork/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+export const deleteReceivedMessage = async (receiverSSN, messageId) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/received/${receiverSSN}/delete/${messageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
+export const deleteSentMessage = async (senderSSN, messageId) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/sent/${senderSSN}/delete/${messageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
+export const rejectJobApplication = async (messageId) => {
+  const response = await fetch(`${BASE_URL}/Message/reject/${messageId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
 };
 
 export const getUser_data = async (USSN) => {
@@ -682,11 +762,47 @@ export const getWorkByPatient = async (Pssn) => {
 
 export const getPatientDisability = async (Pssn) => {
   const response = await fetch(
-    `${BASE_URL}/Patientdisability/getpatientBisabilities/${Pssn}`
+    `${BASE_URL}/Patientdisability/getpatientDisabilities/${Pssn}`
   );
   const data = await response.json();
   const Patient_disability = data.results || data || [];
   return { data: Patient_disability };
+};
+
+export const getAllDisabilities = async () => {
+  const response = await fetch(`${BASE_URL}/Disability/GetAllDisabilities`);
+  const data = await response.json();
+  const disabilities = data.results || data || [];
+  return { data: disabilities };
+};
+
+export const addPatientDisability = async (body) => {
+  const response = await fetch(
+    `${BASE_URL}/PatientDisability/AddDisabilityToPatient`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok) {
+    const errText = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+    throw new Error(
+      typeof errText === "string" ? errText : JSON.stringify(errText)
+    );
+  }
+
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+  return await response.text();
 };
 
 export const getFAByPatient = async (Pssn) => {
@@ -774,22 +890,40 @@ export const sendMssg = async (body) => {
   return data;
 };
 
-export const deletePatientSession = async (therapyId) => {
+export const getAllUsernames = async () => {
+  const response = await fetch(`${BASE_URL}/Account/GetUsernames`);
+  const data = await response.json();
+  const users = data.results || data || [];
+  return { data: users };
+};
+
+export const markMessageAsRead = async (receiverSSN, messageId) => {
   const response = await fetch(
-    `${BASE_URL}/Therapy/delete/${therapyId}`,
+    `${BASE_URL}/Message/received/${receiverSSN}/mark-seen/${messageId}`,
     {
-      method: "DELETE",
+      method: "PUT",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        "Content-Type": "application/json",
       },
     }
   );
+  const data = await response.json();
+  return data;
+};
+
+export const deletePatientSession = async (therapyId) => {
+  const response = await fetch(`${BASE_URL}/Therapy/delete/${therapyId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
 
   const data = await response.text();
   return data;
 };
 
-export const deletePatientWork = async (patientssn,ossn) => {
+export const deletePatientWork = async (patientssn, ossn) => {
   const response = await fetch(
     `${BASE_URL}/patientwork/delete/${patientssn}/${ossn}`,
     {
@@ -802,6 +936,44 @@ export const deletePatientWork = async (patientssn,ossn) => {
 
   const data = await response.text();
   return data;
+};
+
+// Forgot Password - sends reset email
+export const forgotPassword = async (email) => {
+  const response = await fetch(`${BASE_URL}/Account/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(email),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to send reset email: ${response.status}`);
+  }
+
+  return await response.text();
+};
+
+// Reset Password - reset with token
+export const resetPassword = async (email, token, newPassword) => {
+  const response = await fetch(`${BASE_URL}/Account/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      token,
+      newPassword,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to reset password: ${response.status}`);
+  }
+
+  return await response.text();
 };
 
 export default api;

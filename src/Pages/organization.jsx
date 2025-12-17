@@ -4,6 +4,8 @@ import AvailablePrograms from "../Components/AvailablePrograms";
 import FinancialAid from "../Components/FinancialAidOrg";
 import CareGiverBox from "../Components/CareGiverbox";
 import AvailableLocationsBox from "../Components/AvailablePositions";
+import JobApplications from "../Components/JobApplications";
+import Messages from "./Messages";
 import { useLocation, useNavigate } from "react-router-dom";
 import { setAuthState } from "../context/AuthState";
 import { useEffect, useState } from "react";
@@ -19,10 +21,24 @@ export default function Organizationpage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
   };
 
   useEffect(() => {
@@ -31,7 +47,24 @@ export default function Organizationpage() {
         setIsLoading(true);
 
         const orgSSN = localStorage.getItem("ssn");
+        const authToken = localStorage.getItem("authToken");
 
+        console.log("=== Organization Page Load ===");
+        console.log("SSN from localStorage:", orgSSN);
+        console.log("AuthToken from localStorage:", authToken);
+        console.log("All localStorage keys:", Object.keys(localStorage));
+
+        // Redirect to login if no SSN found
+        if (!orgSSN) {
+          console.error(
+            "❌ No organization SSN found in localStorage - redirecting to login"
+          );
+          setIsLoading(false);
+          navigate("/");
+          return;
+        }
+
+        console.log("✅ SSN found, fetching organization data...");
         const response = await fetch(
           `https://localhost:7040/api/organizations/getorganization/${orgSSN}`,
           {
@@ -80,7 +113,11 @@ export default function Organizationpage() {
           >
             <i className="fa-solid fa-users" aria-hidden="true"></i>
           </button>
-          <button className="side-btn" aria-label="messages">
+          <button
+            className="side-btn"
+            aria-label="messages"
+            onClick={() => setAppear(3)}
+          >
             <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
           </button>
           <button
@@ -115,14 +152,16 @@ export default function Organizationpage() {
           <h1>Welcome, {data?.name || data?.managerName || "Amanda"}</h1>
           <p>Tue, 07 June 2022</p>
         </header>
-        <RelativeCard title="Organization" data={data} />
+        {appear !== 3 && <RelativeCard title="Organization" data={data} />}
 
         {appear === 2 && <AvailableLocationsBox />}
         {appear === 1 && <CareGiverBox />}
+        {appear === 3 && <Messages showSidebar={false} showHeader={false} />}
         {appear === 0 && (
           <>
             <AvailablePrograms />
             <FinancialAid />
+            <JobApplications />
           </>
         )}
       </div>

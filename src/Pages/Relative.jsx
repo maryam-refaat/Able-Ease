@@ -21,10 +21,24 @@ export default function Relative() {
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.clear();
-    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
   };
 
   useEffect(() => {

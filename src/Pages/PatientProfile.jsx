@@ -12,7 +12,6 @@ import {
   getProgramByPatient,
   getTherapyByPatient,
   getWorkByPatient,
-  getPatient_Reports,
   deletePatientFromProgram,
   deletePatientSession,
   deletePatientWork,
@@ -33,13 +32,24 @@ export default function PatientProfile() {
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Clear all localStorage
-    localStorage.clear();
-    // Set auth state to logged out
-    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    // Navigate to home
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
   };
 
   // Modal states for confirmations
@@ -64,441 +74,158 @@ export default function PatientProfile() {
       try {
         setIsLoading(true);
 
-        // Determine patient identifier (prefer route state, fall back to localStorage token/SSN)
-        const fromState = location.state?.patientData;
-        const candidateId =
-          fromState?.id ??
-          fromState?.PSSN ??
-          fromState?.patientSSN ??
-          fromState?.ssn ??
-          null;
+        // Get SSN from localStorage
+        const storedSSN = localStorage.getItem("ssn");
 
-        // If we have basic patient data from navigation state, use it as base
-        let base = fromState ? { ...fromState } : {};
-
-        // Try other common places for an identifier
-        const storedToken = (() => {
-          try {
-            return JSON.parse(localStorage.getItem("authToken"));
-          } catch (e) {
-            return null;
-          }
-        })();
-
-        const storedSSN = localStorage.getItem("ssn") || null;
-
-        const patientId = candidateId || storedSSN || storedToken || null;
-
-        if (patientId) {
-          console.log(`Fetching patient data for SSN: ${patientId}`);
-          // fetch patient core data + related resources in parallel
-          const [patientRes, progRes, therapiesRes, reportsRes, workRes] =
-            await Promise.all([
-              getPatientBySSN(patientId).catch((err) => {
-                console.error("getPatientBySSN error:", err);
-                return { data: null };
-              }),
-              getProgramByPatient(patientId).catch((err) => {
-                console.error("getProgramByPatient error:", err);
-                return { data: [] };
-              }),
-              getTherapyByPatient(patientId).catch((err) => {
-                console.error("getTherapyByPatient error:", err);
-                return { data: [] };
-              }),
-              getPatient_Reports(patientId).catch((err) => {
-                console.error("getPatient_Reports error:", err);
-                return { data: [] };
-              }),
-              getWorkByPatient(patientId).catch((err) => {
-                console.error("getWorkByPatient error:", err);
-                return { data: [] };
-              }),
-            ]);
-
-          console.log("ALL RESPONSES:", {
-            patientRes,
-            progRes,
-            therapiesRes,
-            reportsRes,
-            workRes,
-          });
-
-          const patientEntity = patientRes?.data ?? null;
-          const patientBase = patientEntity
-            ? {
-                fullName:
-                  patientEntity.name || patientEntity.fullName || base.fullName,
-                phone:
-                  patientEntity.contactInfo ||
-                  patientEntity.phone ||
-                  base.phone,
-                email: patientEntity.email || base.email,
-                gender: patientEntity.gender || base.gender,
-                address: patientEntity.address || base.address,
-                birthDate:
-                  patientEntity.birthDate ||
-                  patientEntity.birthdate ||
-                  base.birthDate,
-                ssn: patientEntity.ssn || patientId,
-                relativeName: patientEntity.relativeName,
-                caregiverName: patientEntity.caregiverName,
-                programId: patientEntity.programId,
-                programName: patientEntity.programName,
-                programOrganizationSSN: patientEntity.programOrganizationSSN,
-                avatar: patientEntity.avatar || base.avatar,
-              }
-            : {};
-
-          const rawPrograms = Array.isArray(progRes?.data) ? progRes.data : [];
-          const therapies = Array.isArray(therapiesRes?.data)
-            ? therapiesRes.data
-            : [];
-          const reports = Array.isArray(reportsRes?.data)
-            ? reportsRes.data
-            : [];
-          const rawWork = Array.isArray(workRes?.data) ? workRes.data : [];
-
-          // normalize programs mapping with API field names
-          const programs = rawPrograms.map((p, i) => ({
-            id: p.id ?? p.programId ?? `p-${i}`,
-            organizationSSN: p.organizationSSN ?? "",
-            name: p.name ?? "Program",
-            organizationName: p.organizationName ?? "",
-            startDate: p.startDate ?? "",
-            endDate: p.endDate ?? "",
-            status: p.status ?? "Unknown",
-            price: p.price ?? 0,
-            imageUrl: p.imageUrl ?? "",
-            imgUrl: p.imageUrl ?? "",
-            location: p.location ?? "",
-          }));
-
-          // normalize therapies -> sessions using API field names
-          const sessions = therapies.map((t, i) => {
-            const rawImg =
-              t?.imageUrl ??
-              t?.imgUrl ??
-              t?.image ??
-              t?.img ??
-              t?.photoUrl ??
-              t?.pictureUrl ??
-              t?.ImageUrl ??
-              t?.Image ??
-              t?.imagePath ??
-              t?.fileUrl ??
-              t?.filePath ??
-              "";
-
-            const safeImg =
-              typeof rawImg === "string" && rawImg.trim().length > 0
-                ? rawImg.trim()
-                : "";
-
-            return {
-              id: t.id ?? `t-${i}`,
-              title: t.name ?? "Therapy",
-              centerName: t.center?.name ?? "",
-              location: t.center?.location ?? "",
-              pricePerHour: t.pricePerHour ?? 0,
-              duration: t.duration ?? 0,
-              doctorname: t.doctorname ?? "",
-              therapyDetails: t.therapyDetails ?? "",
-              date: t.date ?? "",
-              imageUrl: safeImg,
-              imgUrl: safeImg,
-              centerID: t.centerID ?? "",
-              state: t.date ? "scheduled" : "pending",
-            };
-          });
-
-          // normalize employment data using API field names
-          const employment =
-            rawWork.length > 0
-              ? {
-                  patientSSN:
-                    rawWork[0].PatientSSN ?? rawWork[0].patientSSN ?? "",
-                  organizationSSN:
-                    rawWork[0].OrganizationSSN ??
-                    rawWork[0].organizationSSN ??
-                    "",
-                  patientName:
-                    rawWork[0].PatientName ?? rawWork[0].patientName ?? "",
-                  organizationName:
-                    rawWork[0].OrganizationName ??
-                    rawWork[0].organizationName ??
-                    "",
-                  jobTitle: rawWork[0].JobTitle ?? rawWork[0].jobTitle ?? "",
-                  salary: rawWork[0].Salary ?? rawWork[0].salary ?? 0,
-                  startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
-                }
-              : null;
-
-          // Use API data if available, otherwise use base/demo data
-          const merged = {
-            ...base,
-            ...patientBase,
-            programs: programs.length > 0 ? programs : base.programs || [],
-            sessions: sessions.length > 0 ? sessions : base.sessions || [],
-            reports: reports.length > 0 ? reports : base.reports || [],
-            employment: employment || base.employment || null,
-          };
-
-          setData(merged);
-          console.log("Patient data loaded:", merged);
-        } else {
-          // no identifier found — keep state data if any, otherwise use stored localStorage data
-          if (Object.keys(base).length) {
-            setData(base);
-          } else {
-            // Try to get stored patient data from localStorage
-            const storedDataStr = localStorage.getItem("patientData");
-            let storedData = null;
-            try {
-              storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
-            } catch (e) {
-              console.error("Failed to parse stored patient data", e);
-            }
-
-            // Set structure with stored data or demo data
-            const patientInfo = {
-              fullName:
-                localStorage.getItem("patientName") ||
-                storedData?.fullName ||
-                "John Smith",
-              email:
-                localStorage.getItem("patientEmail") ||
-                storedData?.email ||
-                "john.smith@example.com",
-              phone:
-                localStorage.getItem("patientPhone") ||
-                storedData?.phone ||
-                "+1 555 123 4567",
-              gender:
-                localStorage.getItem("patientGender") ||
-                storedData?.gender ||
-                "Male",
-              address:
-                localStorage.getItem("patientAddress") ||
-                storedData?.address ||
-                "123 Main Street, Cairo, Egypt",
-              birthDate:
-                localStorage.getItem("patientBirthDate") ||
-                storedData?.birthDate ||
-                "1990-05-15",
-              ssn:
-                localStorage.getItem("patientSSN") ||
-                storedData?.ssn ||
-                "demo-patient-123",
-              programs: [
-                {
-                  id: 1,
-                  name: "Physical Therapy Program",
-                  organizationName: "Able Care Center",
-                  startDate: "2025-12-20",
-                  endDate: "2026-03-20",
-                  status: "Active",
-                  price: 150,
-                },
-              ],
-              sessions: [
-                {
-                  id: 1,
-                  title: "Physiotherapy Session - Week 1",
-                  centerName: "Able Care Center",
-                  location: "Cairo",
-                  pricePerHour: 50,
-                  duration: 60,
-                  state: "completed",
-                },
-                {
-                  id: 2,
-                  title: "Physiotherapy Session - Week 2",
-                  centerName: "Able Care Center",
-                  location: "Cairo",
-                  pricePerHour: 50,
-                  duration: 60,
-                  state: "scheduled",
-                },
-                {
-                  id: 3,
-                  title: "Aquatic Therapy",
-                  centerName: "Wellness Hub",
-                  location: "Giza",
-                  pricePerHour: 40,
-                  duration: 90,
-                  state: "scheduled",
-                },
-                {
-                  id: 4,
-                  title: "Occupational Therapy",
-                  centerName: "Care Plus",
-                  location: "Alexandria",
-                  pricePerHour: 60,
-                  duration: 45,
-                  state: "completed",
-                },
-              ],
-              reports: [
-                {
-                  id: 1,
-                  title: "Initial Assessment Report",
-                  date: "2025-11-01",
-                  type: "Assessment",
-                },
-              ],
-              employment: {
-                patientSSN: "demo-patient-123",
-                organizationSSN: "ORG-001",
-                patientName: "John Smith",
-                organizationName: "Able Care Center",
-                jobTitle: "Physical Therapist Assistant",
-                salary: 3500,
-                startDate: "2024-06-01",
-              },
-            };
-            setData(patientInfo);
-          }
+        if (!storedSSN) {
+          console.log("No SSN found in localStorage");
+          setIsLoading(false);
+          return;
         }
+
+        console.log(`Fetching patient data for SSN: ${storedSSN}`);
+
+        // fetch patient core data + related resources in parallel
+        const [patientRes, progRes, therapiesRes, workRes] = await Promise.all([
+          getPatientBySSN(storedSSN).catch((err) => {
+            console.error("getPatientBySSN error:", err);
+            return { data: null };
+          }),
+          getProgramByPatient(storedSSN).catch((err) => {
+            console.error("getProgramByPatient error:", err);
+            return { data: [] };
+          }),
+          getTherapyByPatient(storedSSN).catch((err) => {
+            console.error("getTherapyByPatient error:", err);
+            return { data: [] };
+          }),
+          getWorkByPatient(storedSSN).catch((err) => {
+            console.error("getWorkByPatient error:", err);
+            return { data: [] };
+          }),
+        ]);
+
+        console.log("ALL RESPONSES:", {
+          patientRes,
+          progRes,
+          therapiesRes,
+          workRes,
+        });
+
+        const patientEntity = patientRes?.data ?? null;
+        const patientBase = patientEntity
+          ? {
+              fullName: patientEntity.name || patientEntity.fullName || "",
+              phone: patientEntity.contactInfo || patientEntity.phone || "",
+              email: patientEntity.email || "",
+              gender: patientEntity.gender || "",
+              address: patientEntity.address || "",
+              birthDate:
+                patientEntity.birthDate || patientEntity.birthdate || "",
+              ssn: patientEntity.ssn || storedSSN,
+              relativeName: patientEntity.relativeName,
+              caregiverName: patientEntity.caregiverName,
+              programId: patientEntity.programId,
+              programName: patientEntity.programName,
+              programOrganizationSSN: patientEntity.programOrganizationSSN,
+              avatar: patientEntity.avatar,
+            }
+          : { ssn: storedSSN };
+
+        const rawPrograms = Array.isArray(progRes?.data) ? progRes.data : [];
+        const therapies = Array.isArray(therapiesRes?.data)
+          ? therapiesRes.data
+          : [];
+        const rawWork = Array.isArray(workRes?.data) ? workRes.data : [];
+
+        // normalize programs mapping with API field names
+        const programs = rawPrograms.map((p, i) => ({
+          id: p.id ?? p.programId ?? `p-${i}`,
+          organizationSSN: p.organizationSSN ?? "",
+          name: p.name ?? "Program",
+          organizationName: p.organizationName ?? "",
+          startDate: p.startDate ?? "",
+          endDate: p.endDate ?? "",
+          status: p.status ?? "Unknown",
+          price: p.price ?? 0,
+          imageUrl: p.imageUrl ?? "",
+          imgUrl: p.imageUrl ?? "",
+          location: p.location ?? "",
+        }));
+
+        // normalize therapies -> sessions using API field names
+        const sessions = therapies.map((t, i) => {
+          const rawImg =
+            t?.imageUrl ??
+            t?.imgUrl ??
+            t?.image ??
+            t?.img ??
+            t?.photoUrl ??
+            t?.pictureUrl ??
+            t?.ImageUrl ??
+            t?.Image ??
+            t?.imagePath ??
+            t?.fileUrl ??
+            t?.filePath ??
+            "";
+
+          const safeImg =
+            typeof rawImg === "string" && rawImg.trim().length > 0
+              ? rawImg.trim()
+              : "";
+
+          return {
+            id: t.id ?? `t-${i}`,
+            title: t.name ?? "Therapy",
+            centerName: t.center?.name ?? "",
+            location: t.center?.location ?? "",
+            pricePerHour: t.pricePerHour ?? 0,
+            duration: t.duration ?? 0,
+            doctorname: t.doctorname ?? "",
+            therapyDetails: t.therapyDetails ?? "",
+            date: t.date ?? "",
+            imageUrl: safeImg,
+            imgUrl: safeImg,
+            centerID: t.centerID ?? "",
+            state: t.date ? "scheduled" : "pending",
+          };
+        });
+
+        // normalize employment data using API field names
+        const employment =
+          rawWork.length > 0
+            ? {
+                patientSSN:
+                  rawWork[0].PatientSSN ?? rawWork[0].patientSSN ?? "",
+                organizationSSN:
+                  rawWork[0].OrganizationSSN ??
+                  rawWork[0].organizationSSN ??
+                  "",
+                patientName:
+                  rawWork[0].PatientName ?? rawWork[0].patientName ?? "",
+                organizationName:
+                  rawWork[0].OrganizationName ??
+                  rawWork[0].organizationName ??
+                  "",
+                jobTitle: rawWork[0].JobTitle ?? rawWork[0].jobTitle ?? "",
+                salary: rawWork[0].Salary ?? rawWork[0].salary ?? 0,
+                startDate: rawWork[0].StartDate ?? rawWork[0].startDate ?? "",
+              }
+            : null;
+
+        // Set data from API response
+        const merged = {
+          ...patientBase,
+          programs: programs,
+          sessions: sessions,
+          employment: employment,
+        };
+
+        setData(merged);
+        console.log("Patient data loaded:", merged);
       } catch (error) {
         console.error("Error fetching patient data:", error);
-        // Try to get stored patient data from localStorage
-        const storedDataStr = localStorage.getItem("patientData");
-        let storedData = null;
-        try {
-          storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
-        } catch (e) {
-          console.error("Failed to parse stored patient data", e);
-        }
-
-        // Set data with stored values instead of error
-        const patientInfo = {
-          fullName:
-            localStorage.getItem("patientName") ||
-            storedData?.fullName ||
-            "John Smith",
-          email:
-            localStorage.getItem("patientEmail") ||
-            storedData?.email ||
-            "john.smith@example.com",
-          phone:
-            localStorage.getItem("patientPhone") ||
-            storedData?.phone ||
-            "+1 555 123 4567",
-          gender:
-            localStorage.getItem("patientGender") ||
-            storedData?.gender ||
-            "Male",
-          address:
-            localStorage.getItem("patientAddress") ||
-            storedData?.address ||
-            "123 Main Street, Cairo, Egypt",
-          birthDate:
-            localStorage.getItem("patientBirthDate") ||
-            storedData?.birthDate ||
-            "1990-05-15",
-          ssn:
-            localStorage.getItem("patientSSN") ||
-            storedData?.ssn ||
-            "demo-patient-123",
-          programs: [
-            {
-              id: 1,
-              name: "Physical Therapy Program",
-              organizationName: "Able Care Center",
-              startDate: "2025-12-20",
-              endDate: "2026-03-20",
-              status: "Active",
-              price: 150,
-            },
-            {
-              id: 2,
-              name: "Rehabilitation Program",
-              organizationName: "Wellness Hub",
-              startDate: "2026-01-05",
-              endDate: "2026-04-05",
-              status: "Active",
-              price: 180,
-            },
-            {
-              id: 3,
-              name: "Mobility Enhancement",
-              organizationName: "Care Plus",
-              startDate: "2025-11-01",
-              endDate: "2025-12-15",
-              status: "Completed",
-              price: 200,
-            },
-          ],
-          sessions: [
-            {
-              id: 1,
-              title: "Physiotherapy Session - Week 1",
-              centerName: "Able Care Center",
-              location: "Cairo",
-              pricePerHour: 50,
-              duration: 60,
-              state: "completed",
-            },
-            {
-              id: 2,
-              title: "Physiotherapy Session - Week 2",
-              centerName: "Able Care Center",
-              location: "Cairo",
-              pricePerHour: 50,
-              duration: 60,
-              state: "scheduled",
-            },
-            {
-              id: 3,
-              title: "Aquatic Therapy",
-              centerName: "Wellness Hub",
-              location: "Giza",
-              pricePerHour: 40,
-              duration: 90,
-              state: "scheduled",
-            },
-            {
-              id: 4,
-              title: "Occupational Therapy",
-              centerName: "Care Plus",
-              location: "Alexandria",
-              pricePerHour: 60,
-              duration: 45,
-              state: "completed",
-            },
-          ],
-          reports: [
-            {
-              id: 1,
-              title: "Initial Assessment Report",
-              date: "2025-11-01",
-              type: "Assessment",
-            },
-            {
-              id: 2,
-              title: "Progress Report - Month 1",
-              date: "2025-12-01",
-              type: "Progress",
-            },
-            {
-              id: 3,
-              title: "Mid-Program Evaluation",
-              date: "2025-12-15",
-              type: "Evaluation",
-            },
-          ],
-          employment: {
-            patientSSN: "demo-patient-123",
-            organizationSSN: "ORG-001",
-            patientName: "John Smith",
-            organizationName: "Able Care Center",
-            jobTitle: "Physical Therapist Assistant",
-            salary: 3500,
-            startDate: "2024-06-01",
-          },
-        };
-        setData(patientInfo);
+        setIsError(true);
       } finally {
         setIsLoading(false);
       }
@@ -951,7 +678,6 @@ export default function PatientProfile() {
             )}
           </section>
 
-          {/* edit modal */}
           {editing && (
             <div className="popup-overlay">
               <div className="popup-card">

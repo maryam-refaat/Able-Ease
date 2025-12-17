@@ -16,6 +16,7 @@ import AllProgram from "./Pages/AllProgram";
 import AllTherapies from "./Pages/AllTherapies";
 import AllEmployments from "./Pages/AllEmployments";
 import CaregiverProfile from "./Components/CareGiverProfile";
+import ResetPassword from "./Pages/ResetPassword";
 
 import Physiocenterpage from "./Components/PhysioTherapyProfile";
 import WebsiteReports from "./Pages/WebsiteRepotrs";
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
   {
     path: "/center-profile",
     element: <Physiocenterpage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
 ]);
 
