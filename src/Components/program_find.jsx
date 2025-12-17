@@ -95,7 +95,7 @@ export default function Programfind() {
     <section className="program-section">
       <div className="program-container">
         <div className="program-header">
-          <h2 className="program-title">
+          <h2 className="program-title2">
             Discover Our Programs
           </h2>
           <button className="program-view-btn">

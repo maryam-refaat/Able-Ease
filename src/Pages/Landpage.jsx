@@ -220,7 +220,7 @@ export default function Landpage() {
       <br />
       <br />
 
-      <h2  className="program-title" style={{ paddingLeft: "160px",paddingBottom:"20px" }}>Meet Our Care Givers</h2>
+      <h2  className="program-title2" style={{ paddingLeft: "160px",paddingBottom:"20px" }}>Meet Our Care Givers</h2>
 
       
       <SimpleCarousel images={[pic, pic, pic]} autoDelay={3000} />

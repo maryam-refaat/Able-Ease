@@ -253,9 +253,15 @@
 }
 
 .program-title {
+ 
+  font-size: 22px !important;
+  font-weight: 800;
+  background: linear-gradient(135deg, #198751 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
 }
 
 .program-org {
