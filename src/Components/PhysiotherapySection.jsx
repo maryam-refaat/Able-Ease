@@ -68,7 +68,7 @@ export default function PhysiotherapySection() {
             alignItems: "center",
           }}
         >
-          <h3 className="section-title" style={{ margin: 0 }}>
+          <h3 className="section-title2" style={{ margin: 0 }}>
             Physiotherapy Centers
           </h3>
 
