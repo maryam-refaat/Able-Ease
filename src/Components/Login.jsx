@@ -7,13 +7,15 @@ import RelativeSignUp from "./relativesign";
 import Modal from "./loginmodal";
 import CaretakerSignUp from "./caretakersign";
 import { useNavigate } from "react-router-dom";
-import { loginAPI } from "../assets/apis";
+import { loginAPI, forgotPassword } from "../assets/apis";
 import { setAuthState } from "../context/AuthState";
 const BASE_URL = "http://localhost:5174"; // example: https://myserver.com/api
 
 const AuthForm = () => {
   const [type, setType] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [forgotPasswordModal, setForgotPasswordModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
@@ -93,7 +95,7 @@ const AuthForm = () => {
       } else if (response.role == "Relative") {
         url = "/relative-profile";
       } else if (response.role == "Caregiver") {
-        url = "/caretaker-profile";
+        url = "/caregiver-profile";
       } else if (response.role == "Center") {
         url = "/center-profile";
       } else if (response.role == "Patient") {
@@ -105,6 +107,28 @@ const AuthForm = () => {
       console.error("Error during login:", error);
       setIsError(true);
       alert("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+
+    if (!forgotEmail || !forgotEmail.includes("@")) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await forgotPassword(forgotEmail);
+      alert("Password reset email sent! Please check your email inbox.");
+      setForgotPasswordModal(false);
+      setForgotEmail("");
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      alert("Failed to send reset email. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +163,14 @@ const AuthForm = () => {
             placeholder="Password"
             required
           />
-          <a href="#" className="forgot-password">
+          <a
+            href="#"
+            className="forgot-password"
+            onClick={(e) => {
+              e.preventDefault();
+              setForgotPasswordModal(true);
+            }}
+          >
             Forgot Password
           </a>
           <button type="submit" className="login-button" disabled={isLoading}>
@@ -148,7 +179,72 @@ const AuthForm = () => {
         </form>
       </div>
 
-      {/* POPUP */}
+      {/* FORGOT PASSWORD MODAL */}
+      {forgotPasswordModal && (
+        <Modal onClose={() => setForgotPasswordModal(false)}>
+          <div style={{ padding: "20px" }}>
+            <h3>Reset Password</h3>
+            <p style={{ marginBottom: "20px", color: "#6b7280" }}>
+              Enter your email address and we'll send you a link to reset your
+              password.
+            </p>
+            <form onSubmit={handleForgotPassword}>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginBottom: "15px",
+                  borderRadius: "6px",
+                  border: "1px solid #e6eef8",
+                  fontSize: "14px",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setForgotPasswordModal(false)}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "6px",
+                    border: "1px solid #e6eef8",
+                    background: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "6px",
+                    border: "none",
+                    background: "#1f73ff",
+                    color: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      )}
+
+      {/* SIGNUP MODAL */}
       {openModal && (
         <Modal onClose={() => setOpenModal(false)}>{renderForm()}</Modal>
       )}

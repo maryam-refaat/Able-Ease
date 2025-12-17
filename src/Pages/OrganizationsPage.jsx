@@ -12,6 +12,7 @@ import {
   getOrganizations,
   getOrg_Programs,
   getOrg_CareGivers,
+  getOrg_Proposals,
 } from "../assets/apis";
 
 /* Dummy fallback data */
@@ -140,9 +141,10 @@ export default function OrganizationsPage() {
 
     const loadData = async () => {
       try {
-        const [progRes, carRes] = await Promise.allSettled([
+        const [progRes, carRes, posRes] = await Promise.allSettled([
           getOrg_Programs(selectedOrg),
           getOrg_CareGivers(selectedOrg),
+          getOrg_Proposals(selectedOrg),
         ]);
 
         // Programs - only show dummy on API failure, not on empty array
@@ -155,8 +157,15 @@ export default function OrganizationsPage() {
           setPrograms(DUMMY_PROGRAMS);
         }
 
-        // Positions (using dummy data for now)
-        setPositions(DUMMY_POSITIONS);
+        // Positions - use API data if available
+        if (
+          posRes.status === "fulfilled" &&
+          Array.isArray(posRes.value?.data)
+        ) {
+          setPositions(posRes.value.data);
+        } else {
+          setPositions(DUMMY_POSITIONS);
+        }
 
         // Caregivers - only show dummy on API failure, not on empty array
         if (

@@ -4,16 +4,14 @@ import { useNavigate } from "react-router-dom";
 import "../profilepagecomponents/profile.css";
 import "./messages.css";
 import Footer from "../Components/Footer";
-import{getReceived_msgs, getSent_msgs,sendMssg} from "../assets/apis";
+import {
+  getReceived_msgs,
+  getSent_msgs,
+  sendMssg,
+  getAllUsernames,
+  markMessageAsRead,
+} from "../assets/apis";
 import Sidebar from "../Components/Sidebar";
-
-
-//NO API YET, USING DEMO DATA
-//NO API YET, USING DEMO DATA
-//NO API YET, USING DEMO DATA
-//NO API YET, USING DEMO DATA
-//NO API YET, USING DEMO DATA
-//NO API YET, USING DEMO DATA
 
 const DEMO_CONVERSATIONS = [
   {
@@ -137,7 +135,7 @@ const DEMO_CONVERSATIONS = [
   },
 ];
 
-export default function Messages() {
+export default function Messages({ showSidebar = true, showHeader = true }) {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [query, setQuery] = useState("");
@@ -147,17 +145,21 @@ export default function Messages() {
   const [activeTab, setActiveTab] = useState("received"); // "received" or "sent"
   const [loading, setLoading] = useState(true);
   const [userNameCache, setUserNameCache] = useState({}); // Cache SSN -> Name
+  const [allUsers, setAllUsers] = useState([]); // All users for compose combobox
   const listRef = useRef(null);
-  
+
   // Get user data from localStorage (patient or relative)
   const [userData] = useState(() => {
+    // Get SSN from localStorage
+    const storedSSN = localStorage.getItem("ssn");
+
     // Check if relative data exists
     const relativeDataStr = localStorage.getItem("relativeData");
     const patientDataStr = localStorage.getItem("patientData");
-    
+
     let data = null;
     let userType = "patient"; // default
-    
+
     // Try to load relative data first
     try {
       if (relativeDataStr) {
@@ -167,7 +169,7 @@ export default function Messages() {
     } catch (e) {
       console.error("Failed to parse relative data", e);
     }
-    
+
     // If no relative data, try patient data
     if (!data) {
       try {
@@ -179,47 +181,55 @@ export default function Messages() {
         console.error("Failed to parse patient data", e);
       }
     }
-    
+
     // Fallback to localStorage items
     if (!data) {
       const relativeName = localStorage.getItem("relativeName");
       const patientName = localStorage.getItem("patientName");
-      const relativeSSN = localStorage.getItem("relativeSSN");
-      const patientSSN = localStorage.getItem("patientSSN");
-      
-      if (relativeName || relativeSSN) {
+
+      if (relativeName) {
         userType = "relative";
         data = {
           fullName: relativeName || "Relative Name",
           email: localStorage.getItem("relativeEmail") || "",
           phone: localStorage.getItem("relativePhone") || "",
-          ssn: relativeSSN || localStorage.getItem("userSSN") || "current-user-ssn"
+          ssn: storedSSN,
         };
       } else {
         data = {
           fullName: patientName || "Patient Name",
           email: localStorage.getItem("patientEmail") || "",
           phone: localStorage.getItem("patientPhone") || "",
-          ssn: patientSSN || localStorage.getItem("userSSN") || "current-user-ssn"
+          ssn: storedSSN,
         };
       }
     }
-    
+
+    // Make sure SSN is always from localStorage
+    if (data && !data.ssn) {
+      data.ssn = storedSSN;
+    }
+
     return { ...data, userType };
   });
-  
-  const userSSN = userData.ssn || localStorage.getItem("ssn") || "current-user-ssn";
+
+  const userSSN = localStorage.getItem("ssn") || userData.ssn;
 
   // Fetch user name by SSN with caching
   const fetchUserName = async (ssn) => {
     if (!ssn || ssn === userSSN) return "You";
     if (userNameCache[ssn]) return userNameCache[ssn];
-    
+
     try {
       const result = await getUser_data(ssn);
       const userData = result?.data;
-      const name = userData?.Name || userData?.name || userData?.FullName || userData?.fullName || `User ${ssn.slice(0, 6)}`;
-      setUserNameCache(prev => ({ ...prev, [ssn]: name }));
+      const name =
+        userData?.Name ||
+        userData?.name ||
+        userData?.FullName ||
+        userData?.fullName ||
+        `User ${ssn.slice(0, 6)}`;
+      setUserNameCache((prev) => ({ ...prev, [ssn]: name }));
       return name;
     } catch (err) {
       console.error("Error fetching user name:", err);
@@ -239,11 +249,12 @@ export default function Messages() {
     const sentDate = msg.SentDate ?? msg.sentDate ?? new Date().toISOString();
     const messageStatus = msg.MessageStatus ?? msg.messageStatus ?? 0;
     const messageType = msg.MessageType ?? msg.messageType ?? "";
-    
+
     // Use provided names or fetch if not available
-    const displaySenderName = senderName || await fetchUserName(senderSSN);
-    const displayReceiverName = receiverName || await fetchUserName(receiverSSN);
-    
+    const displaySenderName = senderName || (await fetchUserName(senderSSN));
+    const displayReceiverName =
+      receiverName || (await fetchUserName(receiverSSN));
+
     return {
       id: messageId,
       subject,
@@ -251,22 +262,24 @@ export default function Messages() {
         from: type === "sent" ? "You" : displaySenderName,
         to: type === "sent" ? displayReceiverName : "You",
         fromSSN: senderSSN,
-        toSSN: receiverSSN
+        toSSN: receiverSSN,
       },
       snippet: body.slice(0, 120),
       unread: messageStatus === 0,
       messageType,
-      messages: [{
-        from: type === "sent" ? "You" : displaySenderName,
-        to: type === "sent" ? displayReceiverName : "You",
-        subject,
-        body,
-        datetime: sentDate,
-        senderSSN,
-        receiverSSN,
-        messageStatus,
-        messageType
-      }]
+      messages: [
+        {
+          from: type === "sent" ? "You" : displaySenderName,
+          to: type === "sent" ? displayReceiverName : "You",
+          subject,
+          body,
+          datetime: sentDate,
+          senderSSN,
+          receiverSSN,
+          messageStatus,
+          messageType,
+        },
+      ],
     };
   };
 
@@ -275,20 +288,49 @@ export default function Messages() {
     window.scrollTo(0, 0);
   }, []);
 
+  // Fetch all users when compose modal opens
+  useEffect(() => {
+    if (composeOpen && allUsers.length === 0) {
+      const fetchUsers = async () => {
+        try {
+          const response = await getAllUsernames();
+          const users = response?.data || [];
+          console.log("All users fetched:", users);
+          console.log("First user structure:", users[0]);
+          setAllUsers(users);
+        } catch (err) {
+          console.error("Failed to fetch users:", err);
+        }
+      };
+      fetchUsers();
+    }
+  }, [composeOpen, allUsers.length]);
+
   useEffect(() => {
     let mounted = true;
-    
+
     const fetchMessages = async () => {
+      // Validate userSSN before fetching
+      if (!userSSN) {
+        console.error("No userSSN found, cannot fetch messages");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         const [receivedRes, sentRes] = await Promise.allSettled([
           getReceived_msgs(userSSN),
-          getSent_msgs(userSSN)
+          getSent_msgs(userSSN),
         ]);
-        
-        const receivedMsgs = receivedRes.status === "fulfilled" ? (receivedRes.value?.data || []) : [];
-        const sentMsgs = sentRes.status === "fulfilled" ? (sentRes.value?.data || []) : [];
-        
+
+        const receivedMsgs =
+          receivedRes.status === "fulfilled"
+            ? receivedRes.value?.data || []
+            : [];
+        const sentMsgs =
+          sentRes.status === "fulfilled" ? sentRes.value?.data || [] : [];
+
         // If both API calls return empty, use demo data
         if (receivedMsgs.length === 0 && sentMsgs.length === 0) {
           if (mounted) {
@@ -297,20 +339,50 @@ export default function Messages() {
           }
           return;
         }
-        
+
         // Transform messages with user names
         const receivedConverted = await Promise.all(
-          receivedMsgs.map(msg => transformMessage(msg, "received"))
+          receivedMsgs.map((msg) => transformMessage(msg, "received"))
         );
         const sentConverted = await Promise.all(
-          sentMsgs.map(msg => transformMessage(msg, "sent"))
+          sentMsgs.map((msg) => transformMessage(msg, "sent"))
         );
-        
+
+        console.log("Received messages:", receivedConverted.length);
+        console.log("Sent messages:", sentConverted.length);
+
         if (mounted) {
-          // Combine and sort by date
-          const allConversations = [...receivedConverted, ...sentConverted]
-            .sort((a, b) => new Date(b.messages[0].datetime) - new Date(a.messages[0].datetime));
-          setConversations(allConversations);
+          // Combine and remove duplicates by messageId
+          const allConversations = [...receivedConverted, ...sentConverted];
+
+          // Remove duplicates by id
+          const uniqueConversations = allConversations.filter(
+            (conv, index, self) =>
+              index === self.findIndex((c) => c.id === conv.id)
+          );
+
+          // Sort by date
+          uniqueConversations.sort(
+            (a, b) =>
+              new Date(b.messages[0].datetime) -
+              new Date(a.messages[0].datetime)
+          );
+
+          console.log(
+            "Total unique conversations:",
+            uniqueConversations.length
+          );
+          console.log("Sample conversation:", uniqueConversations[0]);
+          console.log(
+            "All conversations:",
+            uniqueConversations.map((c) => ({
+              id: c.id,
+              subject: c.subject,
+              senderSSN: c.messages[0].senderSSN,
+              receiverSSN: c.messages[0].receiverSSN,
+            }))
+          );
+          setConversations(uniqueConversations);
         }
       } catch (err) {
         console.error("Error fetching messages:", err);
@@ -321,18 +393,38 @@ export default function Messages() {
         if (mounted) setLoading(false);
       }
     };
-    
+
     fetchMessages();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [userSSN]);
 
   // Filter by active tab (received or sent)
   const tabFiltered = conversations.filter((c) => {
     const lastMsg = c.messages[c.messages.length - 1];
+
+    // Skip messages without SSN fields (demo data)
+    if (!lastMsg.senderSSN || !lastMsg.receiverSSN) {
+      console.log("Skipping message without SSN fields:", c.id);
+      return false;
+    }
+
     if (activeTab === "received") {
-      return lastMsg.from !== "you@domain.com";
+      // Received messages: user is receiver (including self-messages)
+      const isReceived = lastMsg.receiverSSN === userSSN;
+      console.log(
+        `Message ${c.id}: receiverSSN=${lastMsg.receiverSSN}, senderSSN=${lastMsg.senderSSN}, userSSN=${userSSN}, isReceived=${isReceived}`
+      );
+      return isReceived;
     } else {
-      return lastMsg.from === "you@domain.com";
+      // Sent messages: user is sender AND not to self (exclude self-messages, they show in received)
+      const isSent =
+        lastMsg.senderSSN === userSSN && lastMsg.receiverSSN !== userSSN;
+      console.log(
+        `Message ${c.id}: senderSSN=${lastMsg.senderSSN}, userSSN=${userSSN}, isSent=${isSent}`
+      );
+      return isSent;
     }
   });
 
@@ -343,42 +435,84 @@ export default function Messages() {
       c.participants.from.toLowerCase().includes(query.toLowerCase())
   );
 
-  const selectConversation = (id) => {
+  const selectConversation = async (id) => {
     setSelectedId(id);
+    const conversation = conversations.find((c) => c.id === id);
+
+    // Mark as read in UI
     setConversations((prev) =>
       prev.map((c) => (c.id === id ? { ...c, unread: false } : c))
     );
+
+    // If message is unread and in received tab, mark as read on server
+    if (conversation && conversation.unread && activeTab === "received") {
+      try {
+        await markMessageAsRead(userSSN, id);
+        console.log("Message marked as read:", id);
+      } catch (err) {
+        console.error("Failed to mark message as read:", err);
+      }
+    }
   };
 
   const selected = conversations.find((c) => c.id === selectedId) || null;
 
-  const handleSend = () => {
-    if (!compose.to || !compose.body) return;
-    const newConv = {
-      id: `c${Date.now()}`,
-      subject: compose.subject || "(no subject)",
-      participants: { from: compose.to, to: "you@domain.com" },
-      snippet: compose.body.slice(0, 120),
-      unread: false,
-      messages: [
-        {
-          id: `m${Date.now()}`,
-          from: "you@domain.com",
-          to: compose.to,
-          subject: compose.subject,
-          body: compose.body,
-          datetime: new Date().toISOString(),
-          caregiver: "",
-          program: "",
-          organization: "",
+  const handleSend = async () => {
+    if (!compose.to || !compose.body) {
+      alert("Please select a recipient and write a message.");
+      return;
+    }
+
+    try {
+      const payload = {
+        senderSSN: userSSN,
+        receiverSSN: compose.to,
+        subject: compose.subject || "(no subject)",
+        body: compose.body,
+      };
+
+      console.log("Sending message:", payload);
+      const response = await sendMssg(payload);
+      console.log("Message sent successfully:", response);
+
+      // Create optimistic UI update
+      const selectedUser = allUsers.find((u) => u.ssn === compose.to);
+      const newConv = {
+        id: response.messageId || `c${Date.now()}`,
+        subject: compose.subject || "(no subject)",
+        participants: {
+          from: "You",
+          to: selectedUser?.username || selectedUser?.name || "User",
+          fromSSN: userSSN,
+          toSSN: compose.to,
         },
-      ],
-    };
-    setConversations((prev) => [newConv, ...prev]);
-    setCompose({ to: "", subject: "", body: "" });
-    setComposeOpen(false);
-    setSelectedId(newConv.id);
-    // TODO: call sendMessage API to persist
+        snippet: compose.body.slice(0, 120),
+        unread: false,
+        messages: [
+          {
+            from: "You",
+            to: selectedUser?.username || selectedUser?.name || "User",
+            subject: compose.subject || "(no subject)",
+            body: compose.body,
+            datetime: new Date().toISOString(),
+            senderSSN: userSSN,
+            receiverSSN: compose.to,
+            messageStatus: 0,
+            messageType: "contact",
+          },
+        ],
+      };
+
+      setConversations((prev) => [newConv, ...prev]);
+      setCompose({ to: "", subject: "", body: "" });
+      setComposeOpen(false);
+      setSelectedId(newConv.id);
+
+      alert("Message sent successfully!");
+    } catch (err) {
+      console.error("Failed to send message:", err);
+      alert("Failed to send message. Please try again.");
+    }
   };
 
   const handleReply = (text) => {
@@ -395,143 +529,196 @@ export default function Messages() {
       organization: "",
     };
     setConversations((prev) =>
-      prev.map((c) => (c.id === selected.id ? { ...c, messages: [...c.messages, reply], snippet: reply.body.slice(0,120) } : c))
+      prev.map((c) =>
+        c.id === selected.id
+          ? {
+              ...c,
+              messages: [...c.messages, reply],
+              snippet: reply.body.slice(0, 120),
+            }
+          : c
+      )
     );
     // optionally persist via API
   };
 
+  const messagesLayoutContent = (
+    <div className="messages-layout">
+      <aside className="inbox-list-full" ref={listRef}>
+        <div className="inbox-toolbar">
+          <button className="compose-btn" onClick={() => setComposeOpen(true)}>
+            Write Message
+          </button>
+          <input
+            className="inbox-search"
+            placeholder="Search mail"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="inbox-tabs">
+          <button
+            className={`tab-btn ${activeTab === "received" ? "active" : ""}`}
+            onClick={() => setActiveTab("received")}
+          >
+            Received
+          </button>
+          <button
+            className={`tab-btn ${activeTab === "sent" ? "active" : ""}`}
+            onClick={() => setActiveTab("sent")}
+          >
+            Sent
+          </button>
+        </div>
+
+        <div className="conversations">
+          {loading && <div className="empty">Loading messages...</div>}
+          {!loading && filtered.length === 0 && (
+            <div className="empty">No messages</div>
+          )}
+          {!loading &&
+            filtered.map((c) => (
+              <div
+                key={c.id}
+                className={`conversation-row ${
+                  c.id === selectedId ? "selected" : ""
+                } ${c.unread ? "unread" : ""}`}
+                onClick={() => selectConversation(c.id)}
+              >
+                <div className="subject">{c.subject}</div>
+                <div className="snippet">{c.snippet}</div>
+                <div className="meta">
+                  {activeTab === "received"
+                    ? `From: ${c.participants.from}`
+                    : `To: ${c.participants.to}`}
+                </div>
+              </div>
+            ))}
+        </div>
+      </aside>
+
+      <main className="message-detail">
+        {!selected && (
+          <div className="empty">Select a conversation to view</div>
+        )}
+        {selected && (
+          <>
+            <h2 className="detail-subject">{selected.subject}</h2>
+            <div className="messages-thread">
+              {selected.messages.map((m, i) => (
+                <div key={i} className="message-bubble">
+                  <div className="msg-meta">
+                    <strong>{m.from}</strong> →{" "}
+                    <span className="msg-to">{m.to}</span>
+                    <span className="msg-time">
+                      {new Date(m.datetime).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="msg-body">{m.body}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+
   return (
     <>
-      <div className="with-sidebar">
-        <Sidebar userType={userData.userType} />
-
-        <div className="page-container messages-page">
-          <header className="welcome-box centered">
-            <h1>Messages of {userData.fullName?.split(' ')[0] || "User"}</h1>
-            <p>{new Date().toLocaleDateString()}</p>
-          </header>
-
-          <div className="messages-layout">
-            <aside className="inbox-list-full" ref={listRef}>
-              <div className="inbox-toolbar">
-                <button className="compose-btn" onClick={() => setComposeOpen(true)}>Write Message</button>
-                <input
-                  className="inbox-search"
-                  placeholder="Search mail"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-
-              <div className="inbox-tabs">
-                <button
-                  className={`tab-btn ${activeTab === "received" ? "active" : ""}`}
-                  onClick={() => setActiveTab("received")}
-                >
-                  Received
-                </button>
-                <button
-                  className={`tab-btn ${activeTab === "sent" ? "active" : ""}`}
-                  onClick={() => setActiveTab("sent")}
-                >
-                  Sent
-                </button>
-              </div>
-
-              <div className="conversations">
-                {loading && <div className="empty">Loading messages...</div>}
-                {!loading && filtered.length === 0 && <div className="empty">No messages</div>}
-                {!loading && filtered.map((c) => (
-                  <div
-                    key={c.id}
-                    className={`conversation-row ${c.id === selectedId ? "selected" : ""}`}
-                    onClick={() => selectConversation(c.id)}
-                  >
-                    <div className="conv-left">
-                      <div className="conv-from">{c.participants.from}</div>
-                      <div className="conv-subject">{c.subject}</div>
-                    </div>
-                    <div className="conv-right">
-                      {c.unread && <div className="unread-badge">●</div>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </aside>
+      {showSidebar ? (
+        <div className="with-sidebar">
+          <Sidebar userType={userData.userType} />
+          <div className="page-container messages-page">
+            {showHeader && (
+              <header className="welcome-box centered">
+                <h1>
+                  Messages of {userData.fullName?.split(" ")[0] || "User"}
+                </h1>
+                <p>{new Date().toLocaleDateString()}</p>
+              </header>
+            )}
+            {messagesLayoutContent}
           </div>
-
-          {selected && (
-            <div className="message-modal-overlay" onClick={() => setSelectedId(null)}>
-              <div className="message-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={() => setSelectedId(null)}>✕</button>
-                <div className="message-header">
-                  <h2 className="message-subject">{selected.subject}</h2>
-                  <div className="message-meta">
-                    <div><strong>From:</strong> {selected.participants.from}</div>
-                    <div><strong>To:</strong> {selected.participants.to}</div>
-                    <div><strong>Date:</strong> {new Date(selected.messages[selected.messages.length - 1].datetime).toLocaleString()}</div>
-                    {selected.messages[selected.messages.length - 1].organization && (
-                      <div><strong>Organization:</strong> {selected.messages[selected.messages.length - 1].organization}</div>
-                    )}
-                    {selected.messages[selected.messages.length - 1].program && (
-                      <div><strong>Program:</strong> {selected.messages[selected.messages.length - 1].program}</div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="message-thread">
-                  {selected.messages.map((m) => (
-                    <div key={m.id} className={`message-item ${m.from === "you@domain.com" ? "sent" : "received"}`}>
-                      <div className="message-item-header">
-                        <div className="message-item-from">{m.from}</div>
-                        <div className="message-item-time">{new Date(m.datetime).toLocaleString()}</div>
-                      </div>
-                      <div className="message-item-body">{m.body}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <ReplyForm onSend={handleReply} />
-              </div>
-            </div>
-          )}
-
-          {composeOpen && (
-            <div className="message-modal-overlay" onClick={() => setComposeOpen(false)}>
-              <div className="message-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={() => setComposeOpen(false)}>✕</button>
-                <h2>New Message</h2>
-                <div className="compose-form">
-                  <input
-                    className="compose-input"
-                    placeholder="To"
-                    value={compose.to}
-                    onChange={(e) => setCompose({ ...compose, to: e.target.value })}
-                  />
-                  <input
-                    className="compose-input"
-                    placeholder="Subject"
-                    value={compose.subject}
-                    onChange={(e) => setCompose({ ...compose, subject: e.target.value })}
-                  />
-                  <textarea
-                    className="compose-textarea"
-                    placeholder="Write your message..."
-                    value={compose.body}
-                    onChange={(e) => setCompose({ ...compose, body: e.target.value })}
-                  />
-                  <div className="reply-actions">
-                    <button onClick={() => { setComposeOpen(false); setCompose({ to: "", subject: "", body: "" }); }}>Cancel</button>
-                    <button className="send-btn" onClick={handleSend}>Send</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
+      ) : (
+        <>
+          {showHeader && (
+            <header className="welcome-box centered">
+              <h1>Messages of {userData.fullName?.split(" ")[0] || "User"}</h1>
+              <p>{new Date().toLocaleDateString()}</p>
+            </header>
+          )}
+          {messagesLayoutContent}
+        </>
+      )}
 
-      <Footer />
+      {composeOpen && (
+        <div
+          className="message-modal-overlay"
+          onClick={() => setComposeOpen(false)}
+        >
+          <div className="message-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="modal-close"
+              onClick={() => setComposeOpen(false)}
+            >
+              ✕
+            </button>
+            <h2>New Message</h2>
+            <div className="compose-form">
+              <select
+                className="compose-input"
+                value={compose.to}
+                onChange={(e) => setCompose({ ...compose, to: e.target.value })}
+                required
+              >
+                <option value="">Select recipient</option>
+                {allUsers.map((user, idx) => (
+                  <option
+                    key={user.ssn || user.SSN || idx}
+                    value={user.ssn || user.SSN}
+                  >
+                    {user.username || user.name || `User ${idx + 1}`}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="compose-input"
+                placeholder="Subject"
+                value={compose.subject}
+                onChange={(e) =>
+                  setCompose({ ...compose, subject: e.target.value })
+                }
+              />
+              <textarea
+                className="compose-textarea"
+                placeholder="Write your message..."
+                value={compose.body}
+                onChange={(e) =>
+                  setCompose({ ...compose, body: e.target.value })
+                }
+              />
+              <div className="reply-actions">
+                <button
+                  onClick={() => {
+                    setComposeOpen(false);
+                    setCompose({ to: "", subject: "", body: "" });
+                  }}
+                >
+                  Cancel
+                </button>
+                <button className="send-btn" onClick={handleSend}>
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSidebar && <Footer />}
     </>
   );
 }
@@ -546,7 +733,13 @@ function ReplyForm({ onSend }) {
         onChange={(e) => setText(e.target.value)}
       />
       <div className="reply-actions">
-        <button onClick={() => { setText(""); }}>Discard</button>
+        <button
+          onClick={() => {
+            setText("");
+          }}
+        >
+          Discard
+        </button>
         <button
           className="send-btn"
           onClick={() => {

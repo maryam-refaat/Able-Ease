@@ -46,7 +46,7 @@ export const getUserInfo = async (token) => {
 
 // signup relative
 export const signupRelative = async (body) => {
-  const response = await fetch(`${BASE_URL}/relatives`, {
+  const response = await fetch(`${BASE_URL}/relative/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -169,11 +169,12 @@ export const getOrg_CareGivers = async (Oid) => {
 };
 
 export const getOrg_Proposals = async (Oid) => {
-  const response = await fetch(`${BASE_URL}/message/sent/${Oid}/job-proposals`);
+  const response = await fetch(`${BASE_URL}/Message/sent/${Oid}/job-proposals`);
   const data = await response.json();
-  const therapies = data.results || data || [];
-  return { data: therapies };
+  const proposals = data.results || data.data || [];
+  return { data: proposals };
 };
+
 export const getPatient_Reports = async (PSSN) => {
   try {
     const response = await fetch(
@@ -225,17 +226,97 @@ export const getPatient_Program = async (PSSN) => {
 };
 
 export const getReceived_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}`);
-  const data = await response.json();
-  const Recieved = data.results || data || [];
+  const response = await fetch(`${BASE_URL}/Message/received/${RSSN}/contact`);
+  const result = await response.json();
+  const Recieved = result.data || result.results || result || [];
   return { data: Recieved };
 };
 
 export const getSent_msgs = async (RSSN) => {
-  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}`);
-  const data = await response.json();
-  const Sent = data.results || data || [];
+  const response = await fetch(`${BASE_URL}/Message/sent/${RSSN}/contact`);
+  const result = await response.json();
+  const Sent = result.data || result.results || result || [];
   return { data: Sent };
+};
+
+export const getReceivedJobApplications = async (receiverSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/received/${receiverSSN}/job-applications`
+  );
+  const result = await response.json();
+  const applications = result.data || result.results || result || [];
+  return { data: applications };
+};
+
+export const addPatientWork = async (body) => {
+  const response = await fetch(`${BASE_URL}/PatientWork/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+export const deleteReceivedMessage = async (receiverSSN, messageId) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/received/${receiverSSN}/delete/${messageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
+export const deleteSentMessage = async (senderSSN, messageId) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/sent/${senderSSN}/delete/${messageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
+};
+
+export const rejectJobApplication = async (messageId) => {
+  const response = await fetch(`${BASE_URL}/Message/reject/${messageId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
 };
 
 export const getUser_data = async (USSN) => {
@@ -345,14 +426,58 @@ export const signupPatient = async (body) => {
 };
 
 export const signupOrganization = async (body) => {
-  const response = await fetch(`${BASE_URL}/organizations/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+  const isFormData = body instanceof FormData;
 
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(
+    `${BASE_URL}/Organizations/register`,
+    requestConfig
+  );
+  const data = await response.json();
+  return data;
+};
+
+export const signupCaregiver = async (body) => {
+  const isFormData = body instanceof FormData;
+
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(`${BASE_URL}/Caregiver/register`, requestConfig);
+  const data = await response.json();
+  return data;
+};
+
+export const signupTherapy = async (body) => {
+  const isFormData = body instanceof FormData;
+
+  const requestConfig = {
+    method: "POST",
+    body: isFormData ? body : JSON.stringify(body),
+  };
+
+  // Only set Content-Type for JSON, let browser handle FormData
+  if (!isFormData) {
+    requestConfig.headers = { "Content-Type": "application/json" };
+  }
+
+  const response = await fetch(`${BASE_URL}/Center/register`, requestConfig);
   const data = await response.json();
   return data;
 };
@@ -379,6 +504,58 @@ export const getrelativebyid = async (ssn) => {
   });
   const data = await response.json();
   return data;
+};
+
+export const getRelativeBySSN = async (ssn) => {
+  const response = await fetch(`${BASE_URL}/Relative/GetRelative/${ssn}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const addMedicalInfo = async (body) => {
+  console.log("addMedicalInfo called with body:", body);
+
+  const response = await fetch(`${BASE_URL}/MedicalInfo/AddMedicalInfo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(body),
+  });
+
+  console.log("Response status:", response.status);
+  console.log("Response headers:", response.headers);
+
+  // If server returns text/plain, parsing JSON will throw.
+  // Treat any 2xx as success and return text or empty.
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok) {
+    const errText = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+
+    console.error("Server error response:", errText);
+
+    throw new Error(
+      typeof errText === "string" ? errText : JSON.stringify(errText)
+    );
+  }
+
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+  // text/plain or empty body
+  try {
+    return await response.text();
+  } catch {
+    return "";
+  }
 };
 
 export const fetchAvailablePrograms = async (ssn) => {
@@ -481,9 +658,45 @@ export const getProgramPatients = async (programId, ssn) => {
       },
     }
   );
+  return response.json();
+};
 
+// Therapy APIs
+export const fetchAvailabletherapies = async (centerSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Therapy/center/${centerSSN}/unjoined`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
   const data = await response.json();
-  return data;
+  return { data: data || [] };
+};
+
+export const addtherapy = async (formData) => {
+  const response = await fetch(`${BASE_URL}/therapy/add`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  });
+  return await response.json();
+};
+
+export const updatetherapy = async (formData) => {
+  const therapyId = formData.get("Id") || formData.get("id");
+  const response = await fetch(`${BASE_URL}/therapy/update/${therapyId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  });
+  return await response.json();
 };
 
 export const getReportByPatient = async (Pssn) => {
@@ -549,11 +762,47 @@ export const getWorkByPatient = async (Pssn) => {
 
 export const getPatientDisability = async (Pssn) => {
   const response = await fetch(
-    `${BASE_URL}/Patientdisability/getpatientBisabilities/${Pssn}`
+    `${BASE_URL}/Patientdisability/getpatientDisabilities/${Pssn}`
   );
   const data = await response.json();
   const Patient_disability = data.results || data || [];
   return { data: Patient_disability };
+};
+
+export const getAllDisabilities = async () => {
+  const response = await fetch(`${BASE_URL}/Disability/GetAllDisabilities`);
+  const data = await response.json();
+  const disabilities = data.results || data || [];
+  return { data: disabilities };
+};
+
+export const addPatientDisability = async (body) => {
+  const response = await fetch(
+    `${BASE_URL}/PatientDisability/AddDisabilityToPatient`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  const contentType = response.headers.get("content-type") || "";
+  if (!response.ok) {
+    const errText = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+    throw new Error(
+      typeof errText === "string" ? errText : JSON.stringify(errText)
+    );
+  }
+
+  if (contentType.includes("application/json")) {
+    return await response.json();
+  }
+  return await response.text();
 };
 
 export const getFAByPatient = async (Pssn) => {
@@ -641,22 +890,40 @@ export const sendMssg = async (body) => {
   return data;
 };
 
-export const deletePatientSession = async (therapyId) => {
+export const getAllUsernames = async () => {
+  const response = await fetch(`${BASE_URL}/Account/GetUsernames`);
+  const data = await response.json();
+  const users = data.results || data || [];
+  return { data: users };
+};
+
+export const markMessageAsRead = async (receiverSSN, messageId) => {
   const response = await fetch(
-    `${BASE_URL}/Therapy/delete/${therapyId}`,
+    `${BASE_URL}/Message/received/${receiverSSN}/mark-seen/${messageId}`,
     {
-      method: "DELETE",
+      method: "PUT",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        "Content-Type": "application/json",
       },
     }
   );
+  const data = await response.json();
+  return data;
+};
+
+export const deletePatientSession = async (therapyId) => {
+  const response = await fetch(`${BASE_URL}/Therapy/delete/${therapyId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+  });
 
   const data = await response.text();
   return data;
 };
 
-export const deletePatientWork = async (patientssn,ossn) => {
+export const deletePatientWork = async (patientssn, ossn) => {
   const response = await fetch(
     `${BASE_URL}/patientwork/delete/${patientssn}/${ossn}`,
     {
@@ -669,6 +936,44 @@ export const deletePatientWork = async (patientssn,ossn) => {
 
   const data = await response.text();
   return data;
+};
+
+// Forgot Password - sends reset email
+export const forgotPassword = async (email) => {
+  const response = await fetch(`${BASE_URL}/Account/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(email),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to send reset email: ${response.status}`);
+  }
+
+  return await response.text();
+};
+
+// Reset Password - reset with token
+export const resetPassword = async (email, token, newPassword) => {
+  const response = await fetch(`${BASE_URL}/Account/reset-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      token,
+      newPassword,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to reset password: ${response.status}`);
+  }
+
+  return await response.text();
 };
 
 export default api;

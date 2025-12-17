@@ -1,85 +1,105 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 
-import Landpage from './Pages/Landpage';
-import AboutPage from "./Pages/About"
-import Layout from './Components/Layout';
-import RelativePage from './Pages/Relative';
-import HomePage from './Pages/HomePage';
-import OrganizationPage from './Pages/organization';
-import OrganizationsPage from './Pages/OrganizationsPage';
-import TherapyCenters from './Pages/TherapyCenters';
-import PatientProfile from './Pages/PatientProfile';
-import PatientReportsMedical from './Pages/PatientReports_medical';
-import Messages from './Pages/Messages';
-import AllProgram from './Pages/AllProgram';
-import AllTherapies from './Pages/AllTherapies';
-import AllEmployments from './Pages/AllEmployments';
-import WebsiteReports from './Pages/WebsiteRepotrs';
+import Landpage from "./Pages/Landpage";
+import AboutPage from "./Pages/About";
+import Layout from "./Components/Layout";
+import RelativePage from "./Pages/Relative";
+import HomePage from "./Pages/HomePage";
+import OrganizationPage from "./Pages/organization";
+import OrganizationsPage from "./Pages/OrganizationsPage";
+import TherapyCenters from "./Pages/TherapyCenters";
+import PatientProfile from "./Pages/PatientProfile";
+import PatientReportsMedical from "./Pages/PatientReports_medical";
+import Messages from "./Pages/Messages";
+import AllProgram from "./Pages/AllProgram";
+import AllTherapies from "./Pages/AllTherapies";
+import AllEmployments from "./Pages/AllEmployments";
+import CaregiverProfile from "./Components/CareGiverProfile";
+import ResetPassword from "./Pages/ResetPassword";
+
+import Physiocenterpage from "./Components/PhysioTherapyProfile";
+import WebsiteReports from "./Pages/WebsiteRepotrs";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-       {
+      {
         path: "/",
-        element: <Landpage />
+        element: <Landpage />,
       },
       {
         path: "Able-Ease",
-        element: <Landpage />
+        element: <Landpage />,
       },
       {
         path: "/about",
-        element: <AboutPage />
+        element: <AboutPage />,
       },
       {
         path: "/Home",
-        element: <HomePage />
+        element: <HomePage />,
       },
-    ,{
+      {
         path: "/organizations",
-        element: <OrganizationsPage />
-      },{
+        element: <OrganizationsPage />,
+      },
+      {
         path: "/therapy-centers",
-        element: <TherapyCenters />
-      },{
+        element: <TherapyCenters />,
+      },
+      {
         path: "/insights",
-        element: <WebsiteReports />
-      },{
+        element: <WebsiteReports />,
+      },
+      {
         path: "/all-programs",
-        element: <AllProgram />
-      },{
+        element: <AllProgram />,
+      },
+      {
         path: "/all-therapies",
-        element: <AllTherapies />
-      },{
+        element: <AllTherapies />,
+      },
+      {
         path: "/all-employments",
-        element: <AllEmployments />
-      }
-    ]
-    
-  },  {
-        path: "/relative-profile",
-        element: <RelativePage />
+        element: <AllEmployments />,
       },
-       {
-        path: "/patient-profile",
-        element: <PatientProfile />
-      },
-      {
-        path: "/patient-reports",
-        element: <PatientReportsMedical />
-      },
-      {
-        path: "/messages",
-        element: <Messages />
-      },
-      {
-        path: "/organization-profile",
-        element: <OrganizationPage />
-      }
-  
+    ],
+  },
+  {
+    path: "/relative-profile",
+    element: <RelativePage />,
+  },
+  {
+    path: "/patient-profile",
+    element: <PatientProfile />,
+  },
+  {
+    path: "/patient-reports",
+    element: <PatientReportsMedical />,
+  },
+  {
+    path: "/messages",
+    element: <Messages />,
+  },
+  {
+    path: "/organization-profile",
+    element: <OrganizationPage />,
+  },
+  {
+    path: "/caregiver-profile",
+    element: <CaregiverProfile />,
+  },
+  {
+    path: "/center-profile",
+    element: <Physiocenterpage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
+  },
 ]);
 
 function App() {

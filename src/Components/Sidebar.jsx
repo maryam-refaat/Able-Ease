@@ -13,7 +13,7 @@ export default function Sidebar({ userType = "patient" }) {
       case "organization":
         return "/organization-profile";
       case "therapyCenter":
-        return "/therapy-center-profile";
+        return "/center-profile";
       case "patient":
       default:
         return "/patient-profile";
@@ -22,10 +22,30 @@ export default function Sidebar({ userType = "patient" }) {
 
   const profileRoute = getProfileRoute();
 
-  const handleLogout = () => {
-    setAuthState({ isLoggedIn: false, userType: null, ssn: null });
-    localStorage.removeItem("authToken");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      // Call logout API endpoint
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+
+      // Only clear localStorage after successful logout API call
+      localStorage.clear();
+      // Set auth state to logged out
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      // Navigate to home
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      // Still clear and logout on error
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
   };
 
   return (

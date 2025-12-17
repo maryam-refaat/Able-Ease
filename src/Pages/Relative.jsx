@@ -1,13 +1,14 @@
 import "../profilepagecomponents/profile.css";
-import  {RelativeCard}  from "../profilepagecomponents/relativebox";
-import  {MedicalBox}  from "../profilepagecomponents/medicalbox";
+import { RelativeCard } from "../profilepagecomponents/relativebox";
+import { MedicalBox } from "../profilepagecomponents/medicalbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Footer from "../Components/Footer";
 import Sidebar from "../Components/Sidebar";
+import { setAuthState } from "../context/AuthState";
+import { getRelativeBySSN } from "../assets/apis";
 
 export default function Relative() {
-
   const location = useLocation();
   const relativeData = location.state?.relativeData;
 
@@ -20,16 +21,40 @@ export default function Relative() {
   const [modalError, setModalError] = useState("");
   const navigate = useNavigate();
 
+  const handleLogout = async () => {
+    try {
+      await fetch("https://localhost:7040/api/Account/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      localStorage.clear();
+      setAuthState({ isLoggedIn: false, userType: null, ssn: null });
+      navigate("/");
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
         setIsLoading(true);
-        // const token = JSON.parse(localStorage.getItem("relativeToken"));
-        // const fetchedData = await getUserInfo(token);
-        // setData(fetchedData);
-        
-        // Load from localStorage if no data
-        if (!relativeData || Object.keys(relativeData).length === 0) {
+
+        // Get SSN from localStorage
+        const relativeSSN = localStorage.getItem("ssn");
+
+        if (relativeSSN) {
+          // Fetch data from API
+          const relativeData = await getRelativeBySSN(relativeSSN);
+          setData(relativeData);
+        } else {
+          // Fallback to stored data if no SSN
           const storedDataStr = localStorage.getItem("relativeData");
           try {
             const storedData = storedDataStr ? JSON.parse(storedDataStr) : null;
@@ -50,7 +75,7 @@ export default function Relative() {
 
     fetchData();
   }, [relativeData]);
-  
+
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
@@ -62,7 +87,7 @@ export default function Relative() {
       email: data?.email || "",
       phone: data?.phone || "",
       gender: data?.gender || "",
-      address: data?.address || ""
+      address: data?.address || "",
     });
     setModalError("");
     setEditing(true);
@@ -78,16 +103,16 @@ export default function Relative() {
       setSaving(true);
       // TODO: REMOVE WHEN API IS CONNECTED - simulate save delay
       await new Promise((r) => setTimeout(r, 700));
-      
+
       // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
       // const res = await updateRelative(data.id, draft);
       // if (res?.error) throw new Error(res.error);
-      
+
       setData((prev) => ({ ...prev, ...draft }));
       // Update localStorage
       const updatedData = { ...data, ...draft };
       localStorage.setItem("relativeData", JSON.stringify(updatedData));
-      
+
       setEditing(false);
     } catch (err) {
       console.error("Update failed", err);
@@ -97,11 +122,11 @@ export default function Relative() {
     }
   };
 
-  if(isLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if(isError) {
+  if (isError) {
     return <div>Error loading data.</div>;
   }
 
@@ -115,15 +140,20 @@ export default function Relative() {
           <p>Tue, 07 June 2022</p>
         </header>
 
-        <RelativeCard title= "Relative" data={data} onEdit={openEdit} />
-        <MedicalBox />
+        <RelativeCard title="Relative" data={data} onEdit={openEdit} />
+        <MedicalBox
+          relativeSSN={data?.ssn || localStorage.getItem("ssn")}
+          patientSSN={data?.patientSSN || ""}
+        />
         <Footer />
       </div>
 
       {editing && (
         <div className="modal-overlay" onClick={() => setEditing(false)}>
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={() => setEditing(false)}>✕</button>
+            <button className="modal-close" onClick={() => setEditing(false)}>
+              ✕
+            </button>
             <h2>Edit Information</h2>
 
             {modalError && <div className="modal-error">{modalError}</div>}
@@ -132,7 +162,9 @@ export default function Relative() {
               <label>Full Name</label>
               <input
                 value={draft.fullName}
-                onChange={(e) => setDraft({ ...draft, fullName: e.target.value })}
+                onChange={(e) =>
+                  setDraft({ ...draft, fullName: e.target.value })
+                }
                 placeholder="Enter full name"
               />
             </div>
@@ -173,7 +205,9 @@ export default function Relative() {
               <label>Address</label>
               <textarea
                 value={draft.address}
-                onChange={(e) => setDraft({ ...draft, address: e.target.value })}
+                onChange={(e) =>
+                  setDraft({ ...draft, address: e.target.value })
+                }
                 placeholder="Enter address"
                 rows="3"
               />
@@ -183,7 +217,11 @@ export default function Relative() {
               <button onClick={() => setEditing(false)} disabled={saving}>
                 Cancel
               </button>
-              <button className="btn-primary" onClick={handleSave} disabled={saving}>
+              <button
+                className="btn-primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
@@ -193,4 +231,3 @@ export default function Relative() {
     </div>
   );
 }
-

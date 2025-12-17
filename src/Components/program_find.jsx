@@ -117,7 +117,7 @@ export default function Programfind() {
             {programs.map((c) => (
               <div key={c.id} className="center-card">
                 <img
-                  src={c.image || ""}
+                  src={c.imageUrl || ""}
                   alt={c.name}
                   style={{
                     width: "100%",
@@ -127,7 +127,7 @@ export default function Programfind() {
                   }}
                 />
                 <h3 style={{ marginTop: 10 }}>{c.name}</h3>
-                <p style={{ color: "#6b7280" }}>{c.Price}</p>
+                <p style={{ color: "#6b7280" }}>${c.price}</p>
               </div>
             ))}
           </div>
