@@ -32,7 +32,7 @@ import {
 import { formatDate } from "../utils/dateFormatter";
 
 // API Base URL - change this to your actual API URL
-const API_BASE_URL = "https://localhost:7040/api";
+const API_BASE_URL = "https://ableeaseapi.runasp.net";
 
 // Enhanced color palette - green and white theme
 const COLORS = {

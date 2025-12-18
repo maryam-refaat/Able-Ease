@@ -32,7 +32,7 @@ export default function Organizationpage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://localhost:7040/api/Account/logout", {
+      await fetch("https://ableeaseapi.runasp.net/Account/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function Organizationpage() {
 
         console.log("✅ SSN found, fetching organization data...");
         const response = await fetch(
-          `https://localhost:7040/api/organizations/getorganization/${orgSSN}`,
+          `https://ableeaseapi.runasp.net/organizations/getorganization/${orgSSN}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -116,7 +116,7 @@ export default function Organizationpage() {
       const orgSSN = localStorage.getItem("ssn");
       if (orgSSN) {
         const response = await fetch(
-          `https://localhost:7040/api/organizations/getorganization/${orgSSN}`,
+          `https://ableeaseapi.runasp.net/organizations/getorganization/${orgSSN}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -139,7 +139,7 @@ export default function Organizationpage() {
       setLoadingWorkers(true);
       const orgSSN = localStorage.getItem("ssn");
       const response = await fetch(
-        `https://localhost:7040/api/PatientWork/organization/${orgSSN}/patients`,
+        `https://ableeaseapi.runasp.net/PatientWork/organization/${orgSSN}/patients`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -167,7 +167,7 @@ export default function Organizationpage() {
     try {
       const orgSSN = localStorage.getItem("ssn");
       const response = await fetch(
-        `https://localhost:7040/api/PatientWork/Delete/${patientSSN}/${orgSSN}`,
+        `https://ableeaseapi.runasp.net/PatientWork/Delete/${patientSSN}/${orgSSN}`,
         {
           method: "DELETE",
           headers: {

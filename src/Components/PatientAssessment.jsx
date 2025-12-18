@@ -5,7 +5,7 @@ import Footer from "../Components/Footer";
 import PatientCard from "../Components/PatientCard";
 import "./PatientProf.css";
 
-const BASE_URL = "https://localhost:7040/api";
+const BASE_URL = "https://ableeaseapi.runasp.net";
 
 export default function PatientAssessment() {
   const location = useLocation();

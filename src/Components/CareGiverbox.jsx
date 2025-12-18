@@ -70,7 +70,7 @@ export default function CareGiverBox() {
   const trackRef = useRef(null);
   const { alertState, showAlert, closeAlert } = useAlert();
 
-  const baseApiUrl = "https://localhost:7040/api";
+  const baseApiUrl = "https://ableeaseapi.runasp.net";
   const getAuth = () => ({
     token: localStorage.getItem("authToken"),
     organizationSSN: localStorage.getItem("ssn"),

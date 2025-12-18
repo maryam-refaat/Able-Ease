@@ -97,7 +97,7 @@ export default function PatientReportsMedical() {
         // Fetch assessments
         try {
           const assessmentRes = await fetch(
-            `https://localhost:7040/api/Assessment/GetAssessmentPatientsByPatient/${storedSSN}`,
+            `https://ableeaseapi.runasp.net/Assessment/GetAssessmentPatientsByPatient/${storedSSN}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -116,7 +116,7 @@ export default function PatientReportsMedical() {
               rawAssessments.map(async (assessment) => {
                 try {
                   const programRes = await fetch(
-                    `https://localhost:7040/api/Program/ProgramByID/${assessment.assessmentProgramOrganizationSSN}/${assessment.assessmentProgramId}`,
+                    `https://ableeaseapi.runasp.net/Program/ProgramByID/${assessment.assessmentProgramOrganizationSSN}/${assessment.assessmentProgramId}`,
                     {
                       headers: {
                         Authorization: `Bearer ${localStorage.getItem(

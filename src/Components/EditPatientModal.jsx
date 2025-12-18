@@ -56,7 +56,7 @@ export default function EditPatientModal({
       console.log("Payload:", payload);
 
       const response = await fetch(
-        `https://localhost:7040/api/Patients/UpdatePatient/${ssn}`,
+        `https://ableeaseapi.runasp.net/Patients/UpdatePatient/${ssn}`,
         {
           method: "PUT",
           headers: {

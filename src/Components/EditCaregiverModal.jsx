@@ -68,7 +68,7 @@ export default function EditCaregiverModal({
       }
 
       const response = await fetch(
-        `https://localhost:7040/api/Caregiver/UpdateCaregiver/${ssn}`,
+        `https://ableeaseapi.runasp.net/Caregiver/UpdateCaregiver/${ssn}`,
         {
           method: "PUT",
           headers: {

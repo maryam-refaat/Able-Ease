@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./ProgramModal.css";
 
-const baseApiUrl = "https://localhost:7040/api";
+const baseApiUrl = "https://ableeaseapi.runasp.net";
 
 export default function AssignPatientModal({ isOpen, onClose, caregiver }) {
   const [patients, setPatients] = useState([]);

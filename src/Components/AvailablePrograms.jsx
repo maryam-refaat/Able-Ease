@@ -65,7 +65,7 @@ export default function AvailablePrograms() {
       // First, check if the program has any patients
       const ssn = localStorage.getItem("ssn");
       const checkResponse = await fetch(
-        `https://localhost:7040/api/Program/GetProgramPatients/${ssn}/${program.id}`,
+        `https://ableeaseapi.runasp.net/Program/GetProgramPatients/${ssn}/${program.id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,

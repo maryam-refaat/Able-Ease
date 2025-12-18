@@ -17,7 +17,7 @@ export default function CaretakerSignUp() {
   const [loadingOrgs, setLoadingOrgs] = useState(false);
   const formRef = React.useRef(null);
 
-  const baseApiUrl = "https://localhost:7040/api";
+  const baseApiUrl = "https://ableeaseapi.runasp.net";
 
   // Fetch organizations with usernames
   useEffect(() => {
