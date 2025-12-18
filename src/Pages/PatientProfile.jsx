@@ -20,6 +20,7 @@ import {
   deletePatientWork,
 } from "../assets/apis";
 import Footer from "../Components/Footer";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function PatientProfile() {
   const location = useLocation();
@@ -378,7 +379,7 @@ export default function PatientProfile() {
               Welcome,{" "}
               {data?.fullName ? data.fullName.split(" ")[0] : "Patient"}
             </h1>
-            <p>{new Date().toLocaleDateString()}</p>
+            <p>{formatDate(new Date())}</p>
           </header>
 
           {/* Patient card (edit button inside card) */}
@@ -610,10 +611,7 @@ export default function PatientProfile() {
                     {data.employment.organizationName}
                   </div>
                   <div className="employment-sub">
-                    Since{" "}
-                    {data.employment.startDate
-                      ? new Date(data.employment.startDate).toLocaleDateString()
-                      : "N/A"}
+                    Since {formatDate(data.employment.startDate) || "N/A"}
                   </div>
                   {data.employment.salary > 0 && (
                     <div

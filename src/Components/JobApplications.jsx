@@ -9,6 +9,7 @@ import {
 } from "../assets/apis.js";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function JobApplications() {
   const { alertState, showAlert, closeAlert } = useAlert();
@@ -309,7 +310,7 @@ export default function JobApplications() {
                         marginBottom: "8px",
                       }}
                     >
-                      {new Date(sentDate).toLocaleDateString()}
+                      {formatDate(sentDate)}
                     </div>
                     <div
                       style={{

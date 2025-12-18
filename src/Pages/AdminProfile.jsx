@@ -437,6 +437,7 @@ const AdminProfile = () => {
             }}
             showAvatar={false}
             showEdit={false}
+            hideFields={["gender", "contact", "address"]}
           />
 
           <div style={{ marginTop: 12 }}>

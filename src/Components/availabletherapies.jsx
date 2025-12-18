@@ -10,6 +10,7 @@ import AvailableTherapyModal from "./AvailableTherapyModal";
 import "../profilepagecomponents/organization.css";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function Availabletherapiess() {
   const [programs, setPrograms] = useState([]);
@@ -20,8 +21,6 @@ export default function Availabletherapiess() {
   const [deleteLoading, setDeleteLoading] = useState(null);
   const progTrackRef = useRef(null);
   const { alertState, showAlert, closeAlert } = useAlert();
-
-  const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
 
   useEffect(() => {
     const loadPrograms = async () => {

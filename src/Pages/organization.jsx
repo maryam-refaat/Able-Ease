@@ -13,6 +13,7 @@ import OrgAssesments from "../Pages/OrgAssesments";
 import EditOrganizationModal from "../Components/EditOrganizationModal";
 import AlertModal from "../Components/AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function Organizationpage() {
   const location = useLocation();
@@ -256,14 +257,7 @@ export default function Organizationpage() {
       <div className="page-container">
         <header className="welcome-box">
           <h1>Welcome, {data?.name || data?.managerName || "Amanda"}</h1>
-          <p>
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "short",
-              day: "2-digit",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
+          <p>{formatDate(new Date())}</p>
         </header>
         {appear !== 3 && (
           <RelativeCard title="Organization" data={data} onEdit={openEdit} />
@@ -349,9 +343,7 @@ export default function Organizationpage() {
                           }}
                         >
                           <strong>Start Date:</strong>{" "}
-                          {worker.startDate
-                            ? new Date(worker.startDate).toLocaleDateString()
-                            : "N/A"}
+                          {formatDate(worker.startDate) || "N/A"}
                         </p>
                       </div>
                       <button

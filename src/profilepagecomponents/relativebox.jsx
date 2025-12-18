@@ -185,7 +185,7 @@ export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
                 <input disabled value={form.address} />
               </div>
 
-              {title !== "Organization" && (
+              {title !== "Organization" && title !== "Caregiver" && (
                 <>
                   <div className="input-group">
                     <label>Gender</label>

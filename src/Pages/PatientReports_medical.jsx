@@ -18,6 +18,7 @@ import {
   getMedicalInfoByPatient,
   getPatientDisability,
 } from "../assets/apis";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function PatientReportsMedical() {
   const location = useLocation();
@@ -397,8 +398,7 @@ export default function PatientReportsMedical() {
                       >
                         {m.startDate && m.endDate ? (
                           <>
-                            {new Date(m.startDate).toLocaleDateString()} -{" "}
-                            {new Date(m.endDate).toLocaleDateString()}
+                            {formatDate(m.startDate)} - {formatDate(m.endDate)}
                           </>
                         ) : (
                           "—"
@@ -454,11 +454,7 @@ export default function PatientReportsMedical() {
                           fontWeight: 500,
                         }}
                       >
-                        {assessment.assessmentDate
-                          ? new Date(
-                              assessment.assessmentDate
-                            ).toLocaleDateString()
-                          : "—"}
+                        {formatDate(assessment.assessmentDate) || "—"}
                       </div>
 
                       <div style={{ marginTop: 12 }}>
@@ -518,7 +514,7 @@ export default function PatientReportsMedical() {
                           fontWeight: 500,
                         }}
                       >
-                        {r.date ? new Date(r.date).toLocaleDateString() : "—"}
+                        {formatDate(r.date) || "—"}
                       </div>
 
                       <div

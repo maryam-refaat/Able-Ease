@@ -1,8 +1,15 @@
 import React from "react";
 import "../Pages/PatientProf.css";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export default function PatientCard({ title = "Patient", data = {}, onEdit, showAvatar = true, showEdit = true }) {
+export default function PatientCard({
+  title = "Patient",
+  data = {},
+  onEdit,
+  showAvatar = true,
+  showEdit = true,
+  hideFields = [],
+}) {
   const [form, setForm] = useState({
     fullName: "",
     contact: "",
@@ -31,7 +38,10 @@ export default function PatientCard({ title = "Patient", data = {}, onEdit, show
 
       <div className="patient-card__content">
         <div className="patient-card__top">
-          <div className="patient-card__left" style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            className="patient-card__left"
+            style={{ display: "flex", alignItems: "center", gap: 16 }}
+          >
             {showAvatar && (
               <img
                 src={data.avatar || "/profile-placeholder.png"}
@@ -60,25 +70,31 @@ export default function PatientCard({ title = "Patient", data = {}, onEdit, show
             <input type="text" value={form.fullName} disabled />
           </div>
 
-          <div className="patient-card__field">
-            <label>Contact Info</label>
-            <input type="text" value={form.contact} disabled />
-          </div>
-
-          <div className="patient-card__field">
-            <label>Gender</label>
-            <div className="patient-card__select-wrap">
-              <select value={form.gender} disabled>
-                <option>{form.gender || "—"}</option>
-              </select>
-              <span className="patient-card__arrow">▾</span>
+          {!hideFields.includes("contact") && (
+            <div className="patient-card__field">
+              <label>Contact Info</label>
+              <input type="text" value={form.contact} disabled />
             </div>
-          </div>
+          )}
 
-          <div className="patient-card__field">
-            <label>Address</label>
-            <input value={form.address} disabled />
-          </div>
+          {!hideFields.includes("gender") && (
+            <div className="patient-card__field">
+              <label>Gender</label>
+              <div className="patient-card__select-wrap">
+                <select value={form.gender} disabled>
+                  <option>{form.gender || "—"}</option>
+                </select>
+                <span className="patient-card__arrow">▾</span>
+              </div>
+            </div>
+          )}
+
+          {!hideFields.includes("address") && (
+            <div className="patient-card__field">
+              <label>Address</label>
+              <input value={form.address} disabled />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getPatient_Reports } from "../assets/apis";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function PatientsBox({
   patients = [],
@@ -330,9 +331,7 @@ export default function PatientsBox({
                               {report.content}
                             </p>
                             <small style={{ color: "#666" }}>
-                              {report.date
-                                ? new Date(report.date).toLocaleDateString()
-                                : ""}
+                              {formatDate(report.date) || ""}
                             </small>
                           </div>
                           <button

@@ -17,7 +17,7 @@ export default function PositionCard({ pos, onApply = () => {} }) {
     pos.requirement ??
     pos.description ??
     "No requirements provided";
-  const org = pos.senderSSN ?? pos.organizationSSN ?? pos.orgSSN ?? "";
+  const org = pos.senderName ?? pos.senderSSN ?? pos.orgSSN ?? "";
 
   return (
     <div className="position-card" role="article" aria-labelledby={`pos-${id}`}>

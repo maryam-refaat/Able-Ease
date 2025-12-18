@@ -9,6 +9,7 @@ import ProgramModal from "./ProgramModal";
 import "../profilepagecomponents/organization.css";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function AvailablePrograms() {
   const [programs, setPrograms] = useState([]);
@@ -26,8 +27,6 @@ export default function AvailablePrograms() {
   });
   const progTrackRef = useRef(null);
   const { alertState, showAlert, closeAlert } = useAlert();
-
-  const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
 
   useEffect(() => {
     const loadPrograms = async () => {
@@ -199,8 +198,8 @@ export default function AvailablePrograms() {
                         <i className="fa-solid fa-dollar-sign"></i> ${p.price}
                       </div>
                       <div className="program-dates">
-                        <span>{fmtDate(p.startDate)}</span> -{" "}
-                        <span>{fmtDate(p.endDate)}</span>
+                        <span>{formatDate(p.startDate)}</span> -{" "}
+                        <span>{formatDate(p.endDate)}</span>
                       </div>
                     </div>
                     <div className="program-actions">

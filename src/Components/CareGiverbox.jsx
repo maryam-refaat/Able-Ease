@@ -226,14 +226,6 @@ export default function CareGiverBox() {
         }}
       >
         <h3>Care Givers</h3>
-
-        <button
-          className="action-btn add-btn"
-          onClick={handleAddCareGiver}
-          title="Add Care Giver"
-        >
-          <i className="fa-solid fa-user-plus"></i> Add Care Giver
-        </button>
       </div>
 
       {loading ? (

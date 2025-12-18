@@ -2,14 +2,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { fetchAvailabletherapiesJoined } from "../assets/apis";
 import "../profilepagecomponents/organization.css";
+import { formatDate } from "../utils/dateFormatter";
 
 export default function AvailabletherapiessJoined() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const progTrackRef = useRef(null);
-
-  const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
 
   useEffect(() => {
     const loadPrograms = async () => {
