@@ -1,16 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getPhysicenters } from "../assets/api";
+import { getPhysicenters } from "../assets/apis";
 import "../index.css";
 
 import bg from "../assets/89317a691ebd3da8f3477755ea64dd5e1ed1c1c7.png";
 export default function Physicenterfind() {
   const dummyCenters = [
-    { id: 1, name: "Physio Care Center", location: "New York", image: "" },
-    { id: 2, name: "Physio Care Center", location: "Los Angeles", image: "" },
-    { id: 3, name: "Physio Care Center", location: "Chicago", image: "" },
-    { id: 4, name: "Physio Care Center", location: "Miami", image: "" },
-    { id: 5, name: "Physio Care Center", location: "Boston", image: "" },
-    { id: 6, name: "Physio Care Center", location: "Seattle", image: "" },
+    {
+      ssn: "1",
+      name: "Physio Care Center",
+      location: "New York",
+      imageUrl: "",
+    },
+    {
+      ssn: "2",
+      name: "Physio Care Center",
+      location: "Los Angeles",
+      imageUrl: "",
+    },
+    { ssn: "3", name: "Physio Care Center", location: "Chicago", imageUrl: "" },
+    { ssn: "4", name: "Physio Care Center", location: "Miami", imageUrl: "" },
+    { ssn: "5", name: "Physio Care Center", location: "Boston", imageUrl: "" },
+    { ssn: "6", name: "Physio Care Center", location: "Seattle", imageUrl: "" },
   ];
 
   const [centers, setCenters] = useState(dummyCenters);
@@ -74,9 +84,9 @@ export default function Physicenterfind() {
 
           <div className="centers-row" ref={scrollRef} aria-live="polite">
             {centers.map((c) => (
-              <div key={`center-${c.id}`} className="center-card">
-                {c.image || c.imageUrl ? (
-                  <img src={c.image || c.imageUrl} alt={c.name} />
+              <div key={`center-${c.ssn || c.id}`} className="center-card">
+                {c.imageUrl || c.image ? (
+                  <img src={c.imageUrl || c.image} alt={c.name} />
                 ) : (
                   <div
                     style={{

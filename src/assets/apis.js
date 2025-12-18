@@ -248,11 +248,11 @@ export const getPatient_Reports = async (PSSN) => {
 
 export const getPatient_Medicalinfo = async (PSSN) => {
   const response = await fetch(
-    `${BASE_URL}/Report/GetReportsByPatient/${PSSN}`
+    `${BASE_URL}/MedicalInfo/GetMedicalInfosByPatient/${PSSN}`
   );
   const data = await response.json();
-  const reports = data.results || data || [];
-  return { data: reports };
+  const medicalInfo = data.results || data || [];
+  return { data: medicalInfo };
 };
 
 export const getPatient_Therapies = async (PSSN) => {
@@ -409,6 +409,14 @@ export const AddPatientToProgram = async (PSSN, ProID, OSSN) => {
       },
     }
   );
+
+  if (!response.ok) {
+    const error = new Error(`Failed to enroll: ${response.status}`);
+    error.status = response.status;
+    error.statusText = await response.text();
+    throw error;
+  }
+
   const data = await response.text();
   return data;
 };
@@ -785,30 +793,23 @@ export const getTherapyByPatient = async (Pssn) => {
 };
 
 export const getWorkByPatient = async (Pssn) => {
-  try {
-    const response = await fetch(
-      `${BASE_URL}/PatientWork/getby-patient/${Pssn}`
-    );
+  const response = await fetch(`${BASE_URL}/PatientWork/getby-patient/${Pssn}`);
 
-    if (!response.ok) {
-      console.warn(`getWorkByPatient returned ${response.status}`);
-      return { data: [] };
-    }
+  if (!response.ok) {
+    const error = new Error(`Patient not employed: ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
 
-    const text = await response.text();
-    if (!text) {
-      console.warn("getWorkByPatient returned empty response");
-      return { data: [] };
-    }
-
-    const data = JSON.parse(text);
-    console.log("getWorkByPatient data:", data);
-    const Patient_work = data.data || data.results || data || [];
-    return { data: Patient_work };
-  } catch (error) {
-    console.error("getWorkByPatient error:", error.message);
+  const text = await response.text();
+  if (!text) {
     return { data: [] };
   }
+
+  const data = JSON.parse(text);
+  console.log("getWorkByPatient data:", data);
+  const Patient_work = data.data || data.results || data || [];
+  return { data: Patient_work };
 };
 
 export const getPatientDisability = async (Pssn) => {
@@ -1231,4 +1232,86 @@ export const updateUser = async (ssn, body) => {
   }
   return await response.text();
 };
+
+export const addPayment = async (paymentData) => {
+  const response = await fetch(`${BASE_URL}/Payment/AddPayment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(paymentData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to add payment: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+export const getFinancialAidApplications = async (receiverSSN) => {
+  const response = await fetch(
+    `${BASE_URL}/Message/received/${receiverSSN}/financial-aid-applications`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get FA applications: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data?.data || data || [];
+};
+
+export const getProgramById = async (organizationSsn, programId) => {
+  const response = await fetch(
+    `${BASE_URL}/Program/ProgramByID/${organizationSsn}/${programId}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to get program: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+export const addFinancialAid = async (faData) => {
+  const response = await fetch(`${BASE_URL}/FinancialAid/AddFinancialAid`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(faData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to add financial aid: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+export const sendContactMessage = async (messageData) => {
+  const response = await fetch(`${BASE_URL}/Message/send/contact`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+    },
+    body: JSON.stringify(messageData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to send message: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
 export default api;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../Pages/Allemps.css";
-import { ApplyForFA } from "../assets/apis";
+import { ApplyForFA, getProgramByPatient } from "../assets/apis";
 
 export default function FAApplicationModal({
   isOpen,
@@ -10,8 +10,10 @@ export default function FAApplicationModal({
 }) {
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  if (!isOpen) return null;
+  if (!isOpen && !showErrorModal) return null;
 
   const handleSubmit = async () => {
     if (!reason.trim()) return;
@@ -28,6 +30,7 @@ export default function FAApplicationModal({
       program?.Name ||
       program?.title ||
       "Program";
+    const programID = program?.id || program?.ID;
 
     if (!userSSN) {
       alert("User information not found. Please log in again.");
@@ -39,13 +42,49 @@ export default function FAApplicationModal({
       return;
     }
 
+    if (!programID) {
+      alert("Program information not found.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      // Check if patient is already enrolled in this specific program
+      const patientProgramResponse = await getProgramByPatient(userSSN);
+      const patientPrograms = patientProgramResponse?.data || [];
+
+      if (patientPrograms.length > 0) {
+        const currentProgram = patientPrograms[0];
+        const currentProgramId = currentProgram?.id;
+        const currentOrgSSN = currentProgram?.organizationSSN;
+
+        // Check if it's the same program
+        if (
+          currentProgramId === programID &&
+          currentOrgSSN === organizationSSN
+        ) {
+          setErrorMessage(
+            `You are already enrolled in "${programName}"!\n\nYou cannot apply for financial aid for a program you're already enrolled in.\n\nPlease check your enrolled programs.`
+          );
+          setShowErrorModal(true);
+          setIsLoading(false);
+          return;
+        }
+
+        // If enrolled in a different program
+        setErrorMessage(
+          "You are already enrolled in another program.\n\nYou cannot apply for financial aid for multiple programs at the same time.\n\nPlease complete or leave your current program before applying for financial aid for a new one."
+        );
+        setShowErrorModal(true);
+        setIsLoading(false);
+        return;
+      }
+
       const data = {
         receiverSSN: organizationSSN,
         senderSSN: userSSN,
-        subject: programName,
+        subject: programID.toString(),
         body: reason,
       };
 
@@ -73,6 +112,105 @@ export default function FAApplicationModal({
     program?.title ||
     "Program";
   const price = program?.price || program?.Price;
+
+  // Custom Error Modal
+  if (showErrorModal) {
+    return (
+      <div
+        className="modal-overlay"
+        onClick={() => setShowErrorModal(false)}
+        style={{
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <div
+          className="modal-content"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            maxWidth: "500px",
+            padding: "32px",
+            borderRadius: "16px",
+            background: "linear-gradient(135deg, #fff 0%, #f8f9fa 100%)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+            border: "2px solid #dc3545",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: "24px" }}>
+            <div
+              style={{
+                width: "80px",
+                height: "80px",
+                margin: "0 auto 20px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 8px 24px rgba(220, 53, 69, 0.4)",
+              }}
+            >
+              <span style={{ fontSize: "48px", color: "white" }}>⚠️</span>
+            </div>
+            <h3
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "#dc3545",
+              }}
+            >
+              Application Not Allowed
+            </h3>
+          </div>
+
+          <p
+            style={{
+              whiteSpace: "pre-line",
+              textAlign: "center",
+              fontSize: "16px",
+              lineHeight: "1.6",
+              color: "#495057",
+              marginBottom: "28px",
+              fontWeight: "500",
+            }}
+          >
+            {errorMessage}
+          </p>
+
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button
+              onClick={() => setShowErrorModal(false)}
+              style={{
+                padding: "14px 40px",
+                fontSize: "16px",
+                fontWeight: "600",
+                color: "white",
+                background: "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(220, 53, 69, 0.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 6px 20px rgba(220, 53, 69, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(220, 53, 69, 0.3)";
+              }}
+            >
+              Got It
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="modal-overlay" onClick={handleCancel}>

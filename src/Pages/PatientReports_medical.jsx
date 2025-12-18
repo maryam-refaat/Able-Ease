@@ -277,10 +277,6 @@ export default function PatientReportsMedical() {
         </header>
 
         <div className="container">
-          <div className="no-edit">
-            <PatientCard data={data} />
-          </div>
-
           <section className="card-section" style={{ marginTop: 18 }}>
             <div
               style={{

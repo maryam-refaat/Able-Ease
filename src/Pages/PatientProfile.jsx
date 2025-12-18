@@ -7,6 +7,7 @@ import Sidebar from "../Components/Sidebar";
 import { setAuthState } from "../context/AuthState";
 
 import PatientProfileModal from "../Components/PatientProfileModal";
+import EditPatientModal from "../Components/EditPatientModal";
 import {
   getPatientBySSN,
   getProgramByPatient,
@@ -26,10 +27,7 @@ export default function PatientProfile() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState({});
-  const [saving, setSaving] = useState(false);
-  const [modalError, setModalError] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -212,7 +210,8 @@ export default function PatientProfile() {
           pricePerHour: 75,
           duration: 60,
           doctorname: "Dr. Sarah Johnson",
-          therapyDetails: "Focused rehabilitation for lower back pain with exercise therapy",
+          therapyDetails:
+            "Focused rehabilitation for lower back pain with exercise therapy",
           date: "2025-12-20",
           imageUrl: "",
           imgUrl: "",
@@ -267,34 +266,28 @@ export default function PatientProfile() {
   }, []);
 
   const openEdit = () => {
-    setDraft({
-      fullName: data.fullName || "",
-      email: data?.email || "",
-      phone: data?.phone || "",
-      gender: data?.gender || "",
-      address: data?.address || "",
-    });
-    setModalError("");
-    setEditing(true);
+    setEditModalOpen(true);
   };
 
-  const handleSave = async () => {
-    if (!draft.fullName || draft.fullName.trim().length < 2) {
-      setModalError("Please enter a valid name");
-      return;
-    }
-
+  const handleEditSave = async () => {
+    // Reload patient data after successful update
     try {
-      setSaving(true);
-      // TODO: call update API (e.g. updatePatient(data.id, draft))
-      await new Promise((r) => setTimeout(r, 700));
-      setData((prev) => ({ ...prev, ...draft }));
-      setEditing(false);
+      const storedSSN = localStorage.getItem("ssn");
+      if (storedSSN) {
+        const patientRes = await getPatientBySSN(storedSSN);
+        const patientEntity = patientRes?.data;
+        if (patientEntity) {
+          setData((prev) => ({
+            ...prev,
+            fullName:
+              patientEntity.name || patientEntity.fullName || prev.fullName,
+            phone: patientEntity.contactInfo || prev.phone,
+            address: patientEntity.address || prev.address,
+          }));
+        }
+      }
     } catch (err) {
-      console.error("Update failed", err);
-      setModalError("Save failed.");
-    } finally {
-      setSaving(false);
+      console.error("Failed to reload patient data:", err);
     }
   };
 
@@ -650,110 +643,11 @@ export default function PatientProfile() {
                     </div>
                   )}
                 </div>
-                <button
-                  className="resign-btn"
-                  onClick={handleResignClick}
-                  style={{
-                    position: "absolute",
-                    bottom: "16px",
-                    right: "16px",
-                    padding: "8px 12px",
-                    background: "#dc3545",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => (e.target.style.background = "#c82333")}
-                  onMouseLeave={(e) => (e.target.style.background = "#dc3545")}
-                >
-                  Resign
-                </button>
               </div>
             ) : (
               <div className="empty-card">No employment information</div>
             )}
           </section>
-
-          {editing && (
-            <div className="popup-overlay">
-              <div className="popup-card">
-                <h3>Edit patient</h3>
-
-                <div className="popup-input-group">
-                  <label>Full name</label>
-                  <input
-                    value={draft.fullName}
-                    onChange={(e) =>
-                      setDraft({ ...draft, fullName: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="popup-row">
-                  <div className="popup-input-group">
-                    <label>Email</label>
-                    <input
-                      value={draft.email}
-                      onChange={(e) =>
-                        setDraft({ ...draft, email: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="popup-input-group">
-                    <label>Phone</label>
-                    <input
-                      value={draft.phone}
-                      onChange={(e) =>
-                        setDraft({ ...draft, phone: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="popup-input-group">
-                  <label>Gender</label>
-                  <input
-                    value={draft.gender}
-                    onChange={(e) =>
-                      setDraft({ ...draft, gender: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="popup-input-group">
-                  <label>Address</label>
-                  <input
-                    value={draft.address}
-                    onChange={(e) =>
-                      setDraft({ ...draft, address: e.target.value })
-                    }
-                  />
-                </div>
-
-                {modalError && <div className="error">{modalError}</div>}
-
-                <div className="popup-actions">
-                  <button
-                    className="close-btn"
-                    onClick={() => setEditing(false)}
-                  >
-                    Close
-                  </button>
-                  <button
-                    className="add-btn"
-                    onClick={handleSave}
-                    disabled={saving}
-                  >
-                    {saving ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <Footer />
@@ -795,6 +689,14 @@ export default function PatientProfile() {
         }? This action cannot be undone.`}
         confirmText="Resign"
         isLoading={actionLoading}
+      />
+
+      {/* Edit Patient Modal */}
+      <EditPatientModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        patientData={data}
+        onSave={handleEditSave}
       />
     </>
   );

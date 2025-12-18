@@ -4,9 +4,10 @@ import { MedicalBox } from "../profilepagecomponents/medicalbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Footer from "../Components/Footer";
-import Sidebar from "../Components/Sidebar";
+import Messages from "./Messages";
 import { setAuthState } from "../context/AuthState";
 import { getRelativeBySSN } from "../assets/apis";
+import EditRelativeModal from "../Components/EditRelativeModal";
 
 export default function Relative() {
   const location = useLocation();
@@ -19,6 +20,8 @@ export default function Relative() {
   const [draft, setDraft] = useState({});
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState("");
+  const [showMessages, setShowMessages] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -82,43 +85,19 @@ export default function Relative() {
   }, []);
 
   const openEdit = () => {
-    setDraft({
-      fullName: data.fullName || "",
-      email: data?.email || "",
-      phone: data?.phone || "",
-      gender: data?.gender || "",
-      address: data?.address || "",
-    });
-    setModalError("");
-    setEditing(true);
+    setEditModalOpen(true);
   };
 
-  const handleSave = async () => {
-    if (!draft.fullName || draft.fullName.trim().length < 2) {
-      setModalError("Please enter a valid name");
-      return;
-    }
-
+  const handleEditSave = async () => {
+    // Reload relative data after successful update
     try {
-      setSaving(true);
-      // TODO: REMOVE WHEN API IS CONNECTED - simulate save delay
-      await new Promise((r) => setTimeout(r, 700));
-
-      // TODO: UNCOMMENT AND USE REAL API WHEN CONNECTED
-      // const res = await updateRelative(data.id, draft);
-      // if (res?.error) throw new Error(res.error);
-
-      setData((prev) => ({ ...prev, ...draft }));
-      // Update localStorage
-      const updatedData = { ...data, ...draft };
-      localStorage.setItem("relativeData", JSON.stringify(updatedData));
-
-      setEditing(false);
+      const relativeSSN = localStorage.getItem("ssn");
+      if (relativeSSN) {
+        const relativeData = await getRelativeBySSN(relativeSSN);
+        setData(relativeData);
+      }
     } catch (err) {
-      console.error("Update failed", err);
-      setModalError("Save failed.");
-    } finally {
-      setSaving(false);
+      console.error("Failed to reload relative data:", err);
     }
   };
 
@@ -132,7 +111,36 @@ export default function Relative() {
 
   return (
     <div className="with-sidebar">
-      <Sidebar userType="relative" />
+      <div className="side-rect">
+        <div className="side-icons">
+          <button
+            className="side-btn"
+            aria-label="profile"
+            onClick={() => setShowMessages(false)}
+          >
+            <i className="fa-solid fa-user" aria-hidden="true"></i>
+          </button>
+
+          <button
+            className="side-btn"
+            aria-label="messages"
+            onClick={() => setShowMessages(true)}
+          >
+            <i className="fa-solid fa-paper-plane" aria-hidden="true"></i>
+          </button>
+
+          <button
+            className="side-btn"
+            aria-label="logout"
+            onClick={handleLogout}
+          >
+            <i
+              className="fa-solid fa-right-from-bracket"
+              aria-hidden="true"
+            ></i>
+          </button>
+        </div>
+      </div>
 
       <div className="page-container">
         <header className="welcome-box">
@@ -140,11 +148,18 @@ export default function Relative() {
           <p>Tue, 07 June 2022</p>
         </header>
 
-        <RelativeCard title="Relative" data={data} onEdit={openEdit} />
-        <MedicalBox
-          relativeSSN={data?.ssn || localStorage.getItem("ssn")}
-          patientSSN={data?.patientSSN || ""}
-        />
+        {showMessages ? (
+          <Messages showSidebar={false} showHeader={false} />
+        ) : (
+          <>
+            <RelativeCard title="Relative" data={data} onEdit={openEdit} />
+            <MedicalBox
+              relativeSSN={data?.ssn || localStorage.getItem("ssn")}
+              patientSSN={data?.patientSSN || ""}
+            />
+          </>
+        )}
+
         <Footer />
       </div>
 
@@ -228,6 +243,14 @@ export default function Relative() {
           </div>
         </div>
       )}
+
+      {/* Edit Relative Modal */}
+      <EditRelativeModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        relativeData={data}
+        onSave={handleEditSave}
+      />
     </div>
   );
 }

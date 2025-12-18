@@ -502,7 +502,9 @@ export default function OrganizationsPage() {
         title="Confirm Booking"
         message={`Are you sure you want to book "${
           selectedProgram?.name || selectedProgram?.Name
-        }"?`}
+        }"?\n\nYou will pay: $${
+          selectedProgram?.price || selectedProgram?.Price || 0
+        }`}
         program={selectedProgram}
         isBooking={true}
       />

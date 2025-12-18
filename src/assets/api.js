@@ -179,7 +179,8 @@ export const getPrograms = async () => {
 export const getPhysicenters = async () => {
   const response = await fetch(`${BASE_URL}/center/getallcenters`);
   const data = await response.json();
-  return data.results;
+  // API returns direct array of centers
+  return { data: Array.isArray(data) ? data : [] };
 };
 
 // Fetch relatives

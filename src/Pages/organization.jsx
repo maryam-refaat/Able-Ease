@@ -10,6 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { setAuthState } from "../context/AuthState";
 import { useEffect, useState } from "react";
 import OrgAssesments from "../Pages/OrgAssesments";
+import EditOrganizationModal from "../Components/EditOrganizationModal";
 
 export default function Organizationpage() {
   const location = useLocation();
@@ -21,6 +22,9 @@ export default function Organizationpage() {
   const [data, setData] = useState(organizationData || {});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [patientWorkers, setPatientWorkers] = useState([]);
+  const [loadingWorkers, setLoadingWorkers] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -98,6 +102,94 @@ export default function Organizationpage() {
     fetchData();
   }, []);
 
+  const openEdit = () => {
+    setEditModalOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    // Reload organization data after successful update
+    try {
+      const orgSSN = localStorage.getItem("ssn");
+      if (orgSSN) {
+        const response = await fetch(
+          `https://localhost:7040/api/organizations/getorganization/${orgSSN}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const orgData = await response.json();
+          setData(orgData);
+          localStorage.setItem("organizationData", JSON.stringify(orgData));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to reload organization data:", err);
+    }
+  };
+
+  const fetchPatientWorkers = async () => {
+    try {
+      setLoadingWorkers(true);
+      const orgSSN = localStorage.getItem("ssn");
+      const response = await fetch(
+        `https://localhost:7040/api/PatientWork/organization/${orgSSN}/patients`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const workers = await response.json();
+        setPatientWorkers(Array.isArray(workers) ? workers : []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch patient workers:", err);
+    } finally {
+      setLoadingWorkers(false);
+    }
+  };
+
+  const handleRemoveWorker = async (patientSSN) => {
+    if (
+      !confirm("Are you sure you want to remove this patient from employment?")
+    ) {
+      return;
+    }
+
+    try {
+      const orgSSN = localStorage.getItem("ssn");
+      const response = await fetch(
+        `https://localhost:7040/api/PatientWork/Delete/${patientSSN}/${orgSSN}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        alert("Patient removed from employment successfully");
+        fetchPatientWorkers(); // Refresh the list
+      } else {
+        alert("Failed to remove patient from employment");
+      }
+    } catch (err) {
+      console.error("Error removing patient:", err);
+      alert("An error occurred while removing the patient");
+    }
+  };
+
+  useEffect(() => {
+    if (appear === 1) {
+      fetchPatientWorkers();
+    }
+  }, [appear]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -163,10 +255,136 @@ export default function Organizationpage() {
           <h1>Welcome, {data?.name || data?.managerName || "Amanda"}</h1>
           <p>Tue, 07 June 2022</p>
         </header>
-        {appear !== 3 && <RelativeCard title="Organization" data={data} />}
+        {appear !== 3 && (
+          <RelativeCard title="Organization" data={data} onEdit={openEdit} />
+        )}
 
         {appear === 2 && <AvailableLocationsBox />}
-        {appear === 1 && <CareGiverBox />}
+        {appear === 1 && (
+          <>
+            <CareGiverBox />
+
+            {/* Patient Workers Section */}
+            <section className="section-box" style={{ marginTop: "24px" }}>
+              <h2
+                className="section-title"
+                style={{
+                  marginBottom: "16px",
+                  fontSize: "20px",
+                  fontWeight: "600",
+                }}
+              >
+                Employed Patients
+              </h2>
+              {loadingWorkers ? (
+                <div style={{ padding: "20px", textAlign: "center" }}>
+                  Loading employees...
+                </div>
+              ) : patientWorkers.length > 0 ? (
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {patientWorkers.map((worker) => (
+                    <div
+                      key={worker.patientSSN}
+                      style={{
+                        background: "white",
+                        borderRadius: "12px",
+                        padding: "16px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        transition: "transform 0.2s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "translateY(-2px)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "translateY(0)")
+                      }
+                    >
+                      <div style={{ flex: 1 }}>
+                        <h3
+                          style={{
+                            margin: 0,
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            color: "#2c3e50",
+                          }}
+                        >
+                          {worker.patientName || "Unknown Patient"}
+                        </h3>
+                        <p
+                          style={{
+                            margin: "4px 0 0 0",
+                            fontSize: "14px",
+                            color: "#7f8c8d",
+                          }}
+                        >
+                          <strong>Position:</strong> {worker.jobTitle || "N/A"}
+                        </p>
+                        <p
+                          style={{
+                            margin: "4px 0 0 0",
+                            fontSize: "14px",
+                            color: "#27ae60",
+                          }}
+                        >
+                          <strong>Salary:</strong> ${worker.salary || 0}/month
+                        </p>
+                        <p
+                          style={{
+                            margin: "4px 0 0 0",
+                            fontSize: "13px",
+                            color: "#95a5a6",
+                          }}
+                        >
+                          <strong>Start Date:</strong>{" "}
+                          {worker.startDate
+                            ? new Date(worker.startDate).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveWorker(worker.patientSSN)}
+                        style={{
+                          padding: "8px 16px",
+                          background: "#e74c3c",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          transition: "background 0.3s",
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.background = "#c0392b")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.background = "#e74c3c")
+                        }
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    background: "#f8f9fa",
+                    borderRadius: "12px",
+                    padding: "32px",
+                    textAlign: "center",
+                    color: "#6c757d",
+                  }}
+                >
+                  No employed patients at this organization
+                </div>
+              )}
+            </section>
+          </>
+        )}
         {appear === 3 && <Messages showSidebar={false} showHeader={false} />}
         {appear === 4 && <OrgAssesments />}
         {appear === 0 && (
@@ -178,6 +396,14 @@ export default function Organizationpage() {
           </>
         )}
       </div>
+
+      {/* Edit Organization Modal */}
+      <EditOrganizationModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        organizationData={data}
+        onSave={handleEditSave}
+      />
     </div>
   );
 }

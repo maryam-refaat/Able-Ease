@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getRelatives, updateRelative } from "../assets/apis.js";
 import "./profile.css";
 
-export function RelativeCard({ title, data, disableFetch = false }) {
+export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
   const [form, setForm] = useState({
     name: "",
     contact: "",
@@ -159,13 +159,9 @@ export function RelativeCard({ title, data, disableFetch = false }) {
                 </div>
               </div>
 
-              {!isEditing ? (
-                <button className="edit-btn" onClick={() => setIsEditing(true)}>
+              {onEdit && (
+                <button className="edit-btn" onClick={onEdit}>
                   Edit
-                </button>
-              ) : (
-                <button className="save-btn" onClick={handleSave}>
-                  Save
                 </button>
               )}
             </div>
@@ -173,48 +169,32 @@ export function RelativeCard({ title, data, disableFetch = false }) {
             <div className="relative-input-grid">
               <div className="input-group">
                 <label>Name</label>
-                <input
-                  disabled={!isEditing}
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
+                <input disabled value={form.name} />
               </div>
 
               <div className="input-group">
                 <label>Contact Info</label>
-                <input
-                  disabled={!isEditing}
-                  value={form.contact}
-                  onChange={(e) =>
-                    setForm({ ...form, contact: e.target.value })
-                  }
-                />
+                <input disabled value={form.contact} />
               </div>
 
               <div className="input-group">
                 <label>Address</label>
-                <input
-                  disabled={!isEditing}
-                  value={form.address}
-                  onChange={(e) =>
-                    setForm({ ...form, address: e.target.value })
-                  }
-                />
+                <input disabled value={form.address} />
               </div>
 
-              <div className="input-group">
-                <label>Gender</label>
-                <input
-                  disabled={!isEditing}
-                  value={form.gender}
-                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
-                />
-              </div>
+              {title !== "Organization" && (
+                <>
+                  <div className="input-group">
+                    <label>Gender</label>
+                    <input disabled value={form.gender} />
+                  </div>
 
-              <div className="input-group">
-                <label>Patient Name</label>
-                <input disabled value={form.patientName} />
-              </div>
+                  <div className="input-group">
+                    <label>Patient Name</label>
+                    <input disabled value={form.patientName} />
+                  </div>
+                </>
+              )}
             </div>
           </>
         )}
