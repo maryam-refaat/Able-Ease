@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientCard from '../Components/PatientCard';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsernames, registerUser, updateUser, changePassword, getUserBySsn } from '../assets/apis';
+import { getAllUsernames, registerUser, updateUser, changePassword, getUserBySsn, deleteUser } from '../assets/apis';
 import './AdminProfile.css';
 
 const AdminProfile = () => {
@@ -276,6 +276,30 @@ const AdminProfile = () => {
     }
   };
 
+  const handleDeleteUser = async (u) => {
+    const ssnValue = u?.ssn || u?.Ssn || u?.SSN || u?.id || u?.Id || u?.username;
+    if (!ssnValue) {
+      alert('User SSN not found; cannot delete');
+      return;
+    }
+    const currentSsn = user?.ssn || user?.Ssn || user?.SSN || user?.id || user?.Id || user?.username;
+    if (currentSsn && (currentSsn === ssnValue)) {
+      alert('You cannot delete your own account');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to delete ${u?.username || u?.name || 'this user'}? This action cannot be undone.`)) return;
+    try {
+      await deleteUser(ssnValue);
+      setMessage('User deleted successfully!');
+      fetchAdmins();
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error('Delete failed', err);
+      const errorMsg = err?.response?.data?.message || err?.message || 'Failed to delete user';
+      alert(errorMsg);
+    }
+  };
+
   return (
     <div className="admin-page">
       <div className="page-container">
@@ -481,6 +505,16 @@ const AdminProfile = () => {
                       style={{ fontSize: 13 }}
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => handleDeleteUser(u)}
+                      style={{ fontSize: 13, background: '#dc2626', color: 'white' }}
+                      disabled={!(u?.ssn || u?.Ssn || u?.SSN || u?.id || u?.Id)}
+                      title={!(u?.ssn || u?.Ssn || u?.SSN || u?.id || u?.Id) ? 'No identifier available' : 'Delete user'}
+                      aria-label="Delete user"
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>

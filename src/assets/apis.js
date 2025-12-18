@@ -1156,4 +1156,25 @@ export const updateUser = async (ssn, body) => {
   }
   return await response.text();
 };
+
+// Delete a user by SSN
+export const deleteUser = async (ssn) => {
+  if (!ssn) throw new Error('deleteUser requires ssn');
+  const response = await fetch(`${BASE_URL}/Account/${ssn}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`
+    }
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Failed to delete user ${ssn}`);
+  }
+
+  const ct = response.headers.get('content-type') || '';
+  if (ct.includes('application/json')) return await response.json();
+  return await response.text();
+};
+
 export default api;
