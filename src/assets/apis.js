@@ -776,6 +776,33 @@ export const getAllDisabilities = async () => {
   return { data: disabilities };
 };
 
+// Add a new disability (Admin)
+export const addDisability = async (body) => {
+  const payload = {
+    name: body?.name || body?.Name || '',
+    type: body?.type || body?.Type || '',
+    description: body?.description || body?.Description || ''
+  };
+
+  const response = await fetch(`${BASE_URL}/Disability/AddDisability`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('authToken')}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Failed to add disability');
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) return await response.json();
+  return await response.text();
+};
+
 export const addPatientDisability = async (body) => {
   const response = await fetch(
     `${BASE_URL}/PatientDisability/AddDisabilityToPatient`,

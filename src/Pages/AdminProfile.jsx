@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientCard from '../Components/PatientCard';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsernames, registerUser, updateUser, changePassword, getUserBySsn, deleteUser } from '../assets/apis';
+import { getAllUsernames, registerUser, updateUser, changePassword, getUserBySsn, deleteUser, addDisability } from '../assets/apis';
 import './AdminProfile.css';
 
 const AdminProfile = () => {
@@ -25,6 +25,11 @@ const AdminProfile = () => {
   const [message, setMessage] = useState(null);
   const [pwdForm, setPwdForm] = useState({ current: '', newPassword: '', confirm: '' });
   const [pwdMessage, setPwdMessage] = useState(null);
+
+  // Disability form state (Admin)
+  const [disabilityForm, setDisabilityForm] = useState({ name: '', type: '', description: '' });
+  const [disabilityMessage, setDisabilityMessage] = useState(null);
+  const [disabilityLoading, setDisabilityLoading] = useState(false);
 
   const extractRoleValue = (user) => {
     if (!user) return undefined;
@@ -276,6 +281,29 @@ const AdminProfile = () => {
     }
   };
 
+  const handleAddDisability = async () => {
+    if (!disabilityForm.name) return alert('Disability name is required');
+    try {
+      setDisabilityLoading(true);
+      const payload = {
+        name: disabilityForm.name,
+        type: disabilityForm.type || '',
+        description: disabilityForm.description || ''
+      };
+
+      await addDisability(payload);
+      setDisabilityMessage('Disability added successfully!');
+      setDisabilityForm({ name: '', type: '', description: '' });
+      setTimeout(() => setDisabilityMessage(null), 3000);
+    } catch (err) {
+      console.error('Add disability failed', err);
+      const errorMsg = err?.message || 'Failed to add disability';
+      alert(errorMsg);
+    } finally {
+      setDisabilityLoading(false);
+    }
+  };
+
   const handleDeleteUser = async (u) => {
     const ssnValue = u?.ssn || u?.Ssn || u?.SSN || u?.id || u?.Id || u?.username;
     if (!ssnValue) {
@@ -455,6 +483,40 @@ const AdminProfile = () => {
           </div>
           <div className="small-note">* Required fields. Phone: (e.g., +1234567890 or 01234567890)</div>
           {message && <p className="status-msg success">{message}</p>}
+        </section>
+
+        {/* Add Disability (Admin) */}
+        <section className="card-section" style={{ marginTop: 18 }}>
+          <h3>Add Disability</h3>
+          <div className="card-row">
+            <input
+              className="input"
+              placeholder="Name *"
+              value={disabilityForm.name}
+              onChange={(e) => setDisabilityForm({ ...disabilityForm, name: e.target.value })}
+            />
+            <input
+              className="input"
+              placeholder="Type"
+              value={disabilityForm.type}
+              onChange={(e) => setDisabilityForm({ ...disabilityForm, type: e.target.value })}
+            />
+            <input
+              className="input"
+              placeholder="Description"
+              value={disabilityForm.description}
+              onChange={(e) => setDisabilityForm({ ...disabilityForm, description: e.target.value })}
+            />
+
+            <button
+              className="btn primary"
+              onClick={handleAddDisability}
+              disabled={disabilityLoading}
+            >
+              {disabilityLoading ? 'Adding...' : 'Add Disability'}
+            </button>
+          </div>
+          {disabilityMessage && <p className="status-msg success">{disabilityMessage}</p>}
         </section>
 
         {/* All Users Section */}
