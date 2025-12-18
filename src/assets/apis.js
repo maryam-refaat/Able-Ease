@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API_KEY = "";
-const BASE_URL = "https://ableeaseapi.runasp.net/api"; 
-
+export const BASE_URL = "https://ableeaseapi.runasp.net/api";
 
 export const fetchAvailabletherapiesJoined = async (id) => {
   const response = await fetch(`${BASE_URL}/Therapy/center/${id}/joined`, {
@@ -651,15 +650,12 @@ export const fetchAvailablePrograms = async (ssn) => {
 };
 
 export const addProgram = async (organizationSsn, formData) => {
-  const res = await fetch(
-    `https://ableeaseapi.runasp.net/api/Program/AddProgram/${organizationSsn}`,
-    {
-      method: "POST",
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  const res = await fetch(`${BASE_URL}/Program/AddProgram/${organizationSsn}`, {
+    method: "POST",
+    Authorization: `Bearer ${localStorage.getItem("authToken")}`,
 
-      body: formData,
-    }
-  );
+    body: formData,
+  });
 
   if (!res.ok) {
     const error = await res.json();

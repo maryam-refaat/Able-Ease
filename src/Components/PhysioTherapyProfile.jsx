@@ -21,7 +21,8 @@ export default function Physiocenterpage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://ableeaseapi.runasp.net/api/Account/logout", {
+      const { BASE_URL } = await import("../assets/apis.js");
+      await fetch(`${BASE_URL}/Account/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,14 +47,12 @@ export default function Physiocenterpage() {
 
         const orgSSN = localStorage.getItem("ssn");
 
-        const response = await fetch(
-          `https://ableeaseapi.runasp.net/api/center/getcenter/${orgSSN}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        const { BASE_URL } = await import("../assets/apis.js");
+        const response = await fetch(`${BASE_URL}/center/getcenter/${orgSSN}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -87,14 +86,12 @@ export default function Physiocenterpage() {
     try {
       const orgSSN = localStorage.getItem("ssn");
       if (orgSSN) {
-        const response = await fetch(
-          `https://ableeaseapi.runasp.net/api/center/getcenter/${orgSSN}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
-          }
-        );
+        const { BASE_URL } = await import("../assets/apis.js");
+        const response = await fetch(`${BASE_URL}/center/getcenter/${orgSSN}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        });
         if (response.ok) {
           const orgData = await response.json();
           setData(orgData);

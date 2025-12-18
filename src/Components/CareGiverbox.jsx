@@ -3,6 +3,7 @@ import CareGiverModal from "./CareGiverModal";
 import AssignPatientModal from "./AssignPatientModal";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { BASE_URL } from "../assets/apis";
 import "../profilepagecomponents/organization.css";
 
 export default function CareGiverBox() {
@@ -70,7 +71,7 @@ export default function CareGiverBox() {
   const trackRef = useRef(null);
   const { alertState, showAlert, closeAlert } = useAlert();
 
-  const baseApiUrl = "https://ableeaseapi.runasp.net/api";
+  const baseApiUrl = BASE_URL;
   const getAuth = () => ({
     token: localStorage.getItem("authToken"),
     organizationSSN: localStorage.getItem("ssn"),

@@ -32,7 +32,8 @@ export default function Sidebar({
   const handleLogout = async () => {
     try {
       // Call logout API endpoint
-      await fetch("https://ableeaseapi.runasp.net/api/Account/logout", {
+      const { BASE_URL } = await import("../assets/apis.js");
+      await fetch(`${BASE_URL}/Account/logout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

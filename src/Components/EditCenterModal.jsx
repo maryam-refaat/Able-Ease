@@ -55,16 +55,14 @@ export default function EditCenterModal({
         formDataToSend.append("Image", formData.image);
       }
 
-      const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/center/updatecenter/${ssn}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formDataToSend,
-        }
-      );
+      const { BASE_URL } = await import("../assets/apis.js");
+      const response = await fetch(`${BASE_URL}/center/updatecenter/${ssn}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to update: ${response.status}`);

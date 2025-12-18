@@ -45,8 +45,9 @@ export default function EditRelativeModal({
       console.log("SSN:", ssn);
       console.log("Payload:", payload);
 
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Relative/UpdateRelative/${ssn}`,
+        `${BASE_URL}/Relative/UpdateRelative/${ssn}`,
         {
           method: "PUT",
           headers: {

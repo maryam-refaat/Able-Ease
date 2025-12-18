@@ -35,8 +35,9 @@ export default function PatientsBox({
 
   const fetchPatientData = async (patientSSN) => {
     try {
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Patients/GetProgramByPatientSSN/${patientSSN}`,
+        `${BASE_URL}/Patients/GetProgramByPatientSSN/${patientSSN}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -165,17 +166,15 @@ export default function PatientsBox({
 
       console.log("Sending report payload:", payload);
 
-      const response = await fetch(
-        "https://ableeaseapi.runasp.net/api/Report/AddReport",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const { BASE_URL } = await import("../assets/apis.js");
+      const response = await fetch(`${BASE_URL}/Report/AddReport`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -199,8 +198,9 @@ export default function PatientsBox({
     }
 
     try {
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Report/DeleteReport/${reportId}`,
+        `${BASE_URL}/Report/DeleteReport/${reportId}`,
         {
           method: "DELETE",
           headers: {

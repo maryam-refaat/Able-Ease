@@ -67,8 +67,9 @@ export default function EditCaregiverModal({
         formDataToSend.append("Image", formData.image);
       }
 
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Caregiver/UpdateCaregiver/${ssn}`,
+        `${BASE_URL}/Caregiver/UpdateCaregiver/${ssn}`,
         {
           method: "PUT",
           headers: {

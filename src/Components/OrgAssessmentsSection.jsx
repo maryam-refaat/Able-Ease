@@ -28,8 +28,9 @@ export default function OrgAssessmentsSection() {
   const fetchPrograms = async () => {
     setIsLoading(true);
     try {
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Program/OrganizationPrograms/${organizationSSN}`,
+        `${BASE_URL}/Program/OrganizationPrograms/${organizationSSN}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -49,8 +50,9 @@ export default function OrgAssessmentsSection() {
             // First, fetch the assessment for this program
             let programAssessment = null;
             try {
+              const { BASE_URL } = await import("../assets/apis.js");
               const assessmentProgramResponse = await fetch(
-                `https://ableeaseapi.runasp.net/api/Assessment/GetAssessmentsByProgram/${organizationSSN}/${program.id}`,
+                `${BASE_URL}/Assessment/GetAssessmentsByProgram/${organizationSSN}/${program.id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem(
@@ -73,8 +75,9 @@ export default function OrgAssessmentsSection() {
               console.error("Error fetching program assessment:", error);
             }
 
+            const { BASE_URL } = await import("../assets/apis.js");
             const patientsResponse = await fetch(
-              `https://ableeaseapi.runasp.net/api/Program/GetProgramPatients/${organizationSSN}/${program.id}`,
+              `${BASE_URL}/Program/GetProgramPatients/${organizationSSN}/${program.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -93,8 +96,9 @@ export default function OrgAssessmentsSection() {
                 patientsList.map(async (patient) => {
                   try {
                     // First, try to get the assessment patient data using the specific endpoint
+                    const { BASE_URL } = await import("../assets/apis.js");
                     const assessmentResponse = await fetch(
-                      `https://ableeaseapi.runasp.net/api/Assessment/GetAssessmentPatientById/${
+                      `${BASE_URL}/Assessment/GetAssessmentPatientById/${
                         patient.id
                       }/${organizationSSN}/${program.id}/${
                         programAssessment?.id || 0
@@ -152,8 +156,9 @@ export default function OrgAssessmentsSection() {
                         assessmentDate: new Date().toISOString(),
                       };
 
+                      const { BASE_URL } = await import("../assets/apis.js");
                       const addResponse = await fetch(
-                        "https://ableeaseapi.runasp.net/api/Assessment/AddAssessmentPatient",
+                        `${BASE_URL}/Assessment/AddAssessmentPatient`,
                         {
                           method: "POST",
                           headers: {
@@ -265,8 +270,9 @@ export default function OrgAssessmentsSection() {
         assessmentDate: updateForm.assessmentDate,
       };
 
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Assessment/UpdateAssessmentPatient/${updateForm.patientSSN}/${updateForm.assessmentProgramOrganizationSSN}/${updateForm.assessmentProgramId}/${updateForm.assessmentId}`,
+        `${BASE_URL}/Assessment/UpdateAssessmentPatient/${updateForm.patientSSN}/${updateForm.assessmentProgramOrganizationSSN}/${updateForm.assessmentProgramId}/${updateForm.assessmentId}`,
         {
           method: "PUT",
           headers: {
@@ -294,8 +300,9 @@ export default function OrgAssessmentsSection() {
     }
 
     try {
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Assessment/DeleteAssessment/${organizationSSN}/${programId}/${assessmentId}`,
+        `${BASE_URL}/Assessment/DeleteAssessment/${organizationSSN}/${programId}/${assessmentId}`,
         {
           method: "DELETE",
           headers: {

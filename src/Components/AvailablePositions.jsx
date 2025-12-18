@@ -3,8 +3,9 @@ import PositionModal from "./PositionModal";
 import "../profilepagecomponents/organization.css";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { BASE_URL } from "../assets/apis";
 
-const baseApiUrl = "https://ableeaseapi.runasp.net/api"; // Example base URL
+const baseApiUrl = BASE_URL;
 
 export default function AvailableLocationsBox() {
   const [positions, setPositions] = useState([]);

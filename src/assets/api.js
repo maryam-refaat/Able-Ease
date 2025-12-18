@@ -1,10 +1,11 @@
 import axios from "axios";
 
 const API_KEY = "";
-const BASE_URL = ""; // example: https://myserver.com/api
+const BASE_URL = "https://ableeaseapi.runasp.net/api";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:4000/api",
+  baseURL:
+    import.meta.env.VITE_API_BASE || "https://ableeaseapi.runasp.net/api",
   timeout: 10000,
 });
 // Fetch physi centers

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./signup.css";
 import { useNavigate } from "react-router-dom";
-import { signupCaregiver } from "../assets/apis";
+import { signupCaregiver, BASE_URL } from "../assets/apis";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
 
@@ -17,7 +17,7 @@ export default function CaretakerSignUp() {
   const [loadingOrgs, setLoadingOrgs] = useState(false);
   const formRef = React.useRef(null);
 
-  const baseApiUrl = "https://ableeaseapi.runasp.net/api";
+  const baseApiUrl = BASE_URL;
 
   // Fetch organizations with usernames
   useEffect(() => {

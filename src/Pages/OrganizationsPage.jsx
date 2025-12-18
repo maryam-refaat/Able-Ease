@@ -292,22 +292,20 @@ export default function OrganizationsPage() {
         selectedCaregiver?.ID ||
         selectedCaregiver?.ssn;
 
-      const response = await fetch(
-        "https://ableeaseapi.runasp.net/api/Message/send/contact",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-          body: JSON.stringify({
-            senderSSN: senderSSN,
-            receiverSSN: receiverSSN,
-            subject: formData.subject,
-            body: formData.body,
-          }),
-        }
-      );
+      const { BASE_URL } = await import("../assets/apis.js");
+      const response = await fetch(`${BASE_URL}/Message/send/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+        body: JSON.stringify({
+          senderSSN: senderSSN,
+          receiverSSN: receiverSSN,
+          subject: formData.subject,
+          body: formData.body,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to send message");

@@ -62,8 +62,9 @@ export default function EditOrganizationModal({
       console.log("ContactInfo:", formData.contactInfo.trim() || "");
       console.log("Has Image:", !!formData.image);
 
+      const { BASE_URL } = await import("../assets/apis.js");
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/api/Organizations/UpdateOrganization/${ssn}`,
+        `${BASE_URL}/Organizations/UpdateOrganization/${ssn}`,
         {
           method: "PUT",
           headers: {

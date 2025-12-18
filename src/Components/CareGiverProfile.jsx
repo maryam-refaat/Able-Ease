@@ -25,8 +25,9 @@ export default function CaregiverProfile() {
           throw new Error("Missing caregiver SSN in localStorage");
         }
 
+        const { BASE_URL } = await import("../assets/apis.js");
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/api/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
+          `${BASE_URL}/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -64,8 +65,9 @@ export default function CaregiverProfile() {
     try {
       const caregiverSSN = localStorage.getItem("ssn");
       if (caregiverSSN) {
+        const { BASE_URL } = await import("../assets/apis.js");
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/api/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
+          `${BASE_URL}/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
