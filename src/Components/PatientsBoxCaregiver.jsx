@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getPatient_Reports } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function PatientsBox({
   patients = [],
@@ -15,6 +17,7 @@ export default function PatientsBox({
   const [reportForm, setReportForm] = useState({ subject: "", content: "" });
   const [patientPrograms, setPatientPrograms] = useState({});
   const [programNames, setProgramNames] = useState({});
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const hasPatients = Array.isArray(patients) && patients.length > 0;
 
@@ -119,17 +122,17 @@ export default function PatientsBox({
 
   const submitReport = async () => {
     if (!reportForm.subject || !reportForm.content) {
-      alert("Please fill in both subject and content");
+      showAlert("Please fill in both subject and content", "error");
       return;
     }
 
     if (reportForm.subject.trim().length < 5) {
-      alert("Subject must be at least 5 characters long");
+      showAlert("Subject must be at least 5 characters long", "error");
       return;
     }
 
     if (reportForm.content.trim().length < 10) {
-      alert("Content must be at least 10 characters long");
+      showAlert("Content must be at least 10 characters long", "error");
       return;
     }
 
@@ -147,7 +150,7 @@ export default function PatientsBox({
       }
 
       if (!programData) {
-        alert("Failed to get patient's program information");
+        showAlert("Failed to get patient's program information", "error");
         return;
       }
 
@@ -177,7 +180,7 @@ export default function PatientsBox({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      alert("Report added successfully!");
+      showAlert("Report added successfully!", "success");
       setShowAddModal(false);
       setReportForm({ subject: "", content: "" });
 
@@ -185,7 +188,7 @@ export default function PatientsBox({
       await fetchReports(selectedPatient.ssn);
     } catch (error) {
       console.error("Error adding report:", error);
-      alert("Failed to add report. Please try again.");
+      showAlert("Failed to add report. Please try again.", "error");
     }
   };
 
@@ -209,13 +212,13 @@ export default function PatientsBox({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      alert("Report deleted successfully!");
+      showAlert("Report deleted successfully!", "success");
 
       // Refresh reports for this patient
       await fetchReports(patientSSN);
     } catch (error) {
       console.error("Error deleting report:", error);
-      alert("Failed to delete report. Please try again.");
+      showAlert("Failed to delete report. Please try again.", "error");
     }
   };
 
@@ -457,6 +460,14 @@ export default function PatientsBox({
           </div>
         </div>
       )}
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </section>
   );
 }

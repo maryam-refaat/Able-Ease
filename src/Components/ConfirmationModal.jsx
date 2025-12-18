@@ -7,6 +7,8 @@ import {
   getWorkByPatient,
 } from "../assets/apis";
 import { JobApplication } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function ConfirmationModal({
   isOpen,
@@ -22,6 +24,7 @@ export default function ConfirmationModal({
   const [qualifications, setQualifications] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   if (!isOpen && !showErrorModal) return null;
 
@@ -43,7 +46,7 @@ export default function ConfirmationModal({
       const programPrice = program?.price ?? program?.Price ?? 0;
 
       if (!patientSSN) {
-        alert("Please log in ");
+        showAlert("Please log in", "error");
         onCancel();
         return;
       }
@@ -95,8 +98,9 @@ export default function ConfirmationModal({
         await addPayment(paymentData);
         console.log("Payment added successfully");
 
-        alert(
-          `Successfully booked: ${programName}\nTotal paid: $${programPrice}`
+        showAlert(
+          `Successfully booked: ${programName}\nTotal paid: $${programPrice}`,
+          "success"
         );
         onConfirm(); // Close modal on success
       } catch (error) {
@@ -113,7 +117,7 @@ export default function ConfirmationModal({
           setShowErrorModal(true);
           onCancel(); // Close the confirmation modal
         } else {
-          alert("Failed to book program. Please try again.");
+          showAlert("Failed to book program. Please try again.", "error");
         }
       } finally {
         setIsLoading(false);
@@ -126,13 +130,13 @@ export default function ConfirmationModal({
         program?.senderSSN;
 
       if (!orgSSN) {
-        alert("Organization information not found.");
+        showAlert("Organization information not found.", "error");
         onCancel();
         return;
       }
 
       if (!qualifications.trim()) {
-        alert("Please enter your qualifications.");
+        showAlert("Please enter your qualifications.", "warning");
         return;
       }
 
@@ -147,7 +151,10 @@ export default function ConfirmationModal({
           "Position";
 
         if (!userSSN) {
-          alert("User information not found. Please log in again.");
+          showAlert(
+            "User information not found. Please log in again.",
+            "error"
+          );
           onCancel();
           setIsLoading(false);
           return;
@@ -195,12 +202,15 @@ export default function ConfirmationModal({
         const response = await JobApplication(body);
         console.log("Job application response:", response);
 
-        alert("Job application submitted successfully!");
+        showAlert("Job application submitted successfully!", "success");
         setQualifications("");
         onConfirm(); // Close modal on success
       } catch (error) {
         console.error("Job application error:", error);
-        alert("Failed to submit job application. Please try again.");
+        showAlert(
+          "Failed to submit job application. Please try again.",
+          "error"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -385,6 +395,12 @@ export default function ConfirmationModal({
           </button>
         </div>
       </div>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

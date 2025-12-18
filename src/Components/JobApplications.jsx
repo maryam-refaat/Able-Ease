@@ -7,8 +7,11 @@ import {
   deleteReceivedMessage,
   deleteSentMessage,
 } from "../assets/apis.js";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function JobApplications() {
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -160,10 +163,10 @@ export default function JobApplications() {
       setSelectedApplication(null);
       setRejectFormData({ subject: "", body: "" });
 
-      alert("Rejection message sent successfully!");
+      showAlert("Rejection message sent successfully!", "success");
     } catch (err) {
       console.error("Failed to send rejection message:", err);
-      alert("Failed to send rejection message. Please try again.");
+      showAlert("Failed to send rejection message. Please try again.", "error");
     } finally {
       setFormLoading(false);
     }
@@ -211,10 +214,10 @@ export default function JobApplications() {
         startDate: new Date().toISOString().split("T")[0],
       });
 
-      alert("Application accepted and job added successfully!");
+      showAlert("Application accepted and job added successfully!", "success");
     } catch (err) {
       console.error("Failed to accept application:", err);
-      alert("Failed to accept application. Please try again.");
+      showAlert("Failed to accept application. Please try again.", "error");
     } finally {
       setFormLoading(false);
     }
@@ -656,6 +659,13 @@ export default function JobApplications() {
           </div>
         </div>
       )}
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </section>
   );
 }

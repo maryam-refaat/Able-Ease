@@ -2,6 +2,8 @@ import { useState } from "react";
 import "../profilepagecomponents/profile.css";
 import { addMedicalInfo } from "../assets/apis";
 import { useEffect } from "react";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export function MedicalBox({ relativeSSN, patientSSN }) {
   const [showPopup, setShowPopup] = useState(false);
@@ -18,6 +20,7 @@ export function MedicalBox({ relativeSSN, patientSSN }) {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   // Keep SSNs in sync with props/localStorage
   useEffect(() => {
@@ -54,8 +57,9 @@ export function MedicalBox({ relativeSSN, patientSSN }) {
 
     // Check if SSNs are present before submitting
     if (!form.patientSSN || !form.relativeSSN) {
-      alert(
-        "Patient SSN or Relative SSN is missing. Please refresh and try again."
+      showAlert(
+        "Patient SSN or Relative SSN is missing. Please refresh and try again.",
+        "error"
       );
       console.error("Missing SSNs:", {
         patientSSN: form.patientSSN,
@@ -82,7 +86,7 @@ export function MedicalBox({ relativeSSN, patientSSN }) {
       const response = await addMedicalInfo(payload);
       // If the API returns text/plain or empty body, treat 200 OK as success
       if (response !== undefined) {
-        alert("Medical info added successfully!");
+        showAlert("Medical info added successfully!", "success");
 
         // Reset form
         setForm({
@@ -99,7 +103,7 @@ export function MedicalBox({ relativeSSN, patientSSN }) {
     } catch (err) {
       console.error("API Error:", err);
       console.error("Error details:", err.message);
-      alert("Failed to add medical info. Please try again.");
+      showAlert("Failed to add medical info. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -226,6 +230,14 @@ export function MedicalBox({ relativeSSN, patientSSN }) {
           </div>
         </div>
       )}
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </>
   );
 }

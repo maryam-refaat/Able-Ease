@@ -8,6 +8,8 @@ import {
 } from "../assets/apis.js";
 import AvailableTherapyModal from "./AvailableTherapyModal";
 import "../profilepagecomponents/organization.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function Availabletherapiess() {
   const [programs, setPrograms] = useState([]);
@@ -17,6 +19,7 @@ export default function Availabletherapiess() {
   const [selectedProgramForEdit, setSelectedProgramForEdit] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const progTrackRef = useRef(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
 
@@ -65,7 +68,7 @@ export default function Availabletherapiess() {
 
     const therapyId = program.id || program.Id;
     if (!therapyId) {
-      alert("Cannot delete therapy: ID not found");
+      showAlert("Cannot delete therapy: ID not found", "error");
       return;
     }
 
@@ -74,10 +77,10 @@ export default function Availabletherapiess() {
       await deleteTherapy(therapyId);
       // Remove from local state
       setPrograms(programs.filter((p) => (p.id || p.Id) !== therapyId));
-      alert("Therapy deleted successfully");
+      showAlert("Therapy deleted successfully", "success");
     } catch (error) {
       console.error("Delete therapy error:", error);
-      alert("Failed to delete therapy. Please try again.");
+      showAlert("Failed to delete therapy. Please try again.", "error");
     } finally {
       setDeleteLoading(null);
     }
@@ -97,7 +100,7 @@ export default function Availabletherapiess() {
         const response = await updatetherapy(formData);
         console.log("Update response:", response);
 
-        alert("Therapy updated successfully");
+        showAlert("Therapy updated successfully", "success");
       } else {
         // Add - set CenterID from localStorage
         formData.set("CenterID", centerId);
@@ -105,7 +108,7 @@ export default function Availabletherapiess() {
         const response = await addtherapy(formData);
         console.log("Add response:", response);
 
-        alert("Therapy added successfully");
+        showAlert("Therapy added successfully", "success");
       }
 
       // Refresh the therapies list
@@ -117,7 +120,7 @@ export default function Availabletherapiess() {
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error saving therapy:", error);
-      alert("Failed to save therapy. Please try again.");
+      showAlert("Failed to save therapy. Please try again.", "error");
     }
   };
 
@@ -248,6 +251,14 @@ export default function Availabletherapiess() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmitProgram}
         program={selectedProgramForEdit}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
       />
     </section>
   );

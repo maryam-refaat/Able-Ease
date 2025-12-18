@@ -5,6 +5,8 @@ import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
 import Sidebar from "../Components/Sidebar";
 import { setAuthState } from "../context/AuthState";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 import PatientProfileModal from "../Components/PatientProfileModal";
 import EditPatientModal from "../Components/EditPatientModal";
@@ -26,6 +28,7 @@ export default function PatientProfile() {
   const [data, setData] = useState(patientData || {});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -201,24 +204,6 @@ export default function PatientProfile() {
           };
         });
 
-        // Add dummy therapy session for review
-        sessions.push({
-          id: "dummy-1",
-          title: "Physical Therapy - Lower Back",
-          centerName: "HealthCare Rehabilitation Center",
-          location: "123 Medical Plaza, City Center",
-          pricePerHour: 75,
-          duration: 60,
-          doctorname: "Dr. Sarah Johnson",
-          therapyDetails:
-            "Focused rehabilitation for lower back pain with exercise therapy",
-          date: "2025-12-20",
-          imageUrl: "",
-          imgUrl: "",
-          centerID: "center-001",
-          state: "scheduled",
-        });
-
         // normalize employment data using API field names
         console.log("rawWork array:", rawWork);
         const employment =
@@ -318,7 +303,7 @@ export default function PatientProfile() {
       setWithdrawModal({ isOpen: false, program: null });
     } catch (err) {
       console.error("Withdraw failed", err);
-      alert("Failed to withdraw from program. Please try again.");
+      showAlert("Failed to withdraw from program. Please try again.", "error");
     } finally {
       setActionLoading(false);
     }
@@ -345,7 +330,7 @@ export default function PatientProfile() {
       setCancelModal({ isOpen: false, session: null });
     } catch (err) {
       console.error("Cancel session failed", err);
-      alert("Failed to cancel session. Please try again.");
+      showAlert("Failed to cancel session. Please try again.", "error");
     } finally {
       setActionLoading(false);
     }
@@ -374,7 +359,7 @@ export default function PatientProfile() {
       setResignModal({ isOpen: false });
     } catch (err) {
       console.error("Resign failed", err);
-      alert("Failed to resign from employment. Please try again.");
+      showAlert("Failed to resign from employment. Please try again.", "error");
     } finally {
       setActionLoading(false);
     }
@@ -697,6 +682,14 @@ export default function PatientProfile() {
         onClose={() => setEditModalOpen(false)}
         patientData={data}
         onSave={handleEditSave}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
       />
     </>
   );

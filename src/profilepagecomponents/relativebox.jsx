@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { getRelatives, updateRelative } from "../assets/apis.js";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 import "./profile.css";
 
 export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
@@ -16,6 +18,7 @@ export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const baseApiUrl = "https://localhost:7040/api";
 
@@ -127,10 +130,10 @@ export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
       }
 
       setIsEditing(false);
-      alert("Profile updated successfully!");
+      showAlert("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Failed to update relative:", error);
-      alert(`Failed to update profile: ${error.message}`);
+      showAlert(`Failed to update profile: ${error.message}`, "error");
     }
   };
 
@@ -199,6 +202,14 @@ export function RelativeCard({ title, data, disableFetch = false, onEdit }) {
           </>
         )}
       </div>
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

@@ -32,6 +32,10 @@ export default function EditPatientModal({
       const ssn = localStorage.getItem("ssn");
       const token = localStorage.getItem("authToken");
 
+      // Both programOrganizationSSN and programId must be provided together or both null
+      const hasProgram =
+        patientData?.programOrganizationSSN && patientData?.programId;
+
       const payload = {
         name: formData.name.trim(),
         address: formData.address.trim() || "",
@@ -41,8 +45,10 @@ export default function EditPatientModal({
           patientData?.birthDate || patientData?.birthdate || "2025-12-18",
         relativeSSN: patientData?.relativeSSN || null,
         caregiverSSN: patientData?.caregiverSSN || null,
-        programOrganizationSSN: patientData?.programOrganizationSSN || null,
-        programId: patientData?.programId || 0,
+        programOrganizationSSN: hasProgram
+          ? patientData.programOrganizationSSN
+          : null,
+        programId: hasProgram ? patientData.programId : null,
       };
 
       console.log("=== Update Patient Request ===");

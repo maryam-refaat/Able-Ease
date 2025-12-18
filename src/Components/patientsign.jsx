@@ -4,6 +4,8 @@ import "../Components/signup.css";
 import { useNavigate } from "react-router-dom";
 import { setAuthState } from "../context/AuthState";
 import { signupPatient } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function PatientSignUp() {
   const [agree, setAgree] = useState(false);
@@ -13,6 +15,7 @@ export default function PatientSignUp() {
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const formRef = React.useRef(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const handleCloseSuccess = () => {
     setIsSuccess(false);
@@ -42,36 +45,36 @@ export default function PatientSignUp() {
 
     // Basic validation
     if (!data.name || data.name.split(" ").filter(Boolean).length < 2) {
-      alert("Please enter your full name (first and last name).");
+      showAlert("Please enter your full name (first and last name).", "error");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!data.email || !emailRegex.test(data.email)) {
-      alert("Please enter a valid email address");
+      showAlert("Please enter a valid email address", "error");
       return;
     }
 
     if (!data.address || data.address.length < 3) {
-      alert("Please enter a valid address.");
+      showAlert("Please enter a valid address.", "error");
       return;
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/; // allow international formatting, min 7 chars
     if (!data.contactInfo || !phoneRegex.test(data.contactInfo)) {
-      alert("Please enter a valid phone number");
+      showAlert("Please enter a valid phone number", "error");
       return;
     }
 
     if (!data.birthDate) {
-      alert("Please select your birth date");
+      showAlert("Please select your birth date", "error");
       return;
     }
 
     // age check (optional) — ensures date is reasonable and age <= 120
     const birth = new Date(data.birthDate);
     if (isNaN(birth.getTime())) {
-      alert("Invalid birth date");
+      showAlert("Invalid birth date", "error");
       return;
     }
     const age =
@@ -83,27 +86,27 @@ export default function PatientSignUp() {
         ? 1
         : 0);
     if (age < 0 || age > 120) {
-      alert("Please enter a realistic birth date");
+      showAlert("Please enter a realistic birth date", "error");
       return;
     }
 
     if (!data.gender) {
-      alert("Please select your gender");
+      showAlert("Please select your gender", "error");
       return;
     }
 
     if (!data.password || data.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return;
     }
 
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match");
+      showAlert("Passwords do not match", "error");
       return;
     }
 
     if (!agree) {
-      alert("Please accept the privacy & policy terms");
+      showAlert("Please accept the privacy & policy terms", "error");
       return;
     }
 
@@ -157,11 +160,6 @@ export default function PatientSignUp() {
 
     setIsLoading(false);
     setIsSuccess(true);
-
-    // Navigate to profile immediately
-    setTimeout(() => {
-      navigate("/patient-profile");
-    }, 100);
   }
 
   if (isError) {
@@ -196,79 +194,90 @@ export default function PatientSignUp() {
             fontSize: "15px",
           }}
         >
-          You can now access your profile and start booking programs.
+          Please login with your credentials to access your account.
         </p>
         <button
           className="primary-btn"
-          onClick={() =>
-            navigate("/patient-profile", {
-              state: {
-                patientData: JSON.parse(localStorage.getItem("patientData")),
-              },
-            })
-          }
+          onClick={() => {
+            setIsSuccess(false);
+            if (formRef.current) formRef.current.reset();
+          }}
         >
-          Go to Profile
+          OK
         </button>
       </div>
     );
   }
 
   return (
-    <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
-      <h2>Patient Sign Up</h2>
+    <>
+      <form className="form-box" onSubmit={handleSubmit} ref={formRef}>
+        <h2>Patient Sign Up</h2>
 
-      <div className="two-inputs">
-        <input type="text" name="fullName" placeholder="Full Name" required />
-        <input type="text" name="address" placeholder="Address" required />
-      </div>
+        <div className="two-inputs">
+          <input type="text" name="fullName" placeholder="Full Name" required />
+          <input type="text" name="address" placeholder="Address" required />
+        </div>
 
-      <div className="two-inputs">
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="text" name="phone" placeholder="Phone Number" required />
-      </div>
+        <div className="two-inputs">
+          <input type="email" name="email" placeholder="Email" required />
+          <input type="text" name="phone" placeholder="Phone Number" required />
+        </div>
 
-      <div className="two-inputs">
-        <input type="date" name="birthDate" placeholder="Birth Date" required />
-        <select name="gender" required>
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
+        <div className="two-inputs">
+          <input
+            type="date"
+            name="birthDate"
+            placeholder="Birth Date"
+            required
+          />
+          <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
 
-      <div className="two-inputs">
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          required
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          required
-        />
-      </div>
+        <div className="two-inputs">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            required
+          />
+        </div>
 
-      <label className="checkbox-row">
-        <input
-          type="checkbox"
-          checked={agree}
-          onChange={() => setAgree((v) => !v)}
-        />
-        <span>Accept privacy & policy terms</span>
-      </label>
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
+            checked={agree}
+            onChange={() => setAgree((v) => !v)}
+          />
+          <span>Accept privacy & policy terms</span>
+        </label>
 
-      <button
-        disabled={!agree || isLoading}
-        className="primary-btn"
-        type="submit"
-      >
-        {isLoading ? "Signing Up..." : "Sign Up"}
-      </button>
-    </form>
+        <button
+          disabled={!agree || isLoading}
+          className="primary-btn"
+          type="submit"
+        >
+          {isLoading ? "Signing Up..." : "Sign Up"}
+        </button>
+      </form>
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
+    </>
   );
 }

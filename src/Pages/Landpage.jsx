@@ -11,6 +11,8 @@ import "./Landpage.css";
 // import { Navigation, Autoplay } from 'swiper';
 
 import pic from "../assets/unsplash_Qbp4GeJib5A.png";
+import pic2 from "../assets/asset1.jpg";
+import pic3 from "../assets/asset2.jpg";
 
 import Programfind from "../Components/program_find";
 import Physicenterfind from "../Components/physiocenter";
@@ -239,7 +241,7 @@ export default function Landpage() {
         Meet Our Care Givers
       </h2>
 
-      <SimpleCarousel images={[pic, pic, pic]} autoDelay={3000} />
+      <SimpleCarousel images={[pic, pic2, pic3]} autoDelay={3000} />
 
       <p className="paragraph2">
         {" "}

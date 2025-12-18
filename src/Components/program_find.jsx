@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { getPrograms } from "../assets/apis";
 import "./program_find.css";
 import programimg from "../assets/unsplash_VOUicg8Ejus.png";
+import { useNavigate } from "react-router-dom";
 export default function Programfind() {
+  const navigate = useNavigate();
   const dummyPrograms = [
     {
       id: 1,
@@ -95,10 +97,11 @@ export default function Programfind() {
     <section className="program-section">
       <div className="program-container">
         <div className="program-header">
-          <h2 className="program-title2">
-            Discover Our Programs
-          </h2>
-          <button className="program-view-btn">
+          <h2 className="program-title2">Discover Our Programs</h2>
+          <button
+            className="program-view-btn"
+            onClick={() => navigate("/all-programs")}
+          >
             View All
             <i className="fa-solid fa-arrow-right"></i>
           </button>
@@ -115,11 +118,12 @@ export default function Programfind() {
 
           <div className="program-cards" ref={scrollRef} aria-live="polite">
             {programs.map((c) => (
-              <div key={c.id} className="program-card2" onClick={handleCardClick}>
-                <img
-                  src={c.imageUrl || c.image || programimg}
-                  alt={c.name}
-                />
+              <div
+                key={c.id}
+                className="program-card2"
+                onClick={handleCardClick}
+              >
+                <img src={c.imageUrl || c.image || programimg} alt={c.name} />
                 <div className="program-badge">Featured</div>
                 <h3>{c.name}</h3>
                 <p>${c.price || c.Price}</p>

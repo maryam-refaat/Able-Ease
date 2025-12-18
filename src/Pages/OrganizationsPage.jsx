@@ -8,6 +8,8 @@ import PositionCard from "../Components/PositionsCard";
 import CaregiverCarousel from "../Components/CaregiverCarousel";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import ContactModal from "../Components/ContactModal";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 import {
   getOrganizations,
@@ -63,6 +65,7 @@ const DUMMY_CAREGIVERS = [
 ];
 
 export default function OrganizationsPage() {
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [organizations, setOrganizations] = useState(DUMMY_ORGANIZATIONS);
   const [programs, setPrograms] = useState([]);
   const [positions, setPositions] = useState([]);
@@ -310,12 +313,12 @@ export default function OrganizationsPage() {
         throw new Error("Failed to send message");
       }
 
-      alert("Message sent successfully!");
+      showAlert("Message sent successfully!", "success");
       setShowContactModal(false);
       setSelectedCaregiver(null);
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message. Please try again.");
+      showAlert("Failed to send message. Please try again.", "error");
     }
   };
 
@@ -524,6 +527,13 @@ export default function OrganizationsPage() {
         onConfirm={handleContactConfirm}
         onCancel={handleContactCancel}
         receiverName={selectedCaregiver?.name || selectedCaregiver?.Name || ""}
+      />
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
       />
     </div>
   );

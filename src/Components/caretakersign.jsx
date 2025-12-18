@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./signup.css";
 import { useNavigate } from "react-router-dom";
 import { signupCaregiver } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function CaretakerSignUp() {
   const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -80,54 +83,54 @@ export default function CaretakerSignUp() {
 
     // Validation
     if (!name || name.trim().length < 3) {
-      alert("Please enter a valid name (at least 3 characters)");
+      showAlert("Please enter a valid name (at least 3 characters)", "error");
       return;
     }
 
     if (!address || address.trim().length < 5) {
-      alert("Please enter a valid address");
+      showAlert("Please enter a valid address", "error");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      alert("Please enter a valid email address");
+      showAlert("Please enter a valid email address", "error");
       return;
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
     if (!contactInfo || !phoneRegex.test(contactInfo)) {
-      alert("Please enter a valid phone number");
+      showAlert("Please enter a valid phone number", "error");
       return;
     }
 
     if (!gender) {
-      alert("Please select your gender");
+      showAlert("Please select your gender", "error");
       return;
     }
 
     if (!birthDate) {
-      alert("Please enter your birth date");
+      showAlert("Please enter your birth date", "error");
       return;
     }
 
     if (!organizationSSN) {
-      alert("Please select an organization");
+      showAlert("Please select an organization", "error");
       return;
     }
 
     if (!experience || experience.trim().length < 3) {
-      alert("Please enter your experience");
+      showAlert("Please enter your experience", "error");
       return;
     }
 
     if (!password || password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      showAlert("Passwords do not match", "error");
       return;
     }
 
@@ -291,6 +294,12 @@ export default function CaretakerSignUp() {
       >
         {isLoading ? "Signing Up..." : "Sign Up"}
       </button>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </form>
   );
 }

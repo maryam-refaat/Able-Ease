@@ -150,7 +150,14 @@ export default function Physiocenterpage() {
           <h1>
             Welcome, {data?.name || data?.managerName || "Center Manager"}
           </h1>
-          <p>Tue, 07 June 2022</p>
+          <p>
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
         </header>
         {appear !== 1 && (
           <CenterCard

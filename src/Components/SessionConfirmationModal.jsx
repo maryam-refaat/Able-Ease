@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "../Pages/Allemps.css"; // Reusing modal styles
 import { AddPatientToTherapy } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function SessionConfirmationModal({
   isOpen,
@@ -12,6 +14,7 @@ export default function SessionConfirmationModal({
   isBooking = false,
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   if (!isOpen) return null;
 
@@ -32,7 +35,10 @@ export default function SessionConfirmationModal({
       const patientSSN = localStorage.getItem("ssn");
 
       if (!patientSSN) {
-        alert("Patient information not found. Please log in again.");
+        showAlert(
+          "Patient information not found. Please log in again.",
+          "error"
+        );
         onCancel();
         return;
       }
@@ -54,11 +60,11 @@ export default function SessionConfirmationModal({
         const response = await AddPatientToTherapy(body);
         console.log("Therapy booking response:", response);
 
-        alert("Therapy session booked successfully!");
+        showAlert("Therapy session booked successfully!", "success");
         onConfirm();
       } catch (error) {
         console.error("Therapy booking error:", error);
-        alert("Failed to book therapy session. Please try again.");
+        showAlert("Failed to book therapy session. Please try again.", "error");
       } finally {
         setIsLoading(false);
       }
@@ -95,6 +101,12 @@ export default function SessionConfirmationModal({
           </button>
         </div>
       </div>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

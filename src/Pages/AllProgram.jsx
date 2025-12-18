@@ -4,6 +4,8 @@ import { getAuthState } from "../context/AuthState";
 import { getAll_Programs } from "../assets/apis";
 import ConfirmationModal from "../Components/ConfirmationModal";
 import FAApplicationModal from "../Components/FAApplicationModal";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 import "../Org.css";
 import "./Allprog.css";
 
@@ -93,6 +95,7 @@ export default function AllProgram() {
   const [showBookModal, setShowBookModal] = useState(false);
   const [showFAModal, setShowFAModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const navigate = useNavigate();
   const [{ isLoggedIn, userType }, setLocalAuth] = useState(getAuthState());
@@ -176,8 +179,9 @@ export default function AllProgram() {
 
   const handleFASubmit = (reason) => {
     console.log(`Applied for FA: ${selectedProgram?.name}, Reason: ${reason}`);
-    alert(
-      `Financial Aid application submitted for: ${selectedProgram?.name}\n\nYour reason: ${reason}`
+    showAlert(
+      `Financial Aid application submitted for: ${selectedProgram?.name}\n\nYour reason: ${reason}`,
+      "success"
     );
     setShowFAModal(false);
     setSelectedProgram(null);
@@ -279,6 +283,13 @@ export default function AllProgram() {
         onSubmit={handleFASubmit}
         onCancel={handleFACancel}
         program={selectedProgram}
+      />
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
       />
     </div>
   );

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./loginmodal.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function ContactModal({
   isOpen,
@@ -12,6 +14,7 @@ export default function ContactModal({
     body: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   if (!isOpen) return null;
 
@@ -19,7 +22,7 @@ export default function ContactModal({
     e.preventDefault();
 
     if (!formData.subject.trim() || !formData.body.trim()) {
-      alert("Please fill in both subject and body");
+      showAlert("Please fill in both subject and body", "warning");
       return;
     }
 
@@ -142,6 +145,12 @@ export default function ContactModal({
           </div>
         </form>
       </div>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

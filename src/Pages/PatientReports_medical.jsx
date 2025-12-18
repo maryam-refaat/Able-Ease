@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./PatientProf.css";
 import "../profilepagecomponents/profile.css";
 import PatientCard from "../Components/PatientCard";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 import {
   getPatient_Reports,
   getPatient_Medicalinfo,
@@ -20,6 +22,7 @@ import {
 export default function PatientReportsMedical() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   // Get patient data from navigation state or localStorage
   const getStoredPatientData = () => {
@@ -222,7 +225,7 @@ export default function PatientReportsMedical() {
       setAddDisabilityModal(true);
     } catch (err) {
       console.error("Failed to fetch disabilities:", err);
-      alert("Failed to load disabilities. Please try again.");
+      showAlert("Failed to load disabilities. Please try again.", "error");
     }
   };
 
@@ -253,10 +256,10 @@ export default function PatientReportsMedical() {
 
       setDisabilities(normalizedDisabilities);
       setAddDisabilityModal(false);
-      alert("Disability added successfully!");
+      showAlert("Disability added successfully!", "success");
     } catch (err) {
       console.error("Failed to add disability:", err);
-      alert("Failed to add disability. Please try again.");
+      showAlert("Failed to add disability. Please try again.", "error");
     } finally {
       setDisabilityFormLoading(false);
     }
@@ -662,6 +665,13 @@ export default function PatientReportsMedical() {
           </div>
         </div>
       )}
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "../Pages/Allemps.css";
 import { ApplyForFA, getProgramByPatient } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function FAApplicationModal({
   isOpen,
@@ -12,6 +14,7 @@ export default function FAApplicationModal({
   const [isLoading, setIsLoading] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   if (!isOpen && !showErrorModal) return null;
 
@@ -33,17 +36,17 @@ export default function FAApplicationModal({
     const programID = program?.id || program?.ID;
 
     if (!userSSN) {
-      alert("User information not found. Please log in again.");
+      showAlert("User information not found. Please log in again.", "error");
       return;
     }
 
     if (!organizationSSN) {
-      alert("Organization information not found.");
+      showAlert("Organization information not found.", "error");
       return;
     }
 
     if (!programID) {
-      alert("Program information not found.");
+      showAlert("Program information not found.", "error");
       return;
     }
 
@@ -89,12 +92,12 @@ export default function FAApplicationModal({
       };
 
       await ApplyForFA(data);
-      alert("Financial aid application submitted successfully!");
+      showAlert("Financial aid application submitted successfully!", "success");
       setReason("");
       onSubmit(reason); // Call parent callback
     } catch (error) {
       console.error("FA Application error:", error);
-      alert("Failed to submit application. Please try again.");
+      showAlert("Failed to submit application. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -268,6 +271,12 @@ export default function FAApplicationModal({
           </button>
         </div>
       </div>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

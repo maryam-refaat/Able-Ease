@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { getAuthState } from "../context/AuthState";
 import ConfirmationModal from "./ConfirmationModal";
 import FAApplicationModal from "./FAApplicationModal";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 import "../index.css";
 
 export default function Carousel() {
@@ -12,6 +14,7 @@ export default function Carousel() {
   const [showBookModal, setShowBookModal] = useState(false);
   const [showFAModal, setShowFAModal] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const fallback = [
     {
@@ -117,7 +120,7 @@ export default function Carousel() {
   }, []);
 
   const handleBook = (program) => {
-   if (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
+    if (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
       navigate("/Able-Ease#auth-form");
       setTimeout(() => {
         const authElement = document.getElementById("auth-form");
@@ -132,7 +135,7 @@ export default function Carousel() {
   };
 
   const handleApplyFA = (program) => {
-    if  (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
+    if (!isLoggedIn || (userType !== "patient" && userType !== "admin")) {
       navigate("/Able-Ease#auth-form");
       setTimeout(() => {
         const authElement = document.getElementById("auth-form");
@@ -165,8 +168,9 @@ export default function Carousel() {
       selectedProgram?.title ||
       "Program";
     console.log(`Applied for FA: ${programName}, Reason: ${reason}`);
-    alert(
-      `Financial Aid application submitted for: ${programName}\n\nYour reason: ${reason}`
+    showAlert(
+      `Financial Aid application submitted for: ${programName}\n\nYour reason: ${reason}`,
+      "success"
     );
     setShowFAModal(false);
     setSelectedProgram(null);
@@ -318,6 +322,13 @@ export default function Carousel() {
         onSubmit={handleFASubmit}
         onCancel={handleFACancel}
         program={selectedProgram}
+      />
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
       />
     </div>
   );

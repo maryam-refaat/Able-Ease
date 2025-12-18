@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import PositionModal from "./PositionModal";
 import "../profilepagecomponents/organization.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 const baseApiUrl = "https://localhost:7040/api"; // Example base URL
 
@@ -12,6 +14,7 @@ export default function AvailableLocationsBox() {
   const [selectedPositionForEdit, setSelectedPositionForEdit] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const trackRef = useRef(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   // --- API helpers (URLs to be provided by you) ---
   const getAuth = () => ({
@@ -143,7 +146,7 @@ export default function AvailableLocationsBox() {
         // After successful deletion, update the local state
         setPositions(positions.filter((p) => p.id !== position.id));
       } catch (err) {
-        alert("Failed to delete position. Please try again.");
+        showAlert("Failed to delete position. Please try again.", "error");
       } finally {
         setDeleteLoading(null);
       }
@@ -175,7 +178,7 @@ export default function AvailableLocationsBox() {
           )
         );
       } catch (err) {
-        alert("Failed to update position. Please try again.");
+        showAlert("Failed to update position. Please try again.", "error");
         return;
       }
     } else {
@@ -190,7 +193,7 @@ export default function AvailableLocationsBox() {
         };
         setPositions([...positions, newPosition]);
       } catch (err) {
-        alert("Failed to add position. Please try again.");
+        showAlert("Failed to add position. Please try again.", "error");
         return;
       }
     }
@@ -317,6 +320,14 @@ export default function AvailableLocationsBox() {
         onClose={() => setIsModalOpen(false)}
         handleSubmitPosition={handleSubmitPosition}
         position={selectedPositionForEdit}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
       />
     </section>
   );

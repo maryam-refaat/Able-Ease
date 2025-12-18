@@ -144,8 +144,15 @@ export default function Relative() {
 
       <div className="page-container">
         <header className="welcome-box">
-          <h1>Welcome, {data?.fullName || "Amanda"}</h1>
-          <p>Tue, 07 June 2022</p>
+          <h1>Welcome, {data?.fullName || data?.name || "Relative"}</h1>
+          <p>
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
         </header>
 
         {showMessages ? (

@@ -12,6 +12,8 @@ import {
   markMessageAsRead,
 } from "../assets/apis";
 import Sidebar from "../Components/Sidebar";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 const DEMO_CONVERSATIONS = [
   {
@@ -137,6 +139,7 @@ const DEMO_CONVERSATIONS = [
 
 export default function Messages({ showSidebar = true, showHeader = true }) {
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [conversations, setConversations] = useState([]);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -531,7 +534,7 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
 
   const handleSend = async () => {
     if (!compose.to || !compose.body) {
-      alert("Please select a recipient and write a message.");
+      showAlert("Please select a recipient and write a message.", "warning");
       return;
     }
 
@@ -580,10 +583,10 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
       setComposeOpen(false);
       setSelectedId(newConv.id);
 
-      alert("Message sent successfully!");
+      showAlert("Message sent successfully!", "success");
     } catch (err) {
       console.error("Failed to send message:", err);
-      alert("Failed to send message. Please try again.");
+      showAlert("Failed to send message. Please try again.", "error");
     }
   };
 
@@ -789,6 +792,13 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
           </div>
         </div>
       )}
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
 
       {showSidebar && <Footer />}
     </>

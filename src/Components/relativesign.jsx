@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import "./signup.css";
 import { useNavigate } from "react-router-dom";
 import { signupRelative } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function RelativeSignUp() {
   const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -79,39 +82,45 @@ export default function RelativeSignUp() {
 
     // Validation
     if (!data.name || data.name.trim().length < 3) {
-      alert("Please enter a valid full name (at least 3 characters)");
+      showAlert(
+        "Please enter a valid full name (at least 3 characters)",
+        "error"
+      );
       return;
     }
 
     if (!data.patientSSN || data.patientSSN.trim().length < 2) {
-      alert("Please enter your relationship to the patient");
+      showAlert("Please enter your relationship to the patient", "error");
       return;
     }
 
     if (!data.address || data.address.trim().length < 5) {
-      alert("Please enter a valid address");
+      showAlert("Please enter a valid address", "error");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!data.email || !emailRegex.test(data.email)) {
-      alert("Please enter a valid email address");
+      showAlert("Please enter a valid email address", "error");
       return;
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
     if (!data.contactInfo || !phoneRegex.test(data.contactInfo)) {
-      alert("Please enter a valid phone number (at least 10 digits)");
+      showAlert(
+        "Please enter a valid phone number (at least 10 digits)",
+        "error"
+      );
       return;
     }
 
     if (!data.password || data.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return;
     }
 
     if (data.password !== data.confirmPassword) {
-      alert("Passwords do not match");
+      showAlert("Passwords do not match", "error");
       return;
     }
 
@@ -240,6 +249,12 @@ export default function RelativeSignUp() {
       <button disabled={!agree} className="primary-btn" type="submit">
         {isLoading ? "Signing Up..." : "Sign Up"}
       </button>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </form>
   );
 }

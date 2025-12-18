@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./OrgAssessmentsSection.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function OrgAssessmentsSection() {
   const [programs, setPrograms] = useState([]);
@@ -17,6 +19,7 @@ export default function OrgAssessmentsSection() {
   });
 
   const organizationSSN = localStorage.getItem("ssn");
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   useEffect(() => {
     fetchPrograms();
@@ -232,7 +235,7 @@ export default function OrgAssessmentsSection() {
       setPrograms(programsWithPatients);
     } catch (error) {
       console.error("Error fetching programs:", error);
-      alert("Failed to fetch programs");
+      showAlert("Failed to fetch programs", "error");
     } finally {
       setIsLoading(false);
     }
@@ -276,12 +279,12 @@ export default function OrgAssessmentsSection() {
 
       if (!response.ok) throw new Error("Failed to update assessment");
 
-      alert("Assessment updated successfully!");
+      showAlert("Assessment updated successfully!", "success");
       setShowUpdateModal(false);
       fetchPrograms();
     } catch (error) {
       console.error("Error updating assessment:", error);
-      alert("Failed to update assessment");
+      showAlert("Failed to update assessment", "error");
     }
   };
 
@@ -303,11 +306,11 @@ export default function OrgAssessmentsSection() {
 
       if (!response.ok) throw new Error("Failed to delete assessment");
 
-      alert("Assessment deleted successfully!");
+      showAlert("Assessment deleted successfully!", "success");
       fetchPrograms();
     } catch (error) {
       console.error("Error deleting assessment:", error);
-      alert("Failed to delete assessment");
+      showAlert("Failed to delete assessment", "error");
     }
   };
 
@@ -477,6 +480,14 @@ export default function OrgAssessmentsSection() {
           </div>
         </div>
       )}
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </div>
   );
 }

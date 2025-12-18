@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import CareGiverModal from "./CareGiverModal";
 import AssignPatientModal from "./AssignPatientModal";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 import "../profilepagecomponents/organization.css";
 
 export default function CareGiverBox() {
@@ -66,6 +68,7 @@ export default function CareGiverBox() {
   const [selectedCareGiverForAssign, setSelectedCareGiverForAssign] =
     useState(null);
   const trackRef = useRef(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const baseApiUrl = "https://localhost:7040/api";
   const getAuth = () => ({
@@ -128,9 +131,9 @@ export default function CareGiverBox() {
             cg.id === careGiver.id ? { ...cg, availability: "Available" } : cg
           )
         );
-        alert("All patients unassigned successfully.");
+        showAlert("All patients unassigned successfully.", "success");
       } catch (err) {
-        alert(`Failed to unassign patients: ${err.message}`);
+        showAlert(`Failed to unassign patients: ${err.message}`, "error");
       } finally {
         setDeleteLoading(null);
       }
@@ -361,6 +364,14 @@ export default function CareGiverBox() {
         isOpen={isAssignOpen}
         onClose={() => setIsAssignOpen(false)}
         caregiver={selectedCareGiverForAssign}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
       />
     </section>
   );

@@ -70,6 +70,10 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "reports",
+    element: <WebsiteReports />,
+  },
+  {
     path: "/relative-profile",
     element: <RelativePage />,
   },
@@ -100,7 +104,8 @@ const router = createBrowserRouter([
   {
     path: "/reset-password",
     element: <ResetPassword />,
-  },{
+  },
+  {
     path: "/admin-profile",
     element: <AdminProfile />,
   },

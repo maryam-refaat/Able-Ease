@@ -7,8 +7,11 @@ import {
   getAllUsernames,
   markMessageAsRead,
 } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function MessagesContent() {
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [conversations, setConversations] = useState([]);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
@@ -160,7 +163,7 @@ export default function MessagesContent() {
 
   const handleSend = async () => {
     if (!compose.to || !compose.body) {
-      alert("Please select a recipient and write a message.");
+      showAlert("Please select a recipient and write a message.", "warning");
       return;
     }
 
@@ -207,10 +210,10 @@ export default function MessagesContent() {
       setConversations((prev) => [newConv, ...prev]);
       setComposeOpen(false);
       setCompose({ to: "", subject: "", body: "" });
-      alert("Message sent successfully!");
+      showAlert("Message sent successfully!", "success");
     } catch (err) {
       console.error("Failed to send message:", err);
-      alert("Failed to send message. Please try again.");
+      showAlert("Failed to send message. Please try again.", "error");
     }
   };
 
@@ -363,6 +366,13 @@ export default function MessagesContent() {
           </div>
         </div>
       )}
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </div>
   );
 }

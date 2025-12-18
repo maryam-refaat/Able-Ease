@@ -10,8 +10,11 @@ import {
   getPatientBySSN,
 } from "../assets/apis.js";
 import "../profilepagecomponents/organization.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function FinancialAid() {
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [faApplications, setFaApplications] = useState([]);
   const [programsData, setProgramsData] = useState({});
   const [patientsData, setPatientsData] = useState({});
@@ -199,10 +202,10 @@ export default function FinancialAid() {
         prev.filter((app) => (app.messageID || app.messageId) !== messageId)
       );
 
-      alert(`Financial aid accepted for ${programName}`);
+      showAlert(`Financial aid accepted for ${programName}`, "success");
     } catch (error) {
       console.error("Error accepting FA:", error);
-      alert("Failed to accept financial aid. Please try again.");
+      showAlert("Failed to accept financial aid. Please try again.", "error");
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -241,10 +244,10 @@ export default function FinancialAid() {
         prev.filter((app) => (app.messageID || app.messageId) !== messageId)
       );
 
-      alert(`Financial aid rejected for ${programName}`);
+      showAlert(`Financial aid rejected for ${programName}`, "success");
     } catch (error) {
       console.error("Error rejecting FA:", error);
-      alert("Failed to reject financial aid. Please try again.");
+      showAlert("Failed to reject financial aid. Please try again.", "error");
     } finally {
       setProcessingIds((prev) => {
         const newSet = new Set(prev);
@@ -478,6 +481,13 @@ export default function FinancialAid() {
           </button>
         </div>
       )}
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </section>
   );
 }

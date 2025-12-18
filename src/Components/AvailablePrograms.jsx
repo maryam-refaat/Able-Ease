@@ -7,6 +7,8 @@ import {
 import ProgramPatientsModal from "./ProgramPatientsModal";
 import ProgramModal from "./ProgramModal";
 import "../profilepagecomponents/organization.css";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function AvailablePrograms() {
   const [programs, setPrograms] = useState([]);
@@ -23,6 +25,7 @@ export default function AvailablePrograms() {
     message: "",
   });
   const progTrackRef = useRef(null);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const fmtDate = (d) => (d ? new Date(d).toLocaleDateString() : null);
 
@@ -93,7 +96,7 @@ export default function AvailablePrograms() {
       setPrograms(programs.filter((p) => p.id !== program.id));
     } catch (err) {
       console.error("Error deleting program:", err);
-      alert("Failed to delete program");
+      showAlert("Failed to delete program", "error");
     } finally {
       setDeleteLoading(null);
     }
@@ -354,6 +357,14 @@ export default function AvailablePrograms() {
           </div>
         </div>
       )}
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </section>
   );
 }

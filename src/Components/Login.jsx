@@ -9,6 +9,8 @@ import CaretakerSignUp from "./caretakersign";
 import { useNavigate } from "react-router-dom";
 import { loginAPI, forgotPassword } from "../assets/apis";
 import { setAuthState } from "../context/AuthState";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 const BASE_URL = "http://localhost:5174"; // example: https://myserver.com/api
 
 const AuthForm = () => {
@@ -19,6 +21,7 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const renderForm = () => {
     switch (type) {
@@ -54,12 +57,12 @@ const AuthForm = () => {
 
     // Validation
     if (!data.email || data.email.trim().length < 3) {
-      alert("Please enter a valid email");
+      showAlert("Please enter a valid email", "error");
       return;
     }
 
     if (!data.password || data.password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return;
     }
 
@@ -74,16 +77,33 @@ const AuthForm = () => {
       const response = await loginAPI(data);
       // Support payload shape variations: sometimes server returns { data: {...} }
       const payload = response?.data ?? response ?? {};
-      console.debug('Login response payload:', payload);
-      const token = payload.token ?? payload.Token ?? payload.accessToken ?? response.token ?? response.Token ?? null;
-      const ssn = payload.ssn ?? payload.SSN ?? payload.Ssn ?? response.ssn ?? null;
-      const roleRaw = ((payload.role ?? payload.Role ?? response.role ?? response.Role ?? "") + "").toLowerCase();
+      console.debug("Login response payload:", payload);
+      const token =
+        payload.token ??
+        payload.Token ??
+        payload.accessToken ??
+        response.token ??
+        response.Token ??
+        null;
+      const ssn =
+        payload.ssn ?? payload.SSN ?? payload.Ssn ?? response.ssn ?? null;
+      const roleRaw = (
+        (payload.role ?? payload.Role ?? response.role ?? response.Role ?? "") +
+        ""
+      ).toLowerCase();
 
       if (token) localStorage.setItem("authToken", token);
       if (ssn) localStorage.setItem("ssn", ssn);
 
       // also extract username / email if provided by backend
-      const username = payload.username ?? payload.Username ?? payload.userName ?? payload.UserName ?? payload.Email ?? payload.Email ?? null;
+      const username =
+        payload.username ??
+        payload.Username ??
+        payload.userName ??
+        payload.UserName ??
+        payload.Email ??
+        payload.Email ??
+        null;
       const email = payload.email ?? payload.Email ?? null;
       const name = payload.name ?? payload.Name ?? null;
 
@@ -102,24 +122,32 @@ const AuthForm = () => {
       // Persist unified auth state and notify listeners
       setAuthState({ isLoggedIn: true, userType, ssn, username, email, name });
       // ensure storage flags exist and notify listeners
-      localStorage.setItem('auth.isLoggedIn', 'true');
-      if (userType) localStorage.setItem('auth.userType', userType);
-      window.dispatchEvent(new CustomEvent('auth-changed'));
-      console.log('Login successful - userType:', userType, 'username:', username, 'email:', email);
+      localStorage.setItem("auth.isLoggedIn", "true");
+      if (userType) localStorage.setItem("auth.userType", userType);
+      window.dispatchEvent(new CustomEvent("auth-changed"));
+      console.log(
+        "Login successful - userType:",
+        userType,
+        "username:",
+        username,
+        "email:",
+        email
+      );
 
       let url = "/";
-      if (roleRaw === 'organization') url = "/organization-profile";
-      else if (roleRaw === 'relative') url = "/relative-profile";
-      else if (roleRaw === 'caregiver') url = "/caregiver-profile";
-      else if (roleRaw === 'center' || roleRaw === 'physiotherapycenter') url = "/center-profile";
-      else if (roleRaw === 'patient') url = "/patient-profile";
-      else if (roleRaw === 'admin') url = "/admin-profile";
+      if (roleRaw === "organization") url = "/organization-profile";
+      else if (roleRaw === "relative") url = "/relative-profile";
+      else if (roleRaw === "caregiver") url = "/caregiver-profile";
+      else if (roleRaw === "center" || roleRaw === "physiotherapycenter")
+        url = "/center-profile";
+      else if (roleRaw === "patient") url = "/patient-profile";
+      else if (roleRaw === "admin") url = "/admin-profile";
 
       navigate(url);
     } catch (error) {
       console.error("Error during login:", error);
       setIsError(true);
-      alert("Login failed. Please try again.");
+      showAlert("Login failed. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -129,19 +157,22 @@ const AuthForm = () => {
     e.preventDefault();
 
     if (!forgotEmail || !forgotEmail.includes("@")) {
-      alert("Please enter a valid email address");
+      showAlert("Please enter a valid email address", "error");
       return;
     }
 
     try {
       setIsLoading(true);
       await forgotPassword(forgotEmail);
-      alert("Password reset email sent! Please check your email inbox.");
+      showAlert(
+        "Password reset email sent! Please check your email inbox.",
+        "success"
+      );
       setForgotPasswordModal(false);
       setForgotEmail("");
     } catch (error) {
       console.error("Forgot password error:", error);
-      alert("Failed to send reset email. Please try again.");
+      showAlert("Failed to send reset email. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -261,6 +292,14 @@ const AuthForm = () => {
       {openModal && (
         <Modal onClose={() => setOpenModal(false)}>{renderForm()}</Modal>
       )}
+
+      {/* ALERT MODAL */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </div>
   );
 };

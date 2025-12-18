@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import "./signup.css";
 import { useNavigate } from "react-router-dom";
 import { signupOrganization } from "../assets/apis";
+import AlertModal from "./AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function OrganizationSignUp() {
   const [agree, setAgree] = useState(false);
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -34,34 +37,37 @@ export default function OrganizationSignUp() {
 
     // Validation
     if (!name || name.trim().length < 3) {
-      alert("Please enter a valid organization name (at least 3 characters)");
+      showAlert(
+        "Please enter a valid organization name (at least 3 characters)",
+        "error"
+      );
       return;
     }
 
     if (!address || address.trim().length < 5) {
-      alert("Please enter a valid address");
+      showAlert("Please enter a valid address", "error");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      alert("Please enter a valid email address");
+      showAlert("Please enter a valid email address", "error");
       return;
     }
 
     const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
     if (!contactInfo || !phoneRegex.test(contactInfo)) {
-      alert("Please enter a valid phone number");
+      showAlert("Please enter a valid phone number", "error");
       return;
     }
 
     if (!password || password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      showAlert("Password must be at least 6 characters long", "error");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      showAlert("Passwords do not match", "error");
       return;
     }
 
@@ -193,6 +199,12 @@ export default function OrganizationSignUp() {
       <button disabled={!agree} className="primary-btn" type="submit">
         {isLoading ? "Signing Up..." : "Sign Up"}
       </button>
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
+      />
     </form>
   );
 }

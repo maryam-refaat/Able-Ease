@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword } from "../assets/apis";
 import "./Landpage.css";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
@@ -48,10 +51,11 @@ export default function ResetPassword() {
     try {
       setIsLoading(true);
       await resetPassword(email, token, newPassword);
-      alert(
-        "Password reset successful! You can now login with your new password."
+      showAlert(
+        "Password reset successful! You can now login with your new password.",
+        "success"
       );
-      navigate("/");
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
       console.error("Reset password error:", err);
       setError(
@@ -277,6 +281,13 @@ export default function ResetPassword() {
           </button>
         </form>
       </div>
+
+      <AlertModal
+        isOpen={alertState.isOpen}
+        message={alertState.message}
+        type={alertState.type}
+        onClose={closeAlert}
+      />
     </div>
   );
 }

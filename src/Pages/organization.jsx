@@ -11,6 +11,8 @@ import { setAuthState } from "../context/AuthState";
 import { useEffect, useState } from "react";
 import OrgAssesments from "../Pages/OrgAssesments";
 import EditOrganizationModal from "../Components/EditOrganizationModal";
+import AlertModal from "../Components/AlertModal";
+import { useAlert } from "../hooks/useAlert";
 
 export default function Organizationpage() {
   const location = useLocation();
@@ -25,6 +27,7 @@ export default function Organizationpage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [patientWorkers, setPatientWorkers] = useState([]);
   const [loadingWorkers, setLoadingWorkers] = useState(false);
+  const { alertState, showAlert, closeAlert } = useAlert();
 
   const handleLogout = async () => {
     try {
@@ -173,14 +176,14 @@ export default function Organizationpage() {
       );
 
       if (response.ok) {
-        alert("Patient removed from employment successfully");
+        showAlert("Patient removed from employment successfully", "success");
         fetchPatientWorkers(); // Refresh the list
       } else {
-        alert("Failed to remove patient from employment");
+        showAlert("Failed to remove patient from employment", "error");
       }
     } catch (err) {
       console.error("Error removing patient:", err);
-      alert("An error occurred while removing the patient");
+      showAlert("An error occurred while removing the patient", "error");
     }
   };
 
@@ -253,7 +256,14 @@ export default function Organizationpage() {
       <div className="page-container">
         <header className="welcome-box">
           <h1>Welcome, {data?.name || data?.managerName || "Amanda"}</h1>
-          <p>Tue, 07 June 2022</p>
+          <p>
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
         </header>
         {appear !== 3 && (
           <RelativeCard title="Organization" data={data} onEdit={openEdit} />
@@ -403,6 +413,14 @@ export default function Organizationpage() {
         onClose={() => setEditModalOpen(false)}
         organizationData={data}
         onSave={handleEditSave}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        message={alertState.message}
+        type={alertState.type}
       />
     </div>
   );
