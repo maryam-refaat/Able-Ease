@@ -36,7 +36,7 @@ export default function PatientsBox({
   const fetchPatientData = async (patientSSN) => {
     try {
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/Patients/GetProgramByPatientSSN/${patientSSN}`,
+        `https://ableeaseapi.runasp.net/api/Patients/GetProgramByPatientSSN/${patientSSN}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -166,7 +166,7 @@ export default function PatientsBox({
       console.log("Sending report payload:", payload);
 
       const response = await fetch(
-        "https://ableeaseapi.runasp.net/Report/AddReport",
+        "https://ableeaseapi.runasp.net/api/Report/AddReport",
         {
           method: "POST",
           headers: {
@@ -200,7 +200,7 @@ export default function PatientsBox({
 
     try {
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/Report/DeleteReport/${reportId}`,
+        `https://ableeaseapi.runasp.net/api/Report/DeleteReport/${reportId}`,
         {
           method: "DELETE",
           headers: {

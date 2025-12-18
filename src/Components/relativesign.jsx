@@ -17,7 +17,7 @@ export default function RelativeSignUp() {
   const [loadingPatients, setLoadingPatients] = useState(false);
   const formRef = React.useRef(null);
 
-  const baseApiUrl = "https://ableeaseapi.runasp.net";
+  const baseApiUrl = "https://ableeaseapi.runasp.net/api";
 
   // Fetch patients with usernames
   useEffect(() => {

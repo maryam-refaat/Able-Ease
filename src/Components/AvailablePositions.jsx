@@ -4,7 +4,7 @@ import "../profilepagecomponents/organization.css";
 import AlertModal from "./AlertModal";
 import { useAlert } from "../hooks/useAlert";
 
-const baseApiUrl = "https://ableeaseapi.runasp.net"; // Example base URL
+const baseApiUrl = "https://ableeaseapi.runasp.net/api"; // Example base URL
 
 export default function AvailableLocationsBox() {
   const [positions, setPositions] = useState([]);

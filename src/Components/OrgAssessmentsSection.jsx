@@ -29,7 +29,7 @@ export default function OrgAssessmentsSection() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/Program/OrganizationPrograms/${organizationSSN}`,
+        `https://ableeaseapi.runasp.net/api/Program/OrganizationPrograms/${organizationSSN}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -50,7 +50,7 @@ export default function OrgAssessmentsSection() {
             let programAssessment = null;
             try {
               const assessmentProgramResponse = await fetch(
-                `https://ableeaseapi.runasp.net/Assessment/GetAssessmentsByProgram/${organizationSSN}/${program.id}`,
+                `https://ableeaseapi.runasp.net/api/Assessment/GetAssessmentsByProgram/${organizationSSN}/${program.id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem(
@@ -74,7 +74,7 @@ export default function OrgAssessmentsSection() {
             }
 
             const patientsResponse = await fetch(
-              `https://ableeaseapi.runasp.net/Program/GetProgramPatients/${organizationSSN}/${program.id}`,
+              `https://ableeaseapi.runasp.net/api/Program/GetProgramPatients/${organizationSSN}/${program.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -94,7 +94,7 @@ export default function OrgAssessmentsSection() {
                   try {
                     // First, try to get the assessment patient data using the specific endpoint
                     const assessmentResponse = await fetch(
-                      `https://ableeaseapi.runasp.net/Assessment/GetAssessmentPatientById/${
+                      `https://ableeaseapi.runasp.net/api/Assessment/GetAssessmentPatientById/${
                         patient.id
                       }/${organizationSSN}/${program.id}/${
                         programAssessment?.id || 0
@@ -153,7 +153,7 @@ export default function OrgAssessmentsSection() {
                       };
 
                       const addResponse = await fetch(
-                        "https://ableeaseapi.runasp.net/Assessment/AddAssessmentPatient",
+                        "https://ableeaseapi.runasp.net/api/Assessment/AddAssessmentPatient",
                         {
                           method: "POST",
                           headers: {
@@ -266,7 +266,7 @@ export default function OrgAssessmentsSection() {
       };
 
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/Assessment/UpdateAssessmentPatient/${updateForm.patientSSN}/${updateForm.assessmentProgramOrganizationSSN}/${updateForm.assessmentProgramId}/${updateForm.assessmentId}`,
+        `https://ableeaseapi.runasp.net/api/Assessment/UpdateAssessmentPatient/${updateForm.patientSSN}/${updateForm.assessmentProgramOrganizationSSN}/${updateForm.assessmentProgramId}/${updateForm.assessmentId}`,
         {
           method: "PUT",
           headers: {
@@ -295,7 +295,7 @@ export default function OrgAssessmentsSection() {
 
     try {
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/Assessment/DeleteAssessment/${organizationSSN}/${programId}/${assessmentId}`,
+        `https://ableeaseapi.runasp.net/api/Assessment/DeleteAssessment/${organizationSSN}/${programId}/${assessmentId}`,
         {
           method: "DELETE",
           headers: {

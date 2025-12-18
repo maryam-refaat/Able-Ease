@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_KEY = "";
-const BASE_URL = "https://ableeaseapi.runasp.net"; 
+const BASE_URL = "https://ableeaseapi.runasp.net/api"; 
 
 
 export const fetchAvailabletherapiesJoined = async (id) => {
@@ -652,7 +652,7 @@ export const fetchAvailablePrograms = async (ssn) => {
 
 export const addProgram = async (organizationSsn, formData) => {
   const res = await fetch(
-    `https://ableeaseapi.runasp.net/Program/AddProgram/${organizationSsn}`,
+    `https://ableeaseapi.runasp.net/api/Program/AddProgram/${organizationSsn}`,
     {
       method: "POST",
       Authorization: `Bearer ${localStorage.getItem("authToken")}`,

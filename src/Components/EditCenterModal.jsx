@@ -56,7 +56,7 @@ export default function EditCenterModal({
       }
 
       const response = await fetch(
-        `https://ableeaseapi.runasp.net/center/updatecenter/${ssn}`,
+        `https://ableeaseapi.runasp.net/api/center/updatecenter/${ssn}`,
         {
           method: "PUT",
           headers: {

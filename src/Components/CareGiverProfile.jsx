@@ -26,7 +26,7 @@ export default function CaregiverProfile() {
         }
 
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
+          `https://ableeaseapi.runasp.net/api/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -65,7 +65,7 @@ export default function CaregiverProfile() {
       const caregiverSSN = localStorage.getItem("ssn");
       if (caregiverSSN) {
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
+          `https://ableeaseapi.runasp.net/api/caregiver/getcaregiver/${caregiverSSN}?includeDetails=true`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,

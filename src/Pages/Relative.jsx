@@ -26,7 +26,7 @@ export default function Relative() {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://ableeaseapi.runasp.net/Account/logout", {
+      await fetch("https://ableeaseapi.runasp.net/api/Account/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

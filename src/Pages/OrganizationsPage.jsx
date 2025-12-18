@@ -293,7 +293,7 @@ export default function OrganizationsPage() {
         selectedCaregiver?.ssn;
 
       const response = await fetch(
-        "https://ableeaseapi.runasp.net/Message/send/contact",
+        "https://ableeaseapi.runasp.net/api/Message/send/contact",
         {
           method: "POST",
           headers: {

@@ -21,7 +21,7 @@ export default function Physiocenterpage() {
 
   const handleLogout = async () => {
     try {
-      await fetch("https://ableeaseapi.runasp.net/Account/logout", {
+      await fetch("https://ableeaseapi.runasp.net/api/Account/logout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export default function Physiocenterpage() {
         const orgSSN = localStorage.getItem("ssn");
 
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/center/getcenter/${orgSSN}`,
+          `https://ableeaseapi.runasp.net/api/center/getcenter/${orgSSN}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -88,7 +88,7 @@ export default function Physiocenterpage() {
       const orgSSN = localStorage.getItem("ssn");
       if (orgSSN) {
         const response = await fetch(
-          `https://ableeaseapi.runasp.net/center/getcenter/${orgSSN}`,
+          `https://ableeaseapi.runasp.net/api/center/getcenter/${orgSSN}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
