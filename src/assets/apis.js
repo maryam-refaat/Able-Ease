@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const API_KEY = "";
-const BASE_URL = "https://ableeaseapi.runasp.net"; // example: https://myserver.com/api
+const BASE_URL = "https://ableeaseapi.runasp.net"; 
 
-// Fetch a single patient by SSN
+
 export const fetchAvailabletherapiesJoined = async (id) => {
   const response = await fetch(`${BASE_URL}/Therapy/center/${id}/joined`, {
     method: "GET",

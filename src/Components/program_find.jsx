@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getPrograms } from "../assets/apis";
-import "./program_find.css";
+import "./Program_find.css";
 import programimg from "../assets/unsplash_VOUicg8Ejus.png";
 import { useNavigate } from "react-router-dom";
 export default function Programfind() {
