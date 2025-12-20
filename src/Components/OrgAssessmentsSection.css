@@ -7,6 +7,50 @@
     box-shadow: 0 8px 32px rgba(25, 135, 81, 0.12);
 }
 
+@media (max-width: 1024px) {
+    .org-assessments-section {
+        padding: 28px;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .org-assessments-section {
+        padding: 20px;
+        margin: 30px auto;
+    }
+
+    .assessment-patients-list {
+        grid-template-columns: 1fr !important;
+    }
+
+    .assessment-program-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .org-assessments-section {
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .assessment-program-title {
+        font-size: 1.4rem !important;
+    }
+
+    .assessment-program-buttons {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-add {
+        width: 100%;
+    }
+}
+
 .assessment-program-block {
     margin-bottom: 40px;
     padding: 24px;

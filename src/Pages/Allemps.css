@@ -6,6 +6,35 @@
   padding-top: 100px;
 }
 
+@media (max-width: 1024px) {
+  .all-employments-page {
+    padding: 35px 30px;
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-employments-page {
+    padding: 30px 20px;
+    padding-top: 80px;
+  }
+
+  .all-employments-title {
+    font-size: 2rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .all-employments-page {
+    padding: 20px 10px;
+    padding-top: 70px;
+  }
+
+  .all-employments-title {
+    font-size: 1.5rem !important;
+  }
+}
+
 .all-employments-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -43,6 +72,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -74,11 +104,44 @@
   animation: slideUp 0.3s ease-out;
 }
 
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 30px;
+    width: 95%;
+  }
+
+  .modal-title,
+  .modal-content h3 {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 20px;
+    width: 98%;
+  }
+
+  .modal-title,
+  .modal-content h3 {
+    font-size: 1.3rem !important;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-btn {
+    width: 100%;
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -232,7 +295,7 @@
   .all-employments-grid .position-card {
     flex-direction: column;
   }
-  
+
   .all-employments-grid .position-left {
     width: 100%;
   }

@@ -23,11 +23,37 @@
   animation: modalSlideIn 0.3s ease-out;
 }
 
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-width: 100%;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98%;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+}
+
 @keyframes modalSlideIn {
   from {
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -38,6 +64,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -79,6 +106,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -6,6 +6,44 @@
   padding-top: 100px;
 }
 
+@media (max-width: 1024px) {
+  .all-therapies-page {
+    padding: 35px 30px;
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-therapies-page {
+    padding: 30px 20px;
+    padding-top: 80px;
+  }
+
+  .all-therapies-title {
+    font-size: 2rem !important;
+  }
+
+  .all-therapies-grid .programs-card {
+    flex-direction: column !important;
+  }
+
+  .all-therapies-grid .program-img-wrapper {
+    width: 100% !important;
+    height: 200px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .all-therapies-page {
+    padding: 20px 10px;
+    padding-top: 70px;
+  }
+
+  .all-therapies-title {
+    font-size: 1.5rem !important;
+  }
+}
+
 .all-therapies-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -43,6 +81,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -55,17 +94,17 @@
     flex-direction: column;
     max-height: none;
   }
-  
+
   .all-therapies-grid .program-img-wrapper {
     width: 100%;
     height: 220px;
   }
-  
+
   .all-therapies-grid .program-buttons {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .all-therapies-grid .program-book-btn {
     width: 100%;
   }

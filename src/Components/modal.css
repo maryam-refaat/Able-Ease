@@ -22,6 +22,21 @@
   animation: fadeIn 0.3s ease;
 }
 
+@media (max-width: 768px) {
+  .modal-box {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-box {
+    width: 95%;
+    padding: 15px;
+  }
+}
+
 .close-btn {
   position: absolute;
   top: 10px;
@@ -52,6 +67,28 @@
   width: 90%;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 20px;
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+    max-width: 98%;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .modal-message {
+    font-size: 14px;
+  }
 }
 
 .modal-title {
@@ -135,6 +172,20 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
   position: relative;
+}
+
+@media (max-width: 768px) {
+  .modal-content-large {
+    width: 95%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content-large {
+    width: 98%;
+    padding: 15px;
+  }
 }
 
 @keyframes slideUp {

@@ -11,6 +11,38 @@
   min-height: 600px;
 }
 
+@media (max-width: 1024px) {
+  .messages-layout {
+    grid-template-columns: 320px 1fr;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .messages-layout {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .inbox-list-full {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messages-page {
+    padding: 10px;
+  }
+
+  .inbox-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .inbox-search {
+    width: 100%;
+  }
+}
+
 /* FULL-WIDTH inbox list */
 .inbox-list-full {
   background: #fff;

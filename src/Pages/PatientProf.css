@@ -4,8 +4,29 @@
   padding: 30px 40px;
   min-height: 100vh;
   background: #f5f6fa;
-  font-family:  Arial, sans-serif;
+  font-family: Arial, sans-serif;
   margin-top: 120px;
+}
+
+@media (max-width: 1024px) {
+  .page-container {
+    padding: 25px 30px;
+    margin-top: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 20px 15px;
+    margin-top: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 15px 10px;
+    margin-top: 80px;
+  }
 }
 
 /* Top welcome text centered */
@@ -15,7 +36,8 @@
 }
 
 .welcome-box.centered h1 {
-  color: #344d87; /* green in screenshot */
+  color: #344d87;
+  /* green in screenshot */
   font-size: 26px;
   font-weight: 600;
   margin: 0;
@@ -95,6 +117,37 @@
   grid-template-columns: 1fr 1fr;
   gap: 22px;
   margin-top: 28px;
+}
+
+@media (max-width: 768px) {
+  .patient-card__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .patient-card__content {
+    padding: 20px 24px;
+  }
+
+  .patient-card__top {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-card__content {
+    padding: 16px 18px;
+  }
+
+  .patient-card__grid {
+    gap: 12px;
+  }
+
+  .welcome-box.centered h1 {
+    font-size: 22px;
+  }
 }
 
 .patient-card__field {
@@ -451,9 +504,11 @@
   .patient-card__grid {
     grid-template-columns: 1fr;
   }
+
   .patient-card__content {
     padding: 18px;
   }
+
   .profile-cards-grid {
     grid-template-columns: 1fr;
   }

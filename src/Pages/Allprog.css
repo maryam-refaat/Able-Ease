@@ -6,6 +6,45 @@
   padding-top: 100px;
 }
 
+@media (max-width: 1024px) {
+  .all-programs-page {
+    padding: 35px 40px;
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .all-programs-page {
+    padding: 30px 20px;
+    padding-top: 80px;
+  }
+
+  .all-programs-title {
+    font-size: 2rem !important;
+    margin-bottom: 30px !important;
+  }
+
+  .all-programs-grid {
+    gap: 24px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .all-programs-page {
+    padding: 20px 10px;
+    padding-top: 70px;
+  }
+
+  .all-programs-title {
+    font-size: 1.5rem !important;
+    margin-bottom: 20px !important;
+  }
+
+  .all-programs-grid {
+    gap: 16px !important;
+  }
+}
+
 .all-programs-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -43,6 +82,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -78,22 +118,22 @@
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 32px;
   }
-  
+
   .program-card {
     flex-direction: column;
     max-height: none;
   }
-  
+
   .program-img-wrapper {
     width: 100%;
     height: 220px;
   }
-  
+
   .program-buttons {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .program-book-btn,
   .program-fa-btn {
     width: 100%;
