@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import PatientsBox from "../Components/PatientsBoxCaregiver";
 import Sidebar from "../Components/Sidebar";
 import EditCaregiverModal from "../Components/EditCaregiverModal";
-
+import { Outlet } from "react-router-dom";
 export default function CaregiverProfile() {
   const location = useLocation();
   const caregiverData = location.state?.caregiverData;
@@ -96,6 +96,7 @@ export default function CaregiverProfile() {
 
   return (
     <div className="with-sidebar">
+      <Outlet />
       <Sidebar userType="caretaker" />
 
       <div className="page-container">

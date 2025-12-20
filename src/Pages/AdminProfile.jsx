@@ -14,6 +14,7 @@ import {
 import AlertModal from "../Components/AlertModal";
 import { useAlert } from "../hooks/useAlert";
 import "./AdminProfile.css";
+import { Outlet } from "react-router-dom";
 
 const AdminProfile = () => {
   const navigate = useNavigate();
@@ -396,6 +397,7 @@ const AdminProfile = () => {
 
   return (
     <div className="admin-page">
+      <Outlet/>
       <div className="page-container">
         <header
           className="welcome-box centered"

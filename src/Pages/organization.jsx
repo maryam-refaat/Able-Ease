@@ -14,6 +14,7 @@ import EditOrganizationModal from "../Components/EditOrganizationModal";
 import AlertModal from "../Components/AlertModal";
 import { useAlert } from "../hooks/useAlert";
 import { formatDate } from "../utils/dateFormatter";
+import { Outlet } from "react-router-dom";
 
 export default function Organizationpage() {
   const location = useLocation();
@@ -209,6 +210,7 @@ export default function Organizationpage() {
 
   return (
     <div className="with-sidebar">
+      <Outlet />
       <div className="side-rect">
         <div className="side-icons">
           <button

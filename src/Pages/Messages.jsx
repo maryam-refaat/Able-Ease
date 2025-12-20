@@ -14,7 +14,7 @@ import {
 import Sidebar from "../Components/Sidebar";
 import AlertModal from "../Components/AlertModal";
 import { useAlert } from "../hooks/useAlert";
-
+import { Outlet } from "react-router-dom";
 const DEMO_CONVERSATIONS = [
   {
     id: "c1",
@@ -702,6 +702,7 @@ export default function Messages({ showSidebar = true, showHeader = true }) {
 
   return (
     <>
+    <Outlet />
       {showSidebar ? (
         <div className="with-sidebar">
           <Sidebar userType={userData.userType} />

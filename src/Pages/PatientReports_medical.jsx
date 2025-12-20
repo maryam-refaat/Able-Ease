@@ -19,7 +19,7 @@ import {
   getPatientDisability,
 } from "../assets/apis";
 import { formatDate } from "../utils/dateFormatter";
-
+import { Outlet } from "react-router-dom";
 export default function PatientReportsMedical() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -274,6 +274,7 @@ export default function PatientReportsMedical() {
 
   return (
     <div className="with-sidebar">
+      <Outlet />
       <Sidebar userType="patient" />
 
       <div className="page-container">

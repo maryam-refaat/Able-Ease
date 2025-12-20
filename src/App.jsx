@@ -1,4 +1,4 @@
-import { createHashRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 
 import Landpage from "./Pages/Landpage";
@@ -22,7 +22,7 @@ import Physiocenterpage from "./Components/PhysioTherapyProfile";
 import WebsiteReports from "./Pages/WebsiteRepotrs";
 import AdminProfile from "./Pages/AdminProfile";
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,

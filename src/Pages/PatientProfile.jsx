@@ -21,7 +21,7 @@ import {
 } from "../assets/apis";
 import Footer from "../Components/Footer";
 import { formatDate } from "../utils/dateFormatter";
-
+import { Outlet } from "react-router-dom";
 export default function PatientProfile() {
   const location = useLocation();
   const patientData = location.state?.patientData;
@@ -372,6 +372,7 @@ export default function PatientProfile() {
 
   return (
     <>
+    <Outlet />
       <div className="with-sidebar">
         <Sidebar userType="patient" />{" "}
         <div className="page-container">

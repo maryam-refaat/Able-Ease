@@ -4,6 +4,7 @@ import { resetPassword } from "../assets/apis";
 import "./Landpage.css";
 import AlertModal from "../Components/AlertModal";
 import { useAlert } from "../hooks/useAlert";
+import { Outlet } from "react-router-dom";
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -68,7 +69,10 @@ export default function ResetPassword() {
 
   if (error && (!token || !email)) {
     return (
+      <>
+       <Outlet/>
       <div
+       
         style={{
           display: "flex",
           flexDirection: "column",
@@ -109,11 +113,12 @@ export default function ResetPassword() {
             Go to Login
           </button>
         </div>
-      </div>
+      </div></>
     );
   }
 
   return (
+    <><Outlet />
     <div
       style={{
         display: "flex",
@@ -288,6 +293,6 @@ export default function ResetPassword() {
         type={alertState.type}
         onClose={closeAlert}
       />
-    </div>
+    </div></>
   );
 }

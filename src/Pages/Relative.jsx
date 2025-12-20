@@ -8,7 +8,7 @@ import Messages from "./Messages";
 import { setAuthState } from "../context/AuthState";
 import { getRelativeBySSN } from "../assets/apis";
 import EditRelativeModal from "../Components/EditRelativeModal";
-
+import { Outlet } from "react-router-dom";
 export default function Relative() {
   const location = useLocation();
   const relativeData = location.state?.relativeData;
@@ -112,6 +112,7 @@ export default function Relative() {
 
   return (
     <div className="with-sidebar">
+      <Outlet />
       <div className="side-rect">
         <div className="side-icons">
           <button

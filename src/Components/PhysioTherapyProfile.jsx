@@ -7,7 +7,7 @@ import { setAuthState } from "../context/AuthState";
 import AvailabletherapiessJoined from "../Components/AvailabletherapiessJoined.jsx";
 import Messages from "../Pages/Messages";
 import EditCenterModal from "../Components/EditCenterModal";
-
+import { Outlet } from "react-router-dom";
 export default function Physiocenterpage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -113,6 +113,7 @@ export default function Physiocenterpage() {
 
   return (
     <div className="with-sidebar">
+      <Outlet />
       <div className="side-rect">
         <div className="side-icons">
           <button

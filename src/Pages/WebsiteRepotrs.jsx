@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -3018,6 +3019,8 @@ const ReportsDashboard = () => {
   };
 
   return (
+    <>
+    <Outlet/>
     <div
       style={{
         minHeight: "100vh",
@@ -3332,6 +3335,7 @@ const ReportsDashboard = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
